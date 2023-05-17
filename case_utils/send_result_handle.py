@@ -4,11 +4,12 @@
 # @File    : send_result_handle.py
 # @Software: PyCharm
 # @Desc:
+from loguru import logger
 from common_utils.yagmail_handle import YagEmailServe
-from config.settings import email
 from config.global_vars import NotificationType
-from config.settings import SEND_RESULT_TYPE
+from config.settings import SEND_RESULT_TYPE, email, ding_talk
 from common_utils.bs4_handle import SoupAPI
+from common_utils.dingding_handle import DingTalkBot
 
 
 def get_test_info_from_html_report(html_report_path):
@@ -77,53 +78,79 @@ def get_test_info_from_html_report(html_report_path):
     return results
 
 
+def send_email(user, pwd, host, subject, contents, to, attachments):
+    """
+    发送邮件
+    """
+    try:
+        yag = YagEmailServe(user=user, password=pwd, host=host)
+        info = {
+            "subject": subject,
+            "contents": contents,
+            "to": to,
+            "attachments": attachments
+
+        }
+        yag.send_email(info)
+    except Exception as e:
+        logger.error(f"发送邮件通知异常， 错误信息：{e}")
+
+
+def send_dingding(webhook_url, secret, title, text):
+    """
+    发送钉钉消息
+    """
+    try:
+        dingding = DingTalkBot(webhook_url=webhook_url, secret=secret)
+        res = dingding.send_markdown(title=title, text=text, is_at_all=True)
+        if res:
+            logger.info(f"发送钉钉通知成功~")
+        else:
+            logger.error(f"发送钉钉通知失败~")
+    except Exception as e:
+        logger.error(f"发送钉钉通知异常， 错误信息：{e}")
+
+
 def send_result(results, attachment_path=None):
     """
     根据用户配置，采取指定方式，发送测试结果
     """
+    # 通知内容
+    subject = f"{results.get('project_name', None)} 接口自动化报告_{results.get('start_time', None)}"
+    content = f"""
+            各位同事, 大家好:
+
+            &nbsp;&nbsp;自动化用例于{results.get('start_time', None)}开始运行，运行时长：{results.get('runs_time', None)}， 目前已执行完成。
+            -----------------------------------------------------------------------------------------------------------
+            &nbsp;&nbsp;测试人：{results.get('tester', None)} / {results.get('dept', None)}
+            &nbsp;&nbsp;测试平台：{results.get('platform', None)} / {results.get('python_version', None)}
+            &nbsp;&nbsp;测试环境：{results.get('project_env', None)}
+            ---------------------------------------------------------------------------------------------------------------
+            &nbsp;&nbsp;&nbsp;&nbsp;执行结果如下:
+            &nbsp;&nbsp;&nbsp;&nbsp;用例运行总数: {results.get("total_cases", None)} 个
+            &nbsp;&nbsp;&nbsp;&nbsp;通过用例个数（passed）: {results.get("passed", None)} 个
+            &nbsp;&nbsp;&nbsp;&nbsp;失败用例个数（failed）: {results.get("failed", None)} 个
+            &nbsp;&nbsp;&nbsp;&nbsp;异常用例个数（error）: {results.get("error", None)} 个
+            &nbsp;&nbsp;&nbsp;&nbsp;跳过用例个数（skipped）: {results.get("skipped", None)} 个
+            &nbsp;&nbsp;&nbsp;&nbsp;预期失败用例个数（xfailed）: {results.get("xfailed", None)} 个
+            &nbsp;&nbsp;&nbsp;&nbsp;意外通过用例个数（xpassed）: {results.get("xpassed", None)} 个
+            &nbsp;&nbsp;&nbsp;&nbsp;失败重试用例个数 * 次数之和（rerun）: {results.get("rerun", None)} 个
+            &nbsp;&nbsp;&nbsp;&nbsp;成  功   率: {(results.get("passed") / results.get("total_cases")) * 100} %
+
+            **********************************
+            附件为具体的测试报告，详细情况可下载附件进程查看， 非相关负责人员可忽略此消息。谢谢。
+        """
 
     # 默认不发送任何通知
     if SEND_RESULT_TYPE == NotificationType.DEFAULT.value:
         pass
     # 发送邮件通知
     elif SEND_RESULT_TYPE == NotificationType.EMAIL.value:
-        email_settings = email
-        yag = YagEmailServe(user=email_settings.get("user"), password=email_settings.get("password"),
-                            host=email_settings.get("host"))
-        info = {
-            "subject": f"{results.get('project_name', None)} 接口自动化报告_{results.get('start_time', None)}",
-            "contents": f"""
-        各位同事, 大家好:
-
-        &nbsp;&nbsp;&nbsp;&nbsp;自动化用例于{results.get('start_time', None)}开始运行，运行时长：{results.get('runs_time', None)}， 目前已执行完成。
-        -----------------------------------------------------------------------------------------------------------
-        &nbsp;&nbsp;&nbsp;&nbsp;测试人：{results.get('tester', None)} / {results.get('dept', None)}
-        &nbsp;&nbsp;&nbsp;&nbsp;测试平台：{results.get('platform', None)} / {results.get('python_version', None)}
-        &nbsp;&nbsp;&nbsp;&nbsp;测试环境：{results.get('project_env', None)}
-        ---------------------------------------------------------------------------------------------------------------
-        &nbsp;&nbsp;&nbsp;&nbsp;执行结果如下:
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;用例运行总数: {results.get("total_cases", None)} 个
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;通过用例个数（passed）: {results.get("passed", None)} 个
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;失败用例个数（failed）: {results.get("failed", None)} 个
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;异常用例个数（error）: {results.get("error", None)} 个
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;跳过用例个数（skipped）: {results.get("skipped", None)} 个
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;预期失败用例个数（xfailed）: {results.get("xfailed", None)} 个
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;意外通过用例个数（xpassed）: {results.get("xpassed", None)} 个
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;失败重试用例个数 * 次数之和（rerun）: {results.get("rerun", None)} 个
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;成  功   率: {(results.get("passed") / results.get("total_cases")) * 100} %
-
-        **********************************
-        jenkins地址：https://xxxxxxxxx
-        详细情况可登录jenkins平台查看，非相关负责人员可忽略此消息。谢谢。
-        """,
-            "to": email.get("to"),
-            "attachments": attachment_path
-
-        }
-        yag.send_email(info)
+        send_email(user=email.get("user"), pwd=email.get("password"), host=email.get("host"), subject=subject,
+                   contents=content, to=email.get("to"), attachments=attachment_path)
     # 发送钉钉通知
     elif SEND_RESULT_TYPE == NotificationType.DING_TALK.value:
-        pass
+        send_dingding(webhook_url=ding_talk["webhook_url"], secret=ding_talk["secret"], title=subject, text=content)
     # 发送企业微信通知
     elif SEND_RESULT_TYPE == NotificationType.WECHAT.value:
         pass

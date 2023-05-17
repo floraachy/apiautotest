@@ -71,7 +71,6 @@ def pytest_runtest_makereport(item, call):
     # 获取调用结果的测试报告，返回一个report对象
     # report对象的属性包括when（steup, call, teardown三个值）、nodeid(测试用例的名字)、outcome(用例的执行结果，passed,failed)
     report = outcome.get_result()
-    # TODO：由于目前无法动态将用例数据中的title写入测试方法中的文档注释，因此该处理方法暂时搁置
     # 将测试方法的文档注释作为结果表的Description的值，如果文档注释为空，则测试方法名作为结果表的Description的值
     report.description = str(item.function.__doc__)
     report.nodeid = report.nodeid.encode("utf-8").decode("unicode_escape")
@@ -102,7 +101,8 @@ def pytest_sessionfinish(session, exitstatus):
     在测试运行后，修改Environment部分信息
     """
     # 给环境表 添加 项目环境
-    session.config._metadata['项目环境'] = GLOBAL_VARS.get("host", "")
+    env = session.config.getoption("--env") # 可以获取到命令行参数指定的环境
+    session.config._metadata['项目环境'] = {GLOBAL_VARS.get("host", env)}
 
 
 @pytest.hookimpl(hookwrapper=True)

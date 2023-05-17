@@ -16,6 +16,9 @@ PROJECT_NAME = "GitLink 确实开源"
 TESTER = "测试人员：陈银花"
 DEPARTMENT = "所属部门: 开源中心"
 
+# 指定日志收集级别
+LOG_LEVEL = "INFO"
+
 # 测试数据
 test = [
     {

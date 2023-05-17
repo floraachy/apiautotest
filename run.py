@@ -19,13 +19,10 @@ import shutil
 import pytest
 from config.project_path import REPORT_DIR, LOG_DIR, AUTO_CASE_DIR, CONF_DIR
 from case_utils.case_handle import get_case_data
-from common_utils.loguru_handle import error_only
 from loguru import logger
 import click
-from config.settings import REPORT_NAME
+from config.settings import REPORT_NAME, LOG_LEVEL
 from datetime import datetime
-
-
 
 
 @click.command()
@@ -35,9 +32,10 @@ def run(env, m):
     # 捕获所有日志
     logger.add(os.path.join(LOG_DIR, "runtime_{time}_all.log"), enqueue=True, encoding="utf-8", rotation="00:00",
                format="{time:YYYY-MM-DD HH:mm:ss} {level} From {module}.{function} : {message}")
-    # 仅捕获错误日志
-    logger.add(os.path.join(LOG_DIR, "runtime_{time}_error.log"), enqueue=True, encoding="utf-8", rotation="00:00",
-               filter=error_only, format="{time:YYYY-MM-DD HH:mm:ss} {level} From {module}.{function} : {message}")
+    # 仅捕获指定级别日志
+    logger.add(os.path.join(LOG_DIR, "runtime_{time}_all.log"), enqueue=True, encoding="utf-8", rotation="00:00",
+               level=LOG_LEVEL.upper(),
+               format="{time:YYYY-MM-DD HH:mm:ss} {level} From {module}.{function} : {message}")
     logger.info("""
                      _    _         _      _____         _
       __ _ _ __ (_)  / \\  _   _| |_ __|_   _|__  ___| |_

@@ -71,11 +71,8 @@ def pytest_runtest_makereport(item, call):
     report = outcome.get_result()
     # TODO：由于目前无法动态将用例数据中的title写入测试方法中的文档注释，因此该处理方法暂时搁置
     # 将测试方法的文档注释作为结果表的Description的值，如果文档注释为空，则测试方法名作为结果表的Description的值
-    # if item.function.__doc__ is None:
-    #     report.description = str(item.function.__doc__)
-    # else:
-    #     report.description = str(item.function.__name__)
-    report.description = GLOBAL_VARS.get("title", "")
+    logger.debug(f"文档注释：{item.function.__doc__}")
+    report.description = str(item.function.__doc__)
     report.nodeid = report.nodeid.encode("utf-8").decode("unicode_escape")
 
 
@@ -123,8 +120,6 @@ def pytest_html_results_table_header(cells):
     cells.insert(0, html.th('用例描述', class_="sortable", col="name"))
     # 往表格中增加一列"执行时间"，并且给"执行时间"增加排序
     cells.insert(1, html.th('执行时间', class_="sortable time", col="time"))
-    # 移除表格最后一列
-    cells.pop()
 
 
 @pytest.mark.optionalhook
@@ -136,8 +131,6 @@ def pytest_html_results_table_row(report, cells):
     cells.insert(0, html.td(report.description))
     # 往列"执行时间"插入每行的值
     cells.insert(1, html.td(strftime("%Y-%m-%d %H:%M:%S"), class_="col-time"))
-    # 移除表格最后一列
-    cells.pop()
 
 
 def pytest_html_results_table_html(report, data):

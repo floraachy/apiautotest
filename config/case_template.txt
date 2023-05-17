@@ -3,7 +3,9 @@ from case_utils.assert_handle import assert_result
 from case_utils.requests_handle import BaseRequest
 from loguru import logger
 from case_utils.request_data_handle import RequestPreDataHandle
-from config.global_vars import GLOBAL_VARS
+from pytest_html import extras  # 往pytest-html报告中填写额外的内容
+from common_utils.func_handle import add_docstring
+
 
 @pytest.fixture(params=${case_data})
 def case(request):
@@ -12,25 +14,30 @@ def case(request):
     """
     return request.param
 
-
 @pytest.mark.${func_title}
 @pytest.mark.auto
-class ${class_title}Auto:
-    def ${func_title}_auto(self, case):
-        logger.info("-----------------------------START-开始执行用例-----------------------------")
-        logger.debug(f"当前执行的用例数据:{case}")
-        # 将用例标题title作为全局变量，方便后续写入到测试报告report.description中
-        GLOBAL_VARS["title"] = case.get("title", "")
-        if case.get("run", None):
-            # 获取处理完成的用例数据
-            case_data = RequestPreDataHandle(case).request_data_handle()
-            # 发送请求
-            response = BaseRequest.send_request(case_data)
-            # 进行断言
-            assert_result(response, case_data["expected"])
-        else:
-            reason = f"标记了该用例为false，不执行\\n"
-            logger.warning(f"{reason}")
-            pytest.skip(reason)
-        logger.info("------------------------------------------用例执行结束------------------------------------------")
+def ${func_title}_auto(case, extra):
+    """
+
+    """
+    logger.info("-----------------------------START-开始执行用例-----------------------------")
+    logger.debug(f"当前执行的用例数据:{case}")
+    # 给当前测试方法添加文档注释
+    add_docstring(case.get("title", ""))(${func_title}_auto)
+    if case.get("run", None):
+        # 获取处理完成的用例数据
+        case_data = RequestPreDataHandle(case).request_data_handle()
+        # 将用例数据显示在pytest-html报告中
+        extra.append(extras.text(str(case_data), name="用例数据"))
+        # 发送请求
+        response = BaseRequest.send_request(case_data)
+        # 将响应数据显示在pytest-html报告中
+        extra.append(extras.text(str(response.text), name="响应数据"))
+        # 进行断言
+        assert_result(response, case_data["expected"])
+    else:
+        reason = f"标记了该用例为false，不执行\\n"
+        logger.warning(f"{reason}")
+        pytest.skip(reason)
+    logger.info("------------------------------------------用例执行结束------------------------------------------")
 

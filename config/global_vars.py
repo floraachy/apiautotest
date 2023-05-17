@@ -19,3 +19,13 @@ class CaseFileType(Enum):
     YAML = 1
     EXCEL = 2
     ALL = 0
+
+
+class NotificationType(Enum):
+    """ 自动化通知方式 """
+    DEFAULT = 0
+    DING_TALK = 1
+    WECHAT = 2
+    EMAIL = 3
+    ALL = 4
+

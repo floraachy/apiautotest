@@ -13,6 +13,7 @@ import pytest
 from py._xmlgen import html  # 安装pytest-html，版本最好是2.1.1
 from time import strftime
 from config.settings import test, live, REPORT_TITLE, PROJECT_NAME, TESTER, DEPARTMENT
+from case_utils.send_result_handle import get_test_info_from_html_report, send_result
 
 
 # ------------------------------------- START: 配置运行环境 ---------------------------------------#
@@ -54,6 +55,7 @@ def get_config(request):
 
 
 # ------------------------------------- END: 配置运行环境 ---------------------------------------#
+
 # ------------------------------------- START: 报告处理 ---------------------------------------#
 def pytest_collection_modifyitems(items):
     """# 测试用例执行收集完成时，将收集到的item的name和nodeid的中文显示在控制台上"""
@@ -71,7 +73,6 @@ def pytest_runtest_makereport(item, call):
     report = outcome.get_result()
     # TODO：由于目前无法动态将用例数据中的title写入测试方法中的文档注释，因此该处理方法暂时搁置
     # 将测试方法的文档注释作为结果表的Description的值，如果文档注释为空，则测试方法名作为结果表的Description的值
-    logger.debug(f"文档注释：{item.function.__doc__}")
     report.description = str(item.function.__doc__)
     report.nodeid = report.nodeid.encode("utf-8").decode("unicode_escape")
 
@@ -102,6 +103,15 @@ def pytest_sessionfinish(session, exitstatus):
     """
     # 给环境表 添加 项目环境
     session.config._metadata['项目环境'] = GLOBAL_VARS.get("host", "")
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    yield
+    # 获取测试报告路径，并发送测试结果
+    report_path = config.getoption('--html')
+    results = get_test_info_from_html_report(report_path)
+    send_result(results, report_path)
 
 
 def pytest_html_results_summary(prefix, summary, postfix):

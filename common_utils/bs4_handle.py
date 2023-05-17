@@ -65,6 +65,14 @@ class SoupAPI:
         """
         return self.soup.select(selector)
 
+    def get_elements_by_attr(self, attr_name, attr_value=True):
+        """
+        通过属性获取标签
+        如果是查找具体某个属性名称=属性值的标签，可以通过attr_name和attr_value来指定；
+        如果仅想查找具备某个属性名称的标签，而不关心属性值是什么，就可以使用 True 来表示属性存在
+        """
+        return self.soup.find_all(attrs={f'{attr_name}': attr_value})
+
     def get_element_parent(self, element):
         """
         查找指定元素的父元素；
@@ -83,11 +91,23 @@ class SoupAPI:
         """
         return element.next_sibling
 
+    def get_element_next_siblings(self, element):
+        """
+        查找指定元素的下一个所有的兄弟元素；
+        """
+        return element.next_siblings
+
     def get_element_previous_sibling(self, element):
         """
         查找指定元素的上一个兄弟元素；
         """
         return element.previous_sibling
+
+    def get_element_previous_siblings(self, element):
+        """
+        查找指定元素的上一个所有兄弟元素；
+        """
+        return element.previous_siblings
 
     def get_element_children(self, element):
         """

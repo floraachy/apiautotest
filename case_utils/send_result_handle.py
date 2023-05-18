@@ -7,9 +7,10 @@
 from loguru import logger
 from common_utils.yagmail_handle import YagEmailServe
 from config.global_vars import NotificationType
-from config.settings import SEND_RESULT_TYPE, email, ding_talk
+from config.settings import SEND_RESULT_TYPE, email, ding_talk, wechat
 from common_utils.bs4_handle import SoupAPI
 from common_utils.dingding_handle import DingTalkBot
+from common_utils.webchat_handle import WechatBot
 
 
 def get_test_info_from_html_report(html_report_path):
@@ -111,6 +112,26 @@ def send_dingding(webhook_url, secret, title, text):
         logger.error(f"发送钉钉通知异常， 错误信息：{e}")
 
 
+def send_wechat(webhook_url, content, attachment=None):
+    """
+    发送企业微信消息
+    """
+    try:
+        wechat = WechatBot(webhook_url=webhook_url)
+        msg = wechat.send_markdown(content=content)
+        if msg:
+            if attachment:
+                file = wechat.send_file(wechat.upload_file(attachment))
+                if file:
+                    logger.info(f"发送企业微信通知(包括文本以及附件)成功~")
+                else:
+                    logger.error(f"发送企业微信通知(附件)失败~")
+        else:
+            logger.error(f"发送企业微信（文本）失败~")
+    except Exception as e:
+        logger.error(f"发送企业微信通知异常， 错误信息：{e}")
+
+
 def send_result(results, attachment_path=None):
     """
     根据用户配置，采取指定方式，发送测试结果
@@ -120,22 +141,22 @@ def send_result(results, attachment_path=None):
     content = f"""
             各位同事, 大家好:
 
-            &nbsp;&nbsp;自动化用例于{results.get('start_time', None)}开始运行，运行时长：{results.get('runs_time', None)}， 目前已执行完成。
+            ### 自动化用例于{results.get('start_time', None)}开始运行，运行时长：{results.get('runs_time', None)}， 目前已执行完成。
             -----------------------------------------------------------------------------------------------------------
-            &nbsp;&nbsp;测试人：{results.get('tester', None)} / {results.get('dept', None)}
-            &nbsp;&nbsp;测试平台：{results.get('platform', None)} / {results.get('python_version', None)}
-            &nbsp;&nbsp;测试环境：{results.get('project_env', None)}
+            #### 测试人：{results.get('tester', None)} / {results.get('dept', None)}
+            #### 测试平台：{results.get('platform', None)} / {results.get('python_version', None)}
+            #### 测试环境：{results.get('project_env', None)}
             ---------------------------------------------------------------------------------------------------------------
-            &nbsp;&nbsp;&nbsp;&nbsp;执行结果如下:
-            &nbsp;&nbsp;&nbsp;&nbsp;用例运行总数: {results.get("total_cases", None)} 个
-            &nbsp;&nbsp;&nbsp;&nbsp;通过用例个数（passed）: {results.get("passed", None)} 个
-            &nbsp;&nbsp;&nbsp;&nbsp;失败用例个数（failed）: {results.get("failed", None)} 个
-            &nbsp;&nbsp;&nbsp;&nbsp;异常用例个数（error）: {results.get("error", None)} 个
-            &nbsp;&nbsp;&nbsp;&nbsp;跳过用例个数（skipped）: {results.get("skipped", None)} 个
-            &nbsp;&nbsp;&nbsp;&nbsp;预期失败用例个数（xfailed）: {results.get("xfailed", None)} 个
-            &nbsp;&nbsp;&nbsp;&nbsp;意外通过用例个数（xpassed）: {results.get("xpassed", None)} 个
-            &nbsp;&nbsp;&nbsp;&nbsp;失败重试用例个数 * 次数之和（rerun）: {results.get("rerun", None)} 个
-            &nbsp;&nbsp;&nbsp;&nbsp;成  功   率: {(results.get("passed") / results.get("total_cases")) * 100} %
+            #### 执行结果如下:
+            - 用例运行总数: {results.get("total_cases", None)} 个
+            - 通过用例个数（passed）: {results.get("passed", None)} 个
+            - 失败用例个数（failed）: {results.get("failed", None)} 个
+            - 异常用例个数（error）: {results.get("error", None)} 个
+            - 跳过用例个数（skipped）: {results.get("skipped", None)} 个
+            - 预期失败用例个数（xfailed）: {results.get("xfailed", None)} 个
+            - 意外通过用例个数（xpassed）: {results.get("xpassed", None)} 个
+            - 失败重试用例个数 * 次数之和（rerun）: {results.get("rerun", None)} 个
+            - 成  功   率: {(results.get("passed") / results.get("total_cases")) * 100} %
 
             **********************************
             附件为具体的测试报告，详细情况可下载附件进程查看， 非相关负责人员可忽略此消息。谢谢。
@@ -153,7 +174,15 @@ def send_result(results, attachment_path=None):
         send_dingding(webhook_url=ding_talk["webhook_url"], secret=ding_talk["secret"], title=subject, text=content)
     # 发送企业微信通知
     elif SEND_RESULT_TYPE == NotificationType.WECHAT.value:
-        pass
+        send_wechat(webhook_url=wechat["webhook_url"], content=content, attachment=attachment_path)
     # 全部渠道都发送通知
     else:
-        pass
+        # 发送邮件
+        send_email(user=email.get("user"), pwd=email.get("password"), host=email.get("host"), subject=subject,
+                   contents=content, to=email.get("to"), attachments=attachment_path)
+        # 发送钉钉通知
+        send_dingding(webhook_url=ding_talk["webhook_url"], secret=ding_talk["secret"], title=subject, text=content)
+        # 发送企业微信
+        send_wechat(webhook_url=wechat["webhook_url"], content=content, attachment=attachment_path)
+
+

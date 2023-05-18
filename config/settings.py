@@ -64,3 +64,8 @@ ding_talk = {
     "webhook_url": "https://oapi.dingtalk.com/robot/send?access_token=***********",
     "secret": "***********"
 }
+
+# ------------------------------------ 企业微信相关配置 ----------------------------------------------------#
+wechat = {
+    "webhook_url": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=********",
+}

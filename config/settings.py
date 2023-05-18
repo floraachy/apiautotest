@@ -69,3 +69,25 @@ ding_talk = {
 wechat = {
     "webhook_url": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=********",
 }
+
+# ------------------------------------ 数据库相关配置 ----------------------------------------------------#
+db_info = {
+    "test": {
+         "db_host": "xx.xx.xx.xx",
+        "db_port": 3306,
+        "db_user": "root",
+        "db_pwd": "**********",
+        "db_database": "test**********",
+        "ssh": True,
+        "ssh_host": "xx.xx.xx.xx",
+        "ssh_port": 3306,
+        "ssh_user": "root",
+        "ssh_pwd": "**********"
+
+    },
+    "live": {
+
+
+    }
+
+}

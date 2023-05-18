@@ -19,3 +19,9 @@
     eq:
       http_code: 200
       $.login: ${login}
+  assert_sql:
+    eq:
+      sql: select id, `name`, identifier from projects where user_id=${user_id} ORDER BY created_on DESC;
+      $.id: ${project_id}
+      $.name: ${project_name}
+      $.identifier: ${project_identifier}

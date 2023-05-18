@@ -10,11 +10,12 @@
 from requests import Response
 from case_utils.data_handle import json_extractor, re_extract
 from loguru import logger
-from case_utils.requests_handle import response_type
-from case_utils.data_handle import eval_data_process
+from case_utils.request_data_handle import response_type
+from common_utils.mysql_handle import MysqlServer
+from config.settings import db_info
 
 
-def assert_result(response: Response, expected: dict) -> None:
+def assert_response(response: Response, expected: dict) -> None:
     """ 断言方法
     :param response: 实际响应对象
     :param expected: 预期响应内容，从excel中或者yaml读取、或者手动传入,格式如下：
@@ -27,9 +28,9 @@ def assert_result(response: Response, expected: dict) -> None:
     return None
     """
     if expected is None:
-        logger.info("当前用例无断言！")
+        logger.info("当前用例无响应断言！")
         return
-    logger.info(f"预期结果：{expected}, {type(expected)}")
+    logger.debug(f"响应断言预期结果：{expected}, {type(expected)}")
     index = 0
     for k, v in expected.items():
         # 获取需要断言的实际结果部分
@@ -37,7 +38,6 @@ def assert_result(response: Response, expected: dict) -> None:
             if _k == "http_code":
                 actual = response.status_code
             else:
-                logger.debug("根据响应类型的不同，从响应数据中提取实际结果")
                 if response_type(response) == "json":
                     # 如果响应数据是json格式
                     actual = json_extractor(response.json(), _k)
@@ -45,27 +45,70 @@ def assert_result(response: Response, expected: dict) -> None:
                     # 响应数据不是json格式
                     actual = re_extract(response.text, _k)
             index += 1
-            # 对预期结果进行数据处理
-            _v = eval_data_process(_v)
-            logger.info(f'第{index}个断言 -|- 预期结果: {_v}, {type(_v)}   {k}   实际结果: {actual},{type(actual)}')
+            logger.info(f'第{index}个响应断言 -|- 预期结果: {_v}, {type(_v)}   {k}   实际结果: {actual}, {type(actual)}')
             try:
                 if k == "eq":  # 预期结果 = 实际结果
                     assert _v == actual
-                    logger.info("断言成功！")
+                    logger.info(f"预期结果: {_v} ==  实际结果: {actual}, 断言成功！")
                 elif k == "in":  # 实际结果 包含 预期结果
                     assert _v in actual
-                    logger.info("断言成功！")
+                    logger.info(f"预期结果: {_v} in  实际结果: {actual}, 断言成功！")
                 elif k == "gt":  # 预期结果 > 实际结果 (值应该为数值型)
-                    assert actual < _v
-                    logger.info("断言成功！")
+                    assert _v > actual
+                    logger.info(f"预期结果: {_v} >  实际结果: {actual}, 断言成功！")
                 elif k == "lt":  # 预期结果 < 实际结果 (值应该为数值型)
-                    assert actual > _v
-                    logger.info("断言成功！")
+                    assert _v < actual
+                    logger.info(f"预期结果: {_v} <  实际结果: {actual}, 断言成功！")
                 elif k == "not":  # 预期结果 != 实际结果
-                    assert actual != _v
-                    logger.info("断言成功！")
+                    assert _v != actual
+                    logger.info(f"预期结果: {_v} !=  实际结果: {actual}, 断言成功！")
                 else:
-                    logger.error(f"判断关键字: {k} 错误！")
+                    logger.error(f"判断关键字: {k} 错误！, 目前仅支持如下关键字：eq, in, gt, lt, not")
             except AssertionError:
-                logger.error("断言失败")
-                raise AssertionError(f"第{index}个断言 -|- 预期结果: {_v}, {type(_v)}   {k}   实际结果: {actual},{type(actual)}")
+                logger.error(f"第{index}个响应断言失败 -|- 预期结果: {_v}, {type(_v)}   {k}   实际结果: {actual}, {type(actual)}")
+                raise AssertionError(
+                    f"第{index}个响应断言失败 -|- 预期结果: {_v}, {type(_v)}   {k}   实际结果: {actual}, {type(actual)}")
+
+
+def assert_sql(env, expected: dict):
+    """
+    数据库断言
+    :param env: 当前所处环境
+    :param expected: 预期结果，从excel中或者yaml读取、或者手动传入,格式如下：
+    {
+    'eq':
+        {'sql': 'select count(*) from users where user_id=1;', 'len': '1'},
+    'eq':
+        {'sql': 'select * from users where user_id=1;', '$.username': '${username}'},
+    }
+    """
+    if expected is None:
+        logger.info("当前用例无数据库断言！")
+        return
+    try:
+        # 拿不到数据库配置，则不进行数据库断言
+        db = db_info["test" if env.lower() == "test" else "live"]
+        db_host = db["db_host"]
+    except KeyError:
+        logger.error("当前环境无数据库配置，跳过数据库断言！")
+        return
+    for k, v in expected.items():
+        sql_result = None
+        for _k, _v in v.items():
+            if _k == "sql":
+                # 查询数据库，获取查询结果
+                sql_result = MysqlServer(**db).query_one(_v)
+                logger.info(f'数据库响应断言 -|- SQL：{_v} || 查询结果：{sql_result}')
+            try:
+                if k == "eq":  # 预期结果 = 实际结果
+                    if _k == "len":
+                        assert _v == len(sql_result)
+                        logger.info(f"预期结果: {_v} ==  实际结果: {len(sql_result)}, 断言成功！")
+                    # 如果时$.开头，则从数据库查询结果中提取相应的值作为实际结果
+                    elif _k.startswith("$."):
+                        actual = json_extractor(sql_result, _k)
+                        assert _v == actual
+                        logger.info(f"预期结果: {_v} ==  实际结果: {actual}, 断言成功！")
+            except AssertionError:
+                logger.error(f"数据库断言失败 -|- 预期结果:{_v} ==  实际结果: {len(sql_result)}")
+                raise AssertionError(f"数据库断言失败 -|-预期结果: {_v} ==  实际结果: {len(sql_result)}")

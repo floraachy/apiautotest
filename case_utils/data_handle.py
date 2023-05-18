@@ -9,8 +9,33 @@ from loguru import logger
 from jsonpath import jsonpath
 import re
 from faker import Faker
+from string import Template
+from config.global_vars import GLOBAL_VARS
 
 faker = Faker()
+
+
+def case_data_replace(content):
+    """
+    用例数据替换的方法
+    :param content: 原始的字符串内容
+    return content： 替换表达式后的字符串
+    """
+    if content is None:
+        return None
+    logger.debug(f"-----Start-----开始进行字符串替换: 初始字符串为：{content}")
+    if len(content) != 0:
+        # safe_substitute() 方法会保留没有被替换的占位符，不会抛出 KeyError 异常。
+        # 所以，如果 content 中不存在占位符，使用 safe_substitute() 方法进行替换后，得到的结果和原始字符串是一样的。
+        content = Template(str(content)).safe_substitute(GLOBAL_VARS)
+        for func in re.findall('\\${(.*?)}', content):
+            content = content.replace('${%s}' % func, exec_func(func))
+            try:
+                content = content.replace('${%s}' % func, exec_func(func))
+            except Exception as e:
+                logger.error(f"-----END-----替换数据时出现了异常：{e}")
+        logger.debug(f"-----END-----字符串替换完成: 新字符串为：{content}")
+        return content
 
 
 def json_extractor(obj: dict, expr: str = '.'):

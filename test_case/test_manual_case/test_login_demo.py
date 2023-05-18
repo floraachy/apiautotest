@@ -10,7 +10,7 @@
 import pytest
 import os
 from common_utils.yaml_handle import HandleYaml
-from config.settings import DATA_DIR
+from config.project_path import DATA_DIR
 from common_utils.base_request import BaseRequest
 from case_utils.assert_handle import assert_response, assert_sql
 from loguru import logger

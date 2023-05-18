@@ -14,7 +14,7 @@ class HandleYaml:
     def __init__(self, filename):
         """
         初始化用例文件
-        :param filename: 文件绝对路径，如：D:\test\test.xlsx
+        :param filename: 文件绝对路径，如：D:\test\test.yaml
         """
         self.filename = filename
 

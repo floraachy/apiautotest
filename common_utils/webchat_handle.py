@@ -5,7 +5,6 @@
 # @Software: PyCharm
 # @Desc: 企业微信机器人
 import os
-
 from requests import request
 from loguru import logger
 import base64

@@ -1,6 +1,6 @@
 import requests
 from requests import Response
-from requests_toolbelt import MultipartEncoder
+from requests_toolbelt import MultipartEncoder  # 第三方模块：pip install requests_toolbelt
 from typing import Dict, Union
 import time
 from loguru import logger

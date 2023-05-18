@@ -31,7 +31,7 @@ def test_login_demo(case, extra, request):
         # 获取命令行参数，判断当前处于哪个环境
         env = request.config.getoption("--env")
         # 给当前测试方法添加文档注释
-        add_docstring(case.get("title", ""))(test_login)
+        add_docstring(case.get("title", ""))(test_login_demo)
         if case.get("run", None):
             # 处理请求前的用例数据
             case_data = RequestPreDataHandle(case).request_data_handle()

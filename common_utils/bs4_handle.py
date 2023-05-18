@@ -6,7 +6,7 @@
 # @Desc: bs4（BeautifulSoup4）是Python中的第三方库。可以从HTML或XML文件中提取数据的Python库。
 
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup  # pip install beautifulsoup4
 
 
 class SoupAPI:

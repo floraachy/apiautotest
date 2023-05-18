@@ -8,7 +8,7 @@ import pymysql
 from typing import Union
 import json
 from datetime import datetime
-from sshtunnel import SSHTunnelForwarder
+from sshtunnel import SSHTunnelForwarder  # pip install sshtunnel
 from loguru import logger
 
 
@@ -23,28 +23,31 @@ class MysqlServer:
         初始化方法中， 连接mysql数据库， 根据ssh参数决定是否走SSH隧道方式连接mysql数据库
         """
         self.server = None
-        if ssh:
-            self.server = SSHTunnelForwarder(
-                ssh_address_or_host=(kwargs.get("ssh_host"), kwargs.get("ssh_port")),  # ssh 目标服务器 ip 和 port
-                ssh_username=kwargs.get("ssh_user"),  # ssh 目标服务器用户名
-                ssh_password=kwargs.get("ssh_pwd"),  # ssh 目标服务器用户密码
-                remote_bind_address=(db_host, db_port),  # mysql 服务ip 和 part
-                local_bind_address=('127.0.0.1', 5143),  # ssh 目标服务器的用于连接 mysql 或 redis 的端口，该 ip 必须为 127.0.0.1
-            )
-            self.server.start()
-            db_host = self.server.local_bind_host  # server.local_bind_host 是 参数 local_bind_address 的 ip
-            db_port = self.server.local_bind_port  # server.local_bind_port 是 参数 local_bind_address 的 port
-        # 建立连接
-        self.conn = pymysql.connect(host=db_host,
-                                    port=db_port,
-                                    user=db_user,
-                                    password=db_pwd,
-                                    database=db_database,
-                                    charset="utf8",
-                                    cursorclass=pymysql.cursors.DictCursor  # 加上pymysql.cursors.DictCursor这个返回的就是字典
-                                    )
-        # 创建一个游标对象
-        self.cursor = self.conn.cursor()
+        try:
+            if ssh:
+                self.server = SSHTunnelForwarder(
+                    ssh_address_or_host=(kwargs.get("ssh_host"), kwargs.get("ssh_port")),  # ssh 目标服务器 ip 和 port
+                    ssh_username=kwargs.get("ssh_user"),  # ssh 目标服务器用户名
+                    ssh_password=kwargs.get("ssh_pwd"),  # ssh 目标服务器用户密码
+                    remote_bind_address=(db_host, db_port),  # mysql 服务ip 和 part
+                    local_bind_address=('127.0.0.1', 5143),  # ssh 目标服务器的用于连接 mysql 或 redis 的端口，该 ip 必须为 127.0.0.1
+                )
+                self.server.start()
+                db_host = self.server.local_bind_host  # server.local_bind_host 是 参数 local_bind_address 的 ip
+                db_port = self.server.local_bind_port  # server.local_bind_port 是 参数 local_bind_address 的 port
+            # 建立连接
+            self.conn = pymysql.connect(host=db_host,
+                                        port=db_port,
+                                        user=db_user,
+                                        password=db_pwd,
+                                        database=db_database,
+                                        charset="utf8",
+                                        cursorclass=pymysql.cursors.DictCursor  # 加上pymysql.cursors.DictCursor这个返回的就是字典
+                                        )
+            # 创建一个游标对象
+            self.cursor = self.conn.cursor()
+        except Exception as e:
+            logger.error(f"数据库连接失败：{e}")
 
     def query_all(self, sql):
         """

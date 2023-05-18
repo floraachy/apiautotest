@@ -29,8 +29,10 @@ class RequestPreDataHandle:
         针对用例数据进行处理，识别用例数据中的关键字${xxxx}，使用全局变量进行替换或者执行关键字中的方法替换为具体值
         """
         self.url_handle()
+        self.method_handle()
         self.headers_handle()
         self.payload_handle()
+        self.files_handle()
         self.extract_handle()
         self.assert_handle()
         return self.request_data
@@ -72,6 +74,10 @@ class RequestPreDataHandle:
             logger.info(
                 f"-----End-----处理完成后的headers： {type(self.request_data['headers'])} ||  {self.request_data['headers']}")
 
+    def method_handle(self):
+        # 从用例数据中获取method， 处理method
+        logger.info(f"请求头：{self.request_data.get('method')}")
+
     def payload_handle(self):
         # 处理请求参数payload
         logger.info(
@@ -80,6 +86,12 @@ class RequestPreDataHandle:
             self.request_data["payload"] = eval_data_process(case_data_replace(self.request_data.get("payload", None)))
             logger.info(
                 f"-----End-----处理完成后的payload： {type(self.request_data['payload'])} ||  {self.request_data['payload']}")
+
+    def files_handle(self):
+        # 处理文件
+        logger.info(
+            f"-----Start-----处理前的files： {type(self.request_data.get('files', None))} ||  {self.request_data.get('files', None)}")
+        # TODO 暂时还没想好怎么处理
 
     def extract_handle(self):
         # 处理后置提取参

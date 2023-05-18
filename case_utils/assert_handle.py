@@ -96,9 +96,13 @@ def assert_sql(env, expected: dict):
         sql_result = None
         for _k, _v in v.items():
             if _k == "sql":
-                # 查询数据库，获取查询结果
-                sql_result = MysqlServer(**db).query_one(_v)
-                logger.info(f'数据库响应断言 -|- SQL：{_v} || 查询结果：{sql_result}')
+                try:
+                    # 查询数据库，获取查询结果
+                    sql_result = MysqlServer(**db).query_one(_v)
+                    logger.info(f'数据库响应断言 -|- SQL：{_v} || 查询结果：{sql_result}')
+                except Exception as e:
+                    logger.error(f'数据库服务报错：{e}')
+                    raise AssertionError(f"数据库服务报错：{e}")
             try:
                 if k == "eq":  # 预期结果 = 实际结果
                     if _k == "len":

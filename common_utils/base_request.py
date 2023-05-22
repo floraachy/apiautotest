@@ -30,17 +30,30 @@ class BaseRequest:
         :return: 响应对象
         """
         try:
-            logger.info(f"-----Start-----进行接口请求，并获取接口响应数据，请求数据：{type(req_data)} || {req_data}-----")
+            logger.info(f"\n======================================================\n" \
+                        "-------------Start：请求前--------------------\n"
+                        f"用例标题: {req_data.get('title', None)}\n" \
+                        f"请求路径: {req_data.get('url', None)}\n" \
+                        f"请求方式: {req_data.get('method', None)}\n" \
+                        f"请求头:   {req_data.get('headers', None)}\n" \
+                        f"请求关键字: {req_data.get('pk', None)}\n" \
+                        f"请求内容: {req_data.get('payload', None)}\n" \
+                        f"请求文件: {req_data.get('files', None)}\n" \
+                        "=====================================================")
             res = cls.send_api_request(
                 url=req_data.get("url"),
                 method=req_data.get("method").lower(),
                 pk=req_data.get("pk", None),
-                header=req_data.get("header"),
+                header=req_data.get("headers"),
                 payload=req_data.get("payload"),
                 files=req_data.get("files")
             )
-            logger.info(f"-----End-----接口请求结束，请求响应数据：{res.text}-----")
+            logger.info(f"\n======================================================\n" \
+                        "-------------End：请求后--------------------\n"
+                        f"响应数据: {res.text}\n" \
+                        "=====================================================")
         except requests.exceptions.RequestException as e:
+            logger.error(f"请求出错，{str(e)}")
             raise ValueError(f"请求出错，{str(e)}")
 
         return res

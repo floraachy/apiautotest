@@ -24,21 +24,16 @@ def get_test_results_from_pytest_html_report(html_report_path):
         # -------------- 获取测试环境信息 --------------
         environment_info = bs.get_element_by_id("environment").get_text()
         new_environment_info = [element for element in environment_info.split("\n") if element != '']
+        info_mapping = {
+            "Platform": "platform",
+            "Python": "python_version",
+            "开始时间": "start_time",
+            "项目名称": "project_name",
+            "项目环境": "project_env"
+        }
         for key, value in enumerate(new_environment_info):
-            if value == "Platform":
-                test_results['platform'] = new_environment_info[key + 1]
-
-            if value == "Python":
-                test_results['python_version'] = f"Python {new_environment_info[key + 1]}"
-
-            if value == "开始时间":
-                test_results['start_time'] = new_environment_info[key + 1]
-
-            if value == "项目名称":
-                test_results['project_name'] = new_environment_info[key + 1]
-
-            if value == "项目环境":
-                test_results['project_env'] = new_environment_info[key + 1]
+            if value in info_mapping:
+                test_results[info_mapping[value]] = new_environment_info[key + 1]
 
         # -------------- 获取测试人员，所属部门，测试用例总数，运行时长 --------------
         p_elements = bs.get_elements_by_tag("p")
@@ -53,31 +48,22 @@ def get_test_results_from_pytest_html_report(html_report_path):
                 test_results['run_time'] = f"{new_list[4]} 秒"
 
         # -------------- 获取具体结果 --------------
-        # 通过的用例个数
-        passed = bs.select_element('span.passed')[0]
-        test_results["passed"] = int(passed.get_text().split(" ")[0])
-        # 跳过的用例个数
-        skipped = bs.select_element('span.skipped')[0]
-        test_results["skipped"] = int(skipped.get_text().split(" ")[0])
-        # 失败的用例个数
-        failed = bs.select_element('span.failed')[0]
-        test_results["failed"] = int(failed.get_text().split(" ")[0])
-        # 错误的用例个数
-        error = bs.select_element('span.error')[0]
-        test_results["broken"] = int(error.get_text().split(" ")[0])
-        # 预期失败的用例个数
-        xfailed = bs.select_element('span.xfailed')[0]
-        test_results["xfailed"] = int(xfailed.get_text().split(" ")[0])
-        # 意外通过的用例个数
-        xpassed = bs.select_element('span.xpassed')[0]
-        test_results["xpassed"] = int(xpassed.get_text().split(" ")[0])
-        # 重跑的用例个数
-        rerun = bs.select_element('span.rerun')[0]
-        test_results["rerun"] = int(rerun.get_text().split(" ")[0])
+        result_mapping = {
+            'passed': 'span.passed',  # 通过的用例个数
+            'skipped': 'span.skipped',  # 跳过的用例个数
+            'failed': 'span.failed',  # 失败的用例个数
+            'broken': 'span.error',  # 错误的用例个数
+            'xfailed': 'span.xfailed',  # 预期失败的用例个数
+            'xpassed': 'span.xpassed',  # 意外通过的用例个数
+            'rerun': 'span.rerun'  # 重跑的用例个数
+        }
+        for key, value in result_mapping.items():
+            result_element = bs.select_element(value)[0]
+            test_results[key] = int(result_element.get_text().split(" ")[0])
+
         # 用例总数
         test_results['total'] = test_results["passed"] + test_results["skipped"] + test_results["failed"] + \
-                                test_results[
-                                    "broken"] + test_results["xfailed"] + test_results["xpassed"]
+                                test_results["broken"] + test_results["xfailed"] + test_results["xpassed"]
         # 通过率
         # 判断运行用例总数大于0
         if test_results['total'] > 0:

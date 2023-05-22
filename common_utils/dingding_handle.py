@@ -32,6 +32,7 @@ class DingTalkBot:
             self.webhook_url = webhook_url + f'&timestamp={timestamp}&sign={sign}'  # 最终url，url+时间戳+签名
         else:
             self.webhook_url = webhook_url
+
         self.headers = {
             "Content-Type": "application/json",
             "Charset": "UTF-8"
@@ -52,6 +53,24 @@ class DingTalkBot:
         sign = urllib.parse.quote_plus(base64.b64encode(hmac_code))
         return sign
 
+    def send_message(self, payload):
+        """
+        发送钉钉消息
+        :payload: 请求json数据
+        """
+        response = request(
+            url=self.webhook_url,
+            json=payload,
+            headers=self.headers,
+            method="POST"
+        )
+        if response.json().get("errcode") == 0:
+            logger.debug(f"通过钉钉机器人发送{payload.get('msgtype', '')}消息成功：{response.json()}")
+            return True
+        else:
+            logger.error(f"通过钉钉机器人发送{payload.get('msgtype', '')}消息失败：{response.text}")
+            return False
+
     def send_text(self, content, mobiles=None, is_at_all=False):
         """
         发送文本消息
@@ -59,40 +78,27 @@ class DingTalkBot:
         :param mobiles: 被艾特的用户的手机号码，格式是列表，注意需要在content里面添加@人的手机号码
         :param is_at_all: 是否艾特所有人，布尔类型，true为艾特所有人，false为不艾特
         """
+        at_mobiles = ""
         if mobiles:
             if isinstance(mobiles, list):
-                payload = {
-                    "msgtype": "text",
-                    "text": {
-                        "content": content
-                    },
-                    "at": {
-                        "atMobiles": mobiles,
-                        "isAtAll": False
-                    }
-                }
+                at_mobiles = mobiles
+                is_at_all = False
                 for mobile in mobiles:
-                    payload["text"]["content"] += f"@{mobile}"
+                    content += f"@{mobile}"
             else:
                 raise TypeError("mobiles类型错误 不是list类型.")
-        else:
-            payload = {
-                "msgtype": "text",
-                "text": {
-                    "content": content
-                },
-                "at": {
-                    "atMobiles": "",
-                    "isAtAll": is_at_all
-                }
+
+        payload = {
+            "msgtype": "text",
+            "text": {
+                "content": content
+            },
+            "at": {
+                "atMobiles": at_mobiles,
+                "isAtAll": is_at_all
             }
-        response = request(url=self.webhook_url, json=payload, headers=self.headers, method="POST")
-        if response.json().get("errcode") == 0:
-            logger.debug(f"send_text发送钉钉消息成功：{response.json()}")
-            return True
-        else:
-            logger.error(f"send_text发送钉钉消息失败：{response.text}")
-            return False
+        }
+        return self.send_message(payload, "send_text")
 
     def send_link(self, title, text, message_url, pic_url=None):
         """
@@ -111,13 +117,7 @@ class DingTalkBot:
                 "messageUrl": message_url
             }
         }
-        response = request(url=self.webhook_url, json=payload, headers=self.headers, method="POST")
-        if response.json().get("errcode") == 0:
-            logger.debug(f"send_link发送钉钉消息成功：{response.json()}")
-            return True
-        else:
-            logger.error(f"send_link发送钉钉消息失败：{response.text}")
-            return False
+        return self.send_message(payload)
 
     def send_markdown(self, title, text, mobiles=None, is_at_all=False):
         """
@@ -128,42 +128,28 @@ class DingTalkBot:
         :param mobiles: 被艾特的用户的手机号码，格式是列表，注意需要在text里面添加@人的手机号码
         :param is_at_all: 是否艾特所有人，布尔类型，true为艾特所有人，false为不艾特
         """
+        at_mobiles = ""
         if mobiles:
             if isinstance(mobiles, list):
-                payload = {
-                    "msgtype": "markdown",
-                    "markdown": {
-                        "title": title,
-                        "text": text
-                    },
-                    "at": {
-                        "atMobiles": mobiles,
-                        "isAtAll": False
-                    }
-                }
+                at_mobiles = mobiles
+                is_at_all = False
                 for mobile in mobiles:
-                    payload["markdown"]["text"] += f" @{mobile}"
+                    text += f"@{mobile}"
             else:
                 raise TypeError("mobiles类型错误 不是list类型.")
-        else:
-            payload = {
-                "msgtype": "markdown",
-                "markdown": {
-                    "title": title,
-                    "text": text
-                },
-                "at": {
-                    "atMobiles": "",
-                    "isAtAll": is_at_all
-                }
+        payload = {
+            "msgtype": "markdown",
+            "markdown": {
+                "title": title,
+                "text": text
+            },
+            "at": {
+                "atMobiles": at_mobiles,
+                "isAtAll": is_at_all
             }
-        response = request(url=self.webhook_url, json=payload, headers=self.headers, method="POST")
-        if response.json().get("errcode") == 0:
-            logger.debug(f"send_markdown发送钉钉消息成功：{response.json()}")
-            return True
-        else:
-            logger.error(f"send_markdown发送钉钉消息失败：{response.text}")
-            return False
+        }
+
+        return self.send_message(payload)
 
     def send_action_card_single(self, title, text, single_title, single_url, btn_orientation=0):
         """
@@ -185,13 +171,7 @@ class DingTalkBot:
             }
 
         }
-        response = request(url=self.webhook_url, json=payload, headers=self.headers, method="POST")
-        if response.json().get("errcode") == 0:
-            logger.debug(f"send_action_card_single发送钉钉消息成功：{response.json()}")
-            return True
-        else:
-            logger.error(f"send_action_card_single发送钉钉消息失败：{response.text}")
-            return False
+        return self.send_message(payload)
 
     def send_action_card_split(self, title, text, btns, btn_orientation=0):
         """
@@ -216,13 +196,8 @@ class DingTalkBot:
                 "title": btn.get("title"),
                 "actionURL": btn.get("action_url")
             })
-        response = request(url=self.webhook_url, json=payload, headers=self.headers, method="POST")
-        if response.json().get("errcode") == 0:
-            logger.debug(f"send_action_card_split发送钉钉消息成功：{response.json()}")
-            return True
-        else:
-            logger.error(f"send_action_card_split发送钉钉消息失败：{response.text}")
-            return False
+
+        return self.send_message(payload)
 
     def send_feed_card(self, links_msg):
         """
@@ -243,10 +218,5 @@ class DingTalkBot:
                     "picURL": link.get("picURL")
                 }
             )
-        response = request(url=self.webhook_url, json=payload, headers=self.headers, method="POST")
-        if response.json().get("errcode") == 0:
-            logger.debug(f"send_feed_card发送钉钉消息成功：{response.json()}")
-            return True
-        else:
-            logger.error(f"send_feed_card发送钉钉消息失败：{response.text}")
-            return False
+
+        return self.send_message(payload)

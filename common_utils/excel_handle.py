@@ -29,6 +29,25 @@ class ExcelHandle:
         wb.save(self.filename)
         return self.filename
 
+    # add by xiahb
+    def read_sheet(self, sheet, workbook):
+        """
+        读取一个sheet的内容
+        :param sheet: 表单名称
+        :param workbook: 工作簿对象
+        :return: sheet数据列表
+        """
+        sheet_data = {
+            "sheet_name": sheet,
+            "data": []
+        }
+        sheet = workbook[sheet]
+        all_values = list(sheet.values)
+        header = all_values[0]
+        for i in all_values[1:]:
+            sheet_data["data"].append(dict(zip(header, i)))
+        return sheet_data
+
     def read(self, sheet=None) -> list:
         """
         读取excel数据并返回
@@ -46,29 +65,11 @@ class ExcelHandle:
 
         # 如果sheet不为空，则取sheet等于指定sheet
         if sheet:
-            sheet_data = {
-                "sheet_name": sheet,
-                "data": []
-            }
-            sheet = workbook[sheet]
-            all_values = list(sheet.values)
-            header = all_values[0]
-            for i in all_values[1:]:
-                sheet_data["data"].append(dict(zip(header, i)))
-            results.append(sheet_data)
-        # 如果sheet为空，则sheet为第一个表单
+            results.append(self.read_sheet(sheet, workbook))
+        # 如果sheet为空，则读取所有表单数据
         else:
             for sheet in sheets:
-                sheet_data = {
-                    "sheet_name": sheet,
-                    "data": []
-                }
-                sheet = workbook[sheet]
-                all_values = list(sheet.values)
-                header = all_values[0]
-                for i in all_values[1:]:
-                    sheet_data["data"].append(dict(zip(header, i)))
-                results.append(sheet_data)
+                results.append(self.read_sheet(sheet, workbook))
         # 关闭excel
         workbook.close()
         return results

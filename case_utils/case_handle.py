@@ -37,6 +37,41 @@ def get_excel_data(file_path):
         return ExcelHandle(file_path).read()
 
 
+def gen_case_data_from_excel(files):
+    cases = []
+    for file in files:
+        # 读取excel文件中的用例数据，存储到data中
+        data = get_excel_data(file)
+        for _data in data:
+            # 将excel读取到的用例数据，适配allure格式
+            excel_data = {
+                'case_common': {'allure_epic': 'GitLink接口', 'allure_feature': _data["sheet_name"],
+                                'allure_story': _data["sheet_name"]},
+                'case_info': _data["data"]
+            }
+            # 调用gen_case方法生成测试用例, 例如：test_demo.py
+            gen_case_file(case_file_path=file, case_template_path=CASE_TEMPLATE_DIR, case_data=excel_data,
+                          target_case_path=AUTO_CASE_DIR)
+            # 将获取到的用例数据统一保存到cases中
+            cases.extend([excel_data])
+            logger.debug(f"从{file}中读取到的用例数据是：{excel_data}")
+    return cases
+
+
+def gen_case_data_from_yaml(files):
+    cases = []
+    for file in files:
+        # 从yaml/yml中读取用例数据
+        yaml_data = get_yaml_data(file)
+        # 调用gen_case方法生成测试用例, 例如：test_demo.py
+        gen_case_file(case_file_path=file, case_template_path=CASE_TEMPLATE_DIR, case_data=yaml_data,
+                      target_case_path=AUTO_CASE_DIR)
+        # 将获取到的用例数据统一保存到cases中
+        cases.extend([yaml_data])
+        logger.debug(f"从{file}中读取到的用例数据是：{yaml_data}")
+    return cases
+
+
 def get_case_data():
     """
     根据配置文件，从指定类型文件中读取用例数据，并调用生成用例文件方法，生成用例文件
@@ -46,71 +81,28 @@ def get_case_data():
     # 从excel中读取用例数据
     if CASE_FILE_TYPE == CaseFileType.EXCEL.value:
         # 在用例数据"DATA_DIR"目录中寻找后缀是xlsx, xls的文件
-        files = get_files(target=DATA_DIR, start="test_", end=".xlsx") + get_files(target=DATA_DIR, start="test_",
-                                                                                   end=".xls")
-        for file in files:
-            # 读取excel文件中的用例数据，存储到data中
-            data = ExcelHandle(file).read()
-            for _data in data:
-                # 将excel读取到的用例数据，适配allure格式
-                excel_data = {
-                    'case_common': {'allure_epic': 'GitLink接口', 'allure_feature': _data["sheet_name"],
-                                    'allure_story': _data["sheet_name"]},
-                    'case_info': _data["data"]
-                }
-                # 调用gen_case方法生成测试用例, 例如：test_demo.py
-                gen_case_file(case_file_path=file, case_template_path=CASE_TEMPLATE_DIR, case_data=excel_data,
-                              target_case_path=AUTO_CASE_DIR)
-                # 将获取到的用例数据统一保存到cases中
-                cases.extend([excel_data])
-                logger.debug(f"从{file}中读取到的用例数据是：{excel_data}")
+        files = get_files(target=DATA_DIR, start="test_", end=".xlsx") \
+                + get_files(target=DATA_DIR, start="test_", end=".xls")
+        cases = gen_case_data_from_excel(files)
         return cases
     # 从yaml中读取用例数据
     elif CASE_FILE_TYPE == CaseFileType.YAML.value:
         # 在用例数据"DATA_DIR"目录中寻找后缀是yaml, yml的文件
-        files = get_files(target=DATA_DIR, start="test_", end=".yaml") + get_files(target=DATA_DIR, start="test_",
-                                                                                   end=".yml")
-        for file in files:
-            # 从yaml/yml中读取用例数据
-            yaml_data = get_yaml_data(file)
-            # 调用gen_case方法生成测试用例, 例如：test_demo.py
-            gen_case_file(case_file_path=file, case_template_path=CASE_TEMPLATE_DIR, case_data=yaml_data,
-                          target_case_path=AUTO_CASE_DIR)
-            # 将获取到的用例数据统一保存到cases中
-            cases.extend([yaml_data])
-            logger.debug(f"从{file}中读取到的用例数据是：{yaml_data}")
+        files = get_files(target=DATA_DIR, start="test_", end=".yaml") \
+                + get_files(target=DATA_DIR, start="test_", end=".yml")
+        cases = gen_case_data_from_yaml(files)
         return cases
     else:
         # 在用例数据"DATA_DIR"目录中寻找后缀是xlsx,xls, yaml, yml的文件
-        files = get_files(target=DATA_DIR, start="test_", end=".xlsx") + get_files(target=DATA_DIR, start="test_",
-                                                                                   end=".xls") + get_files(
-            target=DATA_DIR, start="test_", end=".yaml") + get_files(target=DATA_DIR, start="test_",
-                                                                     end=".yml")
-        for file in files:
-            if os.path.splitext(file)[1] == ".xlsx" or os.path.splitext(file)[1] == ".xls":
-                # 读取excel文件中的用例数据，存储到data中
-                data = ExcelHandle(file).read()
-                for _data in data:
-                    # 将excel读取到的用例数据，适配allure格式
-                    excel_data = {
-                        'case_common': {'allure_epic': 'GitLink接口', 'allure_feature': _data["sheet_name"],
-                                        'allure_story': _data["sheet_name"]},
-                        'case_info': _data["data"]
-                    }
-                    # 调用gen_case方法生成测试用例, 例如：test_demo.py
-                    gen_case_file(case_file_path=file, case_template_path=CASE_TEMPLATE_DIR, case_data=excel_data,
-                                  target_case_path=AUTO_CASE_DIR)
-                    # 将获取到的用例数据统一保存到cases中
-                    cases.extend([excel_data])
-                    logger.debug(f"从{file}中读取到的用例数据是：{excel_data}")
-            else:
-                # 从yaml/yml中读取用例数据
-                yaml_data = get_yaml_data(file)
-                # 调用gen_case方法生成测试用例, 例如：test_demo.py
-                gen_case_file(case_file_path=file, case_template_path=CASE_TEMPLATE_DIR, case_data=yaml_data,
-                              target_case_path=AUTO_CASE_DIR)
-                # 将获取到的用例数据统一保存到cases中
-                cases.extend([yaml_data])
+        excel_files = get_files(target=DATA_DIR, start="test_", end=".xlsx") \
+                      + get_files(target=DATA_DIR, start="test_", end=".xls")
+        yaml_files = get_files(target=DATA_DIR, start="test_", end=".yaml") \
+                     + get_files(target=DATA_DIR, start="test_", end=".yml")
+        excel_cases = gen_case_data_from_excel(excel_files)
+        cases.extend([excel_cases])
+        yaml_cases = gen_case_data_from_yaml(yaml_files)
+        cases.extend([yaml_cases])
+
         return cases
 
 

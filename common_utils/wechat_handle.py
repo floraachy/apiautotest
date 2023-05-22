@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2023/5/11 15:01
 # @Author  : chenyinhua
-# @File    : webchat_handle.py
+# @File    : wechat_handle.py
 # @Software: PyCharm
 # @Desc: 企业微信机器人
 import os
@@ -29,6 +29,24 @@ class WechatBot:
             "Charset": "UTF-8"
         }
 
+    def send_message(self, payload):
+        """
+        发送微信消息
+        :payload: 请求json数据
+        """
+        response = request(
+            url=self.webhook_url,
+            json=payload,
+            headers=self.headers,
+            method="POST"
+        )
+        if response.json().get("errcode") == 0:
+            logger.debug(f"通过企业微信发送{payload.get('msgtype', '')}消息成功：{response.json()}")
+            return True
+        else:
+            logger.error(f"通过企业微信发送{payload.get('msgtype', '')}消息失败：{response.text}")
+            return False
+
     def send_text(self, content, mentioned_list=[], mentioned_mobile_list=[]):
         """
         发送文本消息
@@ -44,13 +62,7 @@ class WechatBot:
                 "mentioned_mobile_list": mentioned_mobile_list
             }
         }
-        response = request(url=self.webhook_url, method="POST", json=payload, headers=self.headers)
-        if response.json().get("errcode") == 0:
-            logger.debug(f"通过企业微信发送文本消息成功：{response.json()}")
-            return True
-        else:
-            logger.error(f"通过企业微信发送文本消息失败：{response.text}")
-            return False
+        return self.send_message(payload)
 
     def send_markdown(self, content):
         """
@@ -70,13 +82,7 @@ class WechatBot:
                 "content": content
             }
         }
-        response = request(url=self.webhook_url, method="POST", json=payload, headers=self.headers)
-        if response.json().get("errcode") == 0:
-            logger.debug(f"通过企业微信发送md消息成功：{response.json()}")
-            return True
-        else:
-            logger.error(f"通过企业微信发送md消息失败：{response.text}")
-            return False
+        return self.send_message(payload)
 
     def send_picture(self, image_path):
         """
@@ -92,13 +98,7 @@ class WechatBot:
                 "md5": hashlib.md5(image_data).hexdigest()  # # 计算图片的MD5值
             }
         }
-        response = request(url=self.webhook_url, method="POST", json=payload, headers=self.headers)
-        if response.json().get("errcode") == 0:
-            logger.debug(f"通过企业微信发送图片消息成功：{response.json()}")
-            return True
-        else:
-            logger.error(f"通过企业微信发送图片失败：{response.text}")
-            return False
+        return self.send_message(payload)
 
     def send_text_picture(self, articles: list):
         """
@@ -125,13 +125,7 @@ class WechatBot:
                     "picurl": article.get("picurl", "")
                 }
             )
-        response = request(url=self.webhook_url, method="POST", json=payload, headers=self.headers)
-        if response.json().get("errcode") == 0:
-            logger.debug(f"通过企业微信发送图文消息成功：{response.json()}")
-            return True
-        else:
-            logger.error(f"通过企业微信发送图文失败：{response.text}")
-            return False
+        return self.send_message(payload)
 
     def upload_file(self, file_path):
         """
@@ -168,10 +162,4 @@ class WechatBot:
                 "media_id": media_id,
             }
         }
-        response = request(url=self.webhook_url, method="POST", json=payload, headers=self.headers)
-        if response.json().get("errcode") == 0:
-            logger.debug(f"通过企业微信发送文件消息成功：{response.json()}")
-            return True
-        else:
-            logger.error(f"通过企业微信发送文件消息失败：{response.text}")
-            return False
+        return self.send_message(payload)

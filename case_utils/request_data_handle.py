@@ -63,7 +63,6 @@ class RequestPreDataHandle:
                     f"响应断言: {self.request_data.get('assert_response', None)}\n" \
                     f"数据库断言: {self.request_data.get('assert_sql', None)}\n" \
                     "=====================================================")
-
         return self.request_data
 
     def url_handle(self):
@@ -163,9 +162,9 @@ class RequestHandle:
         allure_step(step_title="请求参数", content=self.case_data['payload'])
         allure_step(step_title="请求文件", content=self.case_data['files'])
         allure_step(step_title="后置提取参数（新）", content=self.case_data['extract'])
-        allure_step(step_title="请求响应数据", content=self.case_data['assert_response'])
         allure_step(step_title="响应断言参数", content=self.case_data['assert_response'])
-        allure_step(step_title="数据库断言", content=self.case_data['assert_response'])
+        allure_step(step_title="数据库断言", content=self.case_data['assert_sql'])
+        allure_step(step_title="请求响应数据", content=response.text)
         return response
 
     def after_extract(self, response: Response, extract):

@@ -25,21 +25,22 @@ def get_files(target, start=None, end=None):
     # filenames：包含了当前dirpath路径下所有的非目录子文件的名字（不包含目录路径）。
     for dirpath, dirnames, filenames in os.walk(target):
         for filename in filenames:
+            file_path = os.path.abspath(os.path.join(dirpath, filename))
             # 如果"start"和"end"都有值
             if start and end:
                 # filename是以"start"且filename是以"end"结尾，则追加到files
                 if filename.startswith(start) and filename.endswith(end):
-                    files.append(os.path.abspath(os.path.join(dirpath, filename)))
+                    files.append(file_path)
             # 或者如果"start"有值，filename是以"start"开头，则追加到files
             elif start and (not end):
                 if filename.startswith(start):
-                    files.append(os.path.abspath(os.path.join(dirpath, filename)))
+                    files.append(file_path)
             # 或者如果"end"有值，且filename是以"end"结尾，则追加到files
             elif end and (not start):
                 if filename.endswith(end):
-                    files.append(os.path.abspath(os.path.join(dirpath, filename)))
+                    files.append(file_path)
             else:
-                files.append(os.path.abspath(os.path.join(dirpath, filename)))
+                files.append(file_path)
     # 判断files列表是否为空，不为空则返回files，为空则返回all_files
     return files
 

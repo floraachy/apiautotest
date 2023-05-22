@@ -1,7 +1,17 @@
+## 前言
+
+  公司突然要求你做自动化，但是没有代码基础不知道怎么做？或者有自动化基础，但是不知道如何系统性的做自动化， 放在yaml文件中维护，不知道如何处理多业务依赖的逻辑？
+
+  那么本自动化框架，将为你解决这些问题。
+  - 框架主要使用 python 语言编写，结合 pytest 进行二次开发，用户仅需要在 yaml 或者 excel 文件中编写测试用例， 编写成功之后，会自动生成测试用例代码，零基础代码小白，也可以操作。 
+  - 如果是具备代码基础的，也可以直接通过 py 文件编写测试用例。 
+  - 使用 pytest-html / Allure 生成报告，并针对测试报告样式进行了调整，使得报告更加美观； 
+  - 测试完成后，支持发送 企业微信通知/ 钉钉通知/ 邮箱通知，灵活配置。
+
 
 ## 一、框架介绍
 
-本框架主要是基于 Python + pytest + pytest-html + loguru  + 邮件通知/企业微信通知/钉钉通知 实现的接口自动化框架。
+本框架主要是基于 Python + pytest + pytest-html/Allure + loguru  + 邮件通知/企业微信通知/钉钉通知 实现的接口自动化框架。
 
 * git地址: [https://www.gitlink.org.cn/floraachy/apiautotest](https://www.gitlink.org.cn/floraachy/apiautotest)
 * 项目参与者: floraachy
@@ -10,37 +20,32 @@
 
 对于框架任何问题，欢迎联系我！
 
-## 二、前言
 
-  公司突然要求你做自动化，但是没有代码基础不知道怎么做？或者有自动化基础，但是不知道如何系统性的做自动化， 放在yaml文件中维护，不知道如何处理多业务依赖的逻辑？
-
-  那么本自动化框架，将为你解决这些问题。
-  - 框架主要使用 python 语言编写，结合 pytest 进行二次开发，用户仅需要在 yaml 或者 excel 文件中编写测试用例， 编写成功之后，会自动生成测试用例代码，零基础代码小白，也可以操作。 
-  - 如果是具备代码基础的，也可以直接通过 py 文件编写测试用例。 
-  - 使用 pytest-html 生成报告，并针对测试报告样式进行了调整，使得报告更加美观； 
-  - 测试完成后，支持发送 企业微信通知/ 钉钉通知/ 邮箱通知，灵活配置。
-
-## 三、实现功能
+## 二、实现功能
 
 * 通过session会话方式，解决了登录之后cookie关联处理
 * 框架天然支持接口动态传参、关联灵活处理
 * 测试数据隔离, 实现数据驱动
 * 自动生成用例代码: 测试人员在yaml/excel文件中填写好测试用例, 程序可以直接生成用例代码，纯小白也能使用
 * 动态多断言: 支持响应断言和数据库断言
+* 多种报告随心选择：框架支持pytest-html以及Allure测试报告，可以动态配置所需报告
 * 日志模块: 采用loguru管理日志，可以输出更为优雅，简洁的日志
 * 钉钉、企业微信通知: 支持多种通知场景，执行成功之后，可选择发送钉钉、或者企业微信、邮箱通知
 * 执行环境一键切换，解决多环境相互影响问题
 * 使用pipenv管理虚拟环境和依赖文件，提供了一系列命令和选项来帮助你实现各种依赖和环境管理相关的操作。
 
 
-## 四、目录结构
+## 三、目录结构
 ```
 ├────case_utils/ 测试框架相关工具类
 │    ├────__init__.py
+│    ├────allure_handle.py  操作allure的相关方法
+│    ├────platform_handle.py  跨平台的支持allure，用于生成allure测试报告
 │    ├────assert_handle.py  断言处理， 包括响应断言和数据库断言
 │    ├────case_handle.py   根据配置文件，从指定类型文件中读取用例数据，并调用生成用例文件方法，生成用例文件
 │    ├────data_handle.py    数据处理
 │    ├────request_data_handle.py   针对用例数据进行请求前后的处理
+│    ├────get_results_handle.py   从pytest-html/allure测试报告中获取测试结果
 │    └────send_result_handle.py   根据配置文件，从html测试报告中获取测试结果，发送指定类型的通知
 ├────common_utils/  公共的工具类
 │    ├────__init__.py
@@ -50,8 +55,9 @@
 │    ├────excel_handle.py  处理excel
 │    ├────files_handle.py   处理文件相关操作
 │    ├────func_handle.py   函数装饰器
-│    ├────webchat_handle.py  封装企业微信机器人
+│    ├────wechat_handle.py  封装企业微信机器人
 │    ├────yagmail_handle.py  封装通过yagmail发送邮件的方法
+│    ├────time_handle.py  封装处理时间操作的一些方法
 │    └────yaml_handle.py  处理yaml文件
 ├────config/
 │    ├────__init__.py
@@ -84,7 +90,7 @@
 │    │    └────test_login_demo.py
  ```   
 
-## 五、依赖库
+## 四、依赖库
 ```
 python_version = "3.9"
 pymysql = "*"
@@ -97,15 +103,16 @@ sshtunnel = "*"
 yagmail = "*"
 pyyaml = "*"
 click = "*"
-pytest-html = "==2.1.1"
 faker = "*"
-pytest-rerunfailures = "*"
 jsonpath = "*"
 pytest = "==6.2.5"
+pytest-html = "==2.1.1"
+pytest-rerunfailures = "*"
+allure-pytest = "==2.9.45"
 ```
 
 
-## 六、安装教程
+## 五、安装教程
 
 1. 通过Git工具clone代码到本地 或者 直接下载压缩包ZIP
 2. 本地电脑搭建好 python环境，我使用的python版本是3.9

@@ -9,9 +9,10 @@
 说明：
 1、用例创建原则，测试文件名必须以“test”开头，测试函数必须以“test”开头。
 2、运行方式：
-  > python run.py  (默认在test环境运行测试用例)
+  > python run.py  (默认在test环境运行测试用例, 报告采用allure)
   > python run.py -env live 在live环境运行测试用例
   > python run.py -env=test 在test环境运行测试用例
+  > python run.py -report=pytest-html (默认在test环境运行测试用例, 报告采用pytest-html)
 """
 
 import os

@@ -5,15 +5,14 @@
 # @File    : conftest.py
 # @Software: PyCharm
 # @Desc: 这是文件的描述信息
-
+import os.path
 
 from config.global_vars import GLOBAL_VARS
 from loguru import logger
 import pytest
 from py._xmlgen import html  # 安装pytest-html，版本最好是2.1.1
 from time import strftime
-from config.settings import test, live, REPORT_TITLE, PROJECT_NAME, TESTER, DEPARTMENT
-from case_utils.send_result_handle import get_test_info_from_html_report, send_result
+from config.settings import test, live, ENV_INFO
 
 
 # ------------------------------------- START: 配置运行环境 ---------------------------------------#
@@ -51,7 +50,7 @@ def get_config(request):
         for k, v in item.items():
             GLOBAL_VARS[k] = v
 
-    logger.info(f"当前环境变量为：{GLOBAL_VARS}")
+    logger.debug(f"当前环境变量为：{GLOBAL_VARS}")
 
 
 # ------------------------------------- END: 配置运行环境 ---------------------------------------#
@@ -80,7 +79,7 @@ def pytest_html_report_title(report):
     """
     修改报告标题
     """
-    report.title = REPORT_TITLE
+    report.title = ENV_INFO.get('report_title', "")
 
 
 def pytest_configure(config):
@@ -88,7 +87,7 @@ def pytest_configure(config):
     # 在测试运行前，修改Environment部分信息，配置测试报告环境信息
     """
     # 给环境表 添加项目名称及开始时间
-    config._metadata["项目名称"] = PROJECT_NAME
+    config._metadata["项目名称"] = ENV_INFO.get('project_name', "")
     config._metadata['开始时间'] = strftime('%Y-%m-%d %H:%M:%S')
     # 给环境表 移除packages 及plugins
     config._metadata.pop("Packages")
@@ -101,25 +100,16 @@ def pytest_sessionfinish(session, exitstatus):
     在测试运行后，修改Environment部分信息
     """
     # 给环境表 添加 项目环境
-    env = session.config.getoption("--env") # 可以获取到命令行参数指定的环境
+    env = session.config.getoption("--env")  # 可以获取到命令行参数指定的环境
     session.config._metadata['项目环境'] = {GLOBAL_VARS.get("host", env)}
-
-
-@pytest.hookimpl(hookwrapper=True)
-def pytest_terminal_summary(terminalreporter, exitstatus, config):
-    yield
-    # 获取测试报告路径，并发送测试结果
-    report_path = config.getoption('--html')
-    results = get_test_info_from_html_report(report_path)
-    send_result(results, report_path)
 
 
 def pytest_html_results_summary(prefix, summary, postfix):
     """
     修改Summary部分的信息
     """
-    prefix.extend([html.p(TESTER)])
-    prefix.extend([html.p(DEPARTMENT)])
+    prefix.extend([html.p(f'测试人员：{ENV_INFO.get("tester", "")}')])
+    prefix.extend([html.p(f'所属部门: ：{ENV_INFO.get("department", "")}')])
 
 
 def pytest_html_results_table_header(cells):

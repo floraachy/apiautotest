@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-# @Version: Python 3.9
-# @Time    : 2023/1/31 17:27
+# @Time    : 2023/5/16 11:12
 # @Author  : chenyinhua
 # @File    : project_path.py
 # @Software: PyCharm
-# @Desc: 项目相关路径
+# @Desc:
+
 import os
 
 # ------------------------------------ 项目路径 ----------------------------------------------------#
@@ -43,6 +43,17 @@ MANUAL_CASE_DIR = os.path.join(CASE_DIR, "test_manual_case")
 if not os.path.exists(MANUAL_CASE_DIR):
     os.mkdir(MANUAL_CASE_DIR)
 
+# 测试用例方法模板路径
+CASE_TEMPLATE_DIR = os.path.join(CONF_DIR, "case_template.txt")
+
 # 自动生成测试用例模块
 AUTO_CASE_DIR = os.path.join(CASE_DIR, "test_auto_case")
+
+# 第三方库目录
+LIB_DIR = os.path.join(BASE_DIR, "lib")
+
+# Allure报告，测试结果集目录
+ALLURE_RESULTS_DIR = os.path.join(REPORT_DIR, "allure_results")
+# Allure报告，HTML测试报告目录
+ALLURE_HTML_DIR = os.path.join(REPORT_DIR, "allure_html")
 

@@ -6,7 +6,7 @@
 # @Software: PyCharm
 # @Desc: 全局变量
 
-from enum import Enum
+from enum import Enum, unique  # python 3.x版本才能使用
 
 # 定义一个全局变量，作用于接口关联数据存储
 GLOBAL_VARS = {}
@@ -29,3 +29,32 @@ class NotificationType(Enum):
     EMAIL = 3
     ALL = 4
 
+
+@unique  # 枚举类装饰器，确保只有一个名称绑定到任何一个值。
+class AllureAttachmentType(Enum):
+    """
+    allure 报告的文件类型枚举
+    """
+    TEXT = "txt"
+    CSV = "csv"
+    TSV = "tsv"
+    URI_LIST = "uri"
+
+    HTML = "html"
+    XML = "xml"
+    JSON = "json"
+    YAML = "yaml"
+    PCAP = "pcap"
+
+    PNG = "png"
+    JPG = "jpg"
+    SVG = "svg"
+    GIF = "gif"
+    BMP = "bmp"
+    TIFF = "tiff"
+
+    MP4 = "mp4"
+    OGG = "ogg"
+    WEBM = "webm"
+
+    PDF = "pdf"

@@ -9,21 +9,23 @@
 
 import pytest
 import os
-from common_utils.yaml_handle import HandleYaml
+from common_utils.yaml_handle import YamlHandle
 from config.project_path import DATA_DIR
-from common_utils.base_request import BaseRequest
 from case_utils.assert_handle import assert_response, assert_sql
 from loguru import logger
-from case_utils.request_data_handle import RequestPreDataHandle, after_extract, case_data_replace, eval_data_process
+from case_utils.request_data_handle import RequestPreDataHandle, RequestHandle
 from pytest_html import extras  # 往pytest-html报告中填写额外的内容
 from common_utils.func_handle import add_docstring
+from case_utils.allure_handle import allure_title
+import allure
 
 # 读取用例数据
-cases = HandleYaml(filename=os.path.join(DATA_DIR, "test_login_demo.yaml")).read_yaml
+cases = YamlHandle(filename=os.path.join(DATA_DIR, "test_login_demo.yaml")).read_yaml
 
 
+@allure.story(f'{cases["case_common"]["allure_story"]}')
 @pytest.mark.test_login_demo
-@pytest.mark.parametrize("case", cases)
+@pytest.mark.parametrize("case", cases.get("case_info"))
 def test_login_demo(case, extra, request):
     logger.info("-----------------------------START-开始执行用例-----------------------------")
     logger.debug(f"当前执行的用例数据:{case}")
@@ -32,19 +34,17 @@ def test_login_demo(case, extra, request):
         env = request.config.getoption("--env")
         # 给当前测试方法添加文档注释
         add_docstring(case.get("title", ""))(test_login_demo)
+        # 添加用例标题作为allure中显示的用例标题
+        allure_title(case.get("title", ""))
         if case.get("run", None):
             # 处理请求前的用例数据
             case_data = RequestPreDataHandle(case).request_data_handle()
             # 将用例数据显示在pytest-html报告中
             extra.append(extras.text(str(case_data), name="用例数据"))
             # 发送请求
-            response = BaseRequest.send_request(case_data)
+            response = RequestHandle(case_data).send_request_extract()
             # 将响应数据显示在pytest-html报告中
             extra.append(extras.text(str(response.text), name="响应数据"))
-            # 请求后，提取后置参数作为全局变量
-            after_extract(response, case_data["extract"])
-            # 从全局变量中获取最新值，替换数据库断言中的参数
-            case_data["assert_sql"] = eval_data_process(case_data_replace(case_data["assert_sql"]))
             # 进行响应断言
             assert_response(response, case_data["assert_response"])
             # 进行数据库断言

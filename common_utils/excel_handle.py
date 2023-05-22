@@ -10,7 +10,7 @@ import openpyxl
 from loguru import logger
 
 
-class ReadExcel:
+class ExcelHandle:
 
     def __init__(self, filename):
         """
@@ -29,11 +29,11 @@ class ReadExcel:
         wb.save(self.filename)
         return self.filename
 
-    def read(self, sheet=None):
+    def read(self, sheet=None) -> list:
         """
         读取excel数据并返回
         :param sheet: 表单名称
-        :return: 存在传入的表单, 返回表单数据，不存在则返回空
+        :return: 返回读取的excel数据，是一个列表
         """
         # 创建一个工作簿工作对象(excel文件已存在的情况)
         workbook = openpyxl.open(self.filename)
@@ -41,29 +41,37 @@ class ReadExcel:
 
         # 获取excel当中所有的sheet，返回的是一个列表
         sheets = workbook.sheetnames
+        # 保存从excel中获取到的数据
+        results = []
 
         # 如果sheet不为空，则取sheet等于指定sheet
         if sheet:
-            sheet = sheet
-        # 如果sheet为空，则sheet为第一个表单
-        else:
-            sheet = sheets[0]
-
-        data = []
-
-        if sheet in sheets:
+            sheet_data = {
+                "sheet_name": sheet,
+                "data": []
+            }
             sheet = workbook[sheet]
             all_values = list(sheet.values)
             header = all_values[0]
             for i in all_values[1:]:
-                data.append(dict(zip(header, i)))
-            # 关闭excel
-            workbook.close()
-            return data
+                sheet_data["data"].append(dict(zip(header, i)))
+            results.append(sheet_data)
+        # 如果sheet为空，则sheet为第一个表单
         else:
-            # 关闭excel
-            workbook.close()
-            logger.error(f"表单： 【{sheet}】文件不存在")
+            for sheet in sheets:
+                sheet_data = {
+                    "sheet_name": sheet,
+                    "data": []
+                }
+                sheet = workbook[sheet]
+                all_values = list(sheet.values)
+                header = all_values[0]
+                for i in all_values[1:]:
+                    sheet_data["data"].append(dict(zip(header, i)))
+                results.append(sheet_data)
+        # 关闭excel
+        workbook.close()
+        return results
 
     def write(self, row, column, data, sheet_name=None):
         """

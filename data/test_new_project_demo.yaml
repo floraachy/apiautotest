@@ -1,3 +1,10 @@
+# 公共参数
+case_common:
+  allure_epic: GitLink接口  # 敏捷里面的概念，定义史诗，相当于module级的标签, 往下是 feature
+  allure_feature: 开源项目模块  # 功能点的描述，相当于class级的标签, 理解成模块往下是 story
+  allure_story: 新建项目接口    # 故事，可以理解为场景，相当于method级的标签, 往下是 title
+# 用例数据
+case_info:
 - feature: 新建项目
   title: 正确输入各项必填参数，新建项目成功
   url: /api/projects.json

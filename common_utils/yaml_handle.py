@@ -9,7 +9,7 @@
 import yaml
 
 
-class HandleYaml:
+class YamlHandle:
 
     def __init__(self, filename):
         """

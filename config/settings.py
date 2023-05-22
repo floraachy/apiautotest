@@ -14,14 +14,13 @@ CASE_FILE_TYPE = 1
 SEND_RESULT_TYPE = 4
 
 # 测试报告的定制化信息展示
-# 这个需要写入到allure测试结果集的environment.properties（不支持中文）
 ENV_INFO = {
-    "report_title": "Auto Test Report",
-    "report_name": "autotestreport_",
-    "project_name": "GitLink",
-    "tester": "floraachy",
-    "department": "OpenSource"
-}
+        "report_title": "自动化测试报告",
+        "report_name": "autotestreport_",
+        "project_name": "GitLink 确实开源",
+        "tester": "陈银花",
+        "department": "开源中心"
+    }
 
 # 指定日志收集级别
 LOG_LEVEL = "INFO"

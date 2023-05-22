@@ -94,9 +94,6 @@ def run(env, m, report):
             """
             pytest.main(args=arg_list)
             # ------------------------ 使用allure生成测试报告 ------------------------
-            # 往allure测试结果集目录写入环境配置相关信息
-            ENV_INFO["project_env"] = env
-            AllureReportBeautiful(allure_results_path=ALLURE_RESULTS_DIR).set_report_env(env_info=ENV_INFO)
             logger.debug("-------开始生成allure测试报告-------")
             plat = PlatformHandle()
             # 从LIB_DIR目录中寻找以allure开头的目录作为allure模块的目录，并进入bin目录下
@@ -110,6 +107,9 @@ def run(env, m, report):
                 new_title=ENV_INFO["project_name"])
             AllureReportBeautiful(allure_html_path=ALLURE_HTML_DIR).set_report_name(new_name=ENV_INFO["report_title"])
             logger.debug("-------allure测试报告生成完毕，开始发送测试报告-------")
+            # 往allure测试报告中写入环境配置相关信息
+            ENV_INFO["project_env"] = env
+            AllureReportBeautiful(allure_html_path=ALLURE_HTML_DIR).set_report_env_on_html(env_info=ENV_INFO)
             # 发送从allure-html获取的测试报告
             results = get_test_results_from_from_allure_report(ALLURE_HTML_DIR)
             # 压缩allure-html报告为一个压缩文件zip

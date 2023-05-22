@@ -111,7 +111,7 @@ class AllureReportBeautiful:
         with open(title_filepath, 'w', encoding="utf-8") as f:
             json.dump(new_params, f, ensure_ascii=False, indent=4)
 
-    def set_report_env(self, env_info):
+    def set_report_env_on_results(self, env_info):
         """
         在allure-results报告的根目录下生成一个写入了环境信息的文件：environment.properties(注意：不能放置中文，否则会出现乱码)
         @param env_info:  需要写入的环境信息
@@ -121,6 +121,20 @@ class AllureReportBeautiful:
         with open(os.path.join(self.allure_results_path, "environment.properties"), 'w', encoding="utf-8") as f:
             for k, v in env_info.items():
                 f.write('{}={}\n'.format(k, v))
+
+    def set_report_env_on_html(self, env_info: dict):
+        """
+         在allure-html报告中往widgets/environment.json中写入环境信息,
+            格式参考如下：[{"values":["Auto Test Report"],"name":"report_title"},{"values":["autotestreport_"]]
+        """
+        envs = []
+        for k, v in env_info.items():
+            envs.append({
+                "name": k,
+                "values": [v]
+            })
+        with open(os.path.join(self.allure_html_path, "widgets", "environment.json"), 'w', encoding="utf-8") as f:
+            json.dump(envs, f, ensure_ascii=False, indent=4)
 
 
 def allure_logo_change(allure_path, logo_path):

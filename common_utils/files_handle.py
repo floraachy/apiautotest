@@ -5,6 +5,8 @@
 # @Software: PyCharm
 # @Desc: 处理文件相关操作
 import os
+from loguru import logger
+import zipfile
 
 
 def get_files(target, start=None, end=None):
@@ -61,3 +63,49 @@ def get_newest_file(dir_path):
 
     # 返回最新文件路径
     return sorted_files[0][0]
+
+
+def zip_file(in_path: str, out_path: str):
+    """
+    压缩指定文件夹
+    :param in_path: 目标文件夹路径
+    :param out_path: 压缩文件保存路径+xxxx.zip
+    :return: 无
+    """
+    # 如果传入的路径是一个目录才进行压缩操作
+    if os.path.isdir(in_path):
+        logger.debug("目标路径是一个目录，开始进行压缩......")
+        # 写入
+        zip = zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED)
+        for path, dirnames, filenames in os.walk(in_path):
+            # 去掉目标跟路径，只对目标文件夹下边的文件及文件夹进行压缩
+            fpath = path.replace(in_path, '')
+            for filename in filenames:
+                zip.write(
+                    os.path.join(
+                        path, filename), os.path.join(
+                        fpath, filename))
+        zip.close()
+        logger.debug("压缩完成！")
+    else:
+        logger.error("目标路径不是一个目录，请检查！")
+
+
+def delete_dir_file(file_path):
+    """
+    删除指定目录下的所有文件
+    :param file_path: 目标文件夹路径 (存在多级路径的暂不支持)
+    """
+    paths = os.listdir(file_path)
+    if paths:
+        logger.debug("目标目录存在文件或目录，进行删除操作")
+        for item in paths:
+            path = os.path.join(file_path, item)
+            # 如果目标路径是一个文件，使用os.remove删除
+            if os.path.isfile(path):
+                os.remove(path)
+            # 如果目标路径是一个目录，使用os.rmdir删除
+            if os.path.isdir(path):
+                os.rmdir(path)
+    else:
+        logger.debug("目标目录不存在文件或目录，不需要删除")

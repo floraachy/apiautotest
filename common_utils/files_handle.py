@@ -7,6 +7,7 @@
 import os
 from loguru import logger
 import zipfile
+import shutil
 
 
 def get_files(target, start=None, end=None):
@@ -110,3 +111,28 @@ def delete_dir_file(file_path):
                 os.rmdir(path)
     else:
         logger.debug("目标目录不存在文件或目录，不需要删除")
+
+
+def copy_file(src_file_path, dest_dir_path):
+    """
+    复制一个文件到另一个目录
+    :param: src_file_path: 源文件路径
+    :param: dest_dir_path: 目标文件夹路径
+
+    """
+    # 判断源文件路径是否存在
+    if not os.path.isfile(src_file_path):
+        return "源文件路径不存在"
+
+    # 判断目标文件夹路径是否存在，不存在则创建
+    if not os.path.isdir(dest_dir_path):
+        os.makedirs(dest_dir_path)
+
+    # 复制文件
+    try:
+        shutil.copy(src_file_path, dest_dir_path)
+        return "复制成功"
+    except Exception as e:
+        return f"复制失败：{e}"
+
+

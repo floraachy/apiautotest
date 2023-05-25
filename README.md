@@ -115,26 +115,163 @@ allure-pytest = "==2.9.45"
 ## 五、安装教程
 
 1. 通过Git工具clone代码到本地 或者 直接下载压缩包ZIP
+
 2. 本地电脑搭建好 python环境，我使用的python版本是3.9
+
 3. 安装pipenv: pip install pipenv（必须在项目根目录下）
+
 4. 使用pipenv管理安装环境依赖包：pipenv shell （必须在项目根目录下执行）
 ```
    注意：使用pipenv install会自动安装Pipfile里面的依赖包，该依赖包仅安装在虚拟环境里，不安装在测试机。
 ```
-6. 激活已存在的虚拟环境（如果不存在会创建一个）：pipenv shell （必须在项目根目录下执行）
-7. 更改配置文件config.settings.py，适配你需要测试的环境
-8. 在data目录下新建测试用例数据文件，编写测试用例 （Excel或者Yaml）或者在test_case目录下通过python语言编写用例
-9. 框架主入口为 run.py文件
+如上环境都已经搭建好了，包括框架依赖包也都安装好了。
+
+## 六、如何创建用例
+### 1. 修改配置文件  `config.settings.py`
+1）确认用例是通过YAML还是Excel编写，由CASE_FILE_TYPE控制
+2）确认测试完成后是否发送测试结果，由SEND_RESULT_TYPE控制，并填充对应邮件/钉钉/企业微信配置信息
+3）确认测试是否需要进行数据库断言，如有需求，填充数据库配置信息
+4）指定日志收集级别，由LOG_LEVEL控制
+
+### 2. 修改全局变量，增加测试数据  `config.global_vars.py`
+1) ENV_VARS["common"]是一些公共参数，如报告标题，报告名称，测试者，测试部门。后续会显示在测试报告上。如果还有其他，可自行添加
+2）ENV_VARS["test"]是保存test环境的一些测试数据。ENV_VARS["live"]是保存live环境的一些测试数据。如果还有其他环境可以继续增加，例如增加ENV_VARS["dev"] = {"host": "", ......}
+
+### 3. 编写测试用例数据用于测试方法自动创建  `data`  `test_case.test_auto_case`
+- 在目录`data`下新建一个YAML/Excel文件。按照如下字段要求进行测试用例数据添加
+- 注意：如果需要自动创建测试用例文件，YAML/Excel文件的文件名需要以"test"开头。
+<table>
+	<tr>
+	    <th colspan="2">用例参数</th>
+	    <th>用例参数描述</th>
+	    <th>数据类型</th>  
+            <th>备注</th>  
+	</tr >
+	<tr >
+	    <td rowspan="3">case_common</td>
+	    <td>allure_epic</td>
+	    <td>用作于@allure.epic()装饰器中的内容</td>
+            <td>string</td>
+            <td>如果是使用Excel管理用例数据，这个目前是写死的。可在case_utils.case_handle.py中更改</td> 
+	</tr>
+	<tr>
+	    <td>allure_feature</td>
+	    <td>用作于@allure.feature()装饰器中的内容</td>
+            <td>string</td>
+            <td>如果是使用Excel管理用例数据， 这个用的是excel的表单名称</td>
+	</tr>
+	<tr>
+	    <td>allure_story</td>
+	    <td>用作于@allure.story()装饰器中的内容</td>
+            <td>string</td>
+            <td>如果是使用Excel管理用例数据， 这个用的是excel的表单名称</td>
+	</tr>
+        <tr >
+	    <td rowspan="13">case_info</td>
+	    <td>feature</td>
+	    <td>用例所属模块， 类似于@allure.feature()</td>
+            <td>string</td>
+            <td></td> 
+	</tr>
+        <tr>
+	    <td>title</td>
+	    <td>用例标题</td>
+            <td>string</td>
+            <td></td>
+	</tr>
+        <tr>
+	    <td>run</td>
+	    <td>是否执行用例，为空或者True都会执行</td>
+            <td>string</td>
+            <td>Bool/None</td>
+	</tr>
+        <tr>
+	    <td>url</td>
+	    <td>请求路径（可填写全路径 或者 资源路径）。通常我们填写资源路径。在用例执行前，会针对路径进行处理。具体可见case_utils.request_data_handle.py.RequestPreDataHandle.url_handle</td>
+            <td>string</td>
+            <td>请求路径=基准路径（host/base_url）+资源路径(url)</td>
+	</tr>
+        <tr>
+	    <td>method</td>
+	    <td>请求方式，例如：GET, POST, DELETE, PUT, PATCH等</td>
+            <td>string</td>
+            <td></td>
+	</tr>
+        <tr>
+	    <td>headers</td>
+	    <td>请求头</td>
+            <td>dict</td>
+            <td></td>
+	</tr>
+        <tr>
+	    <td>cookies</td>
+	    <td>请求cookies</td>
+            <td>string/None</td>
+            <td></td>
+	</tr>
+        <tr>
+	    <td>pk</td>
+	    <td>请求数据类型：params, json, file, data</td>
+            <td>string</td>
+            <td></td>
+	</tr>
+        <tr>
+	    <td>payload</td>
+	    <td>请求参数</td>
+            <td>string</td>
+            <td></td>
+	</tr>
+        <tr>
+	    <td>files</td>
+	    <td>上传附件接口所需的文件绝对路径</td>
+            <td>string/None</td>
+            <td></td>
+	</tr>
+        <tr>
+	    <td>extract</td>
+	    <td>后置提取参数</td>
+            <td>dict/None</td>
+            <td></td>
+	</tr>
+        <tr>
+	    <td>assert_response</td>
+	    <td>响应断言</td>
+            <td>dict/None</td>
+            <td></td>
+	</tr>
+        <tr>
+	    <td>assert_sql</td>
+	    <td>数据库断言</td>
+            <td>dict/None</td>
+            <td></td>
+	</tr>
+</table>
+
+### 4. 编写测试用例数据用于手动编写测试用例方法 `data`  `test_case.test_manual_case`
+- 原则上，如果是手动编写测试用例（python代码）， 测试用例数据文件不要以"test"开头。 如果以“test”开头，可能导致用例运行多次。
+1）在目录`data`下新建一个YAML/Excel文件，按照上述要求编写测试用例数据
+2）在test_case.test_manual_case下新建一个以"test"开头的测试方法，进行测试用例方法编写。
+
+
+## 七、运行自动化测试
+### 1.  激活已存在的虚拟环境
+- （如果不存在会创建一个）：pipenv shell （必须在项目根目录下执行）
+
+### 2. 运行
 ```
-	必须在项目根目录下，输入命令运行（如果依赖包是安装在虚拟环境中，需要先启动虚拟环境）。
-    注意：本机环境中没有安装依赖包的情况下，不要直接在run.py中右键直接run
-  > python run.py  (默认在test环境运行测试用例)
+在pycharm>terminal或者电脑命令窗口，进入项目根路径，执行如下命令（如果依赖包是安装在虚拟环境中，需要先启动虚拟环境）。
+  > python run.py  (默认在test环境运行测试用例, 报告采用allure)
   > python run.py -env live 在live环境运行测试用例
   > python run.py -env=test 在test环境运行测试用例
+  > python run.py -report=pytest-html (默认在test环境运行测试用例, 报告采用pytest-html)
 ```
+注意：
+- 如果pycharm.interpreter拥有了框架所需的所有依赖包，可以通过pycharm直接在`run.py`中右键运行
 
-### 初始化项目可能遇到的问题
-#### 1. 测试机安装的是python3.7，但是本框架要求3.9.5，怎么办？
+
+
+## 初始化项目可能遇到的问题
+### 1. 测试机安装的是python3.7，但是本框架要求3.9.5，怎么办？
 方法一：建议采纳此方法
 1）首先在项目根目录下打开命令窗口，移除虚拟环境：pipenv --rm
 2）安装虚拟环境时忽略锁定的版本号，同时安装依赖包：pipenv install --skip-lock
@@ -168,7 +305,7 @@ python_version = "3.7"
 
 6）运行框架：python run.py
 
-#### 2. 无法安装依赖包或者安装很慢，怎么办？
+### 2. 无法安装依赖包或者安装很慢，怎么办？
 检查一下Pipfile文件中的pip的安装源（位置：Pipfile）
 以下安装源均可：
 ```

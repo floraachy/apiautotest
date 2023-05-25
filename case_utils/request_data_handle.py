@@ -30,6 +30,7 @@ class RequestPreDataHandle:
                     f"请求路径: {request_data.get('url', None)}\n" \
                     f"请求方式: {request_data.get('method', None)}\n" \
                     f"请求头:   {request_data.get('headers', None)}\n" \
+                    f"请求cookies: {request_data.get('cookies', None)}\n" \
                     f"请求关键字: {request_data.get('pk', None)}\n" \
                     f"请求内容: {request_data.get('payload', None)}\n" \
                     f"请求文件: {request_data.get('files', None)}\n" \
@@ -46,6 +47,7 @@ class RequestPreDataHandle:
         self.url_handle()
         self.method_handle()
         self.headers_handle()
+        self.cookies_handle()
         self.payload_handle()
         self.files_handle()
         self.extract_handle()
@@ -56,6 +58,7 @@ class RequestPreDataHandle:
                     f"请求路径: {self.request_data.get('url', None)}\n" \
                     f"请求方式: {self.request_data.get('method', None)}\n" \
                     f"请求头:   {self.request_data.get('headers', None)}\n" \
+                    f"请求cookies:   {self.request_data.get('cookies', None)}\n" \
                     f"请求关键字: {self.request_data.get('pk', None)}\n" \
                     f"请求内容: {self.request_data.get('payload', None)}\n" \
                     f"请求文件: {self.request_data.get('files', None)}\n" \
@@ -93,6 +96,12 @@ class RequestPreDataHandle:
     def method_handle(self):
         # TODO 暂时不需要处理，后续有需要在处理
         pass
+
+    def cookies_handle(self):
+        # 从用例数据中获取cookies， 处理cookies
+        if self.request_data.get("cookies", None):
+            self.request_data["cookies"] = eval_data_process(
+                data_replace(content=self.request_data.get("cookies", None), source=GLOBAL_VARS))
 
     def headers_handle(self):
         # 从用例数据中获取header， 处理header
@@ -149,6 +158,7 @@ class RequestHandle:
                     f"请求路径: {self.case_data.get('url', None)}\n" \
                     f"请求方式: {self.case_data.get('method', None)}\n" \
                     f"请求头:   {self.case_data.get('headers', None)}\n" \
+                    f"请求cookies: {self.case_data.get('cookies', None)}\n" \
                     f"请求关键字: {self.case_data.get('pk', None)}\n" \
                     f"请求内容: {self.case_data.get('payload', None)}\n" \
                     f"请求文件: {self.case_data.get('files', None)}\n" \
@@ -159,6 +169,7 @@ class RequestHandle:
         allure_step(step_title=f"请求地址:{self.case_data['url']}")
         allure_step(step_title=f"请求方式：{self.case_data['method']}")
         allure_step(step_title="请求头", content=self.case_data['headers'])
+        allure_step(step_title="请求Cookies", content=self.case_data['cookies'])
         allure_step(step_title="请求参数", content=self.case_data['payload'])
         allure_step(step_title="请求文件", content=self.case_data['files'])
         allure_step(step_title="后置提取参数（新）", content=self.case_data['extract'])

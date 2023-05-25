@@ -18,12 +18,13 @@
 import os
 import shutil
 import pytest
-from config.project_path import REPORT_DIR, LOG_DIR, AUTO_CASE_DIR, CONF_DIR, LIB_DIR, ALLURE_RESULTS_DIR, \
+from config.path_config import REPORT_DIR, LOG_DIR, AUTO_CASE_DIR, CONF_DIR, LIB_DIR, ALLURE_RESULTS_DIR, \
     ALLURE_HTML_DIR
 from case_utils.case_handle import get_case_data
 from loguru import logger
 import click
-from config.settings import LOG_LEVEL, ENV_INFO
+from config.settings import LOG_LEVEL
+from config.global_vars import GLOBAL_VARS, ENV_VARS
 from datetime import datetime
 from case_utils.platform_handle import PlatformHandle
 from case_utils.get_results_handle import get_test_results_from_pytest_html_report, \
@@ -81,8 +82,10 @@ def run(env, m, report):
             "--reruns=3", "--reruns-delay=2"
         """
         arg_list = []
-        if env.lower() == "live":
-            arg_list.append("--env=live")
+        # 根据指定的环境参数，将运行环境所需相关配置数据保存到GLOBAL_VARS
+        GLOBAL_VARS["env_key"] = env.lower()
+        for k, v in ENV_VARS[env.lower()].items():
+            GLOBAL_VARS[k] = v
         # 执行指定测试用例
         if m is not None:
             arg_list.append(f"-m {m}")
@@ -105,27 +108,32 @@ def run(env, m, report):
             os.popen(cmd).read()
             logger.debug("-------美化allure测试报告-------")
             AllureReportBeautiful(allure_html_path=ALLURE_HTML_DIR).set_windows_title(
-                new_title=ENV_INFO["project_name"])
-            AllureReportBeautiful(allure_html_path=ALLURE_HTML_DIR).set_report_name(new_name=ENV_INFO["report_title"])
+                new_title=ENV_VARS["common"]["project_name"])
+            AllureReportBeautiful(allure_html_path=ALLURE_HTML_DIR).set_report_name(
+                new_name=ENV_VARS["common"]["report_title"])
             logger.debug("-------allure测试报告生成完毕，开始发送测试报告-------")
             # 往allure测试报告中写入环境配置相关信息
-            ENV_INFO["project_env"] = env
-            AllureReportBeautiful(allure_html_path=ALLURE_HTML_DIR).set_report_env_on_html(env_info=ENV_INFO)
+            env_info = ENV_VARS["common"]
+            env_info["run_env"] = GLOBAL_VARS.get("host", env)
+            AllureReportBeautiful(allure_html_path=ALLURE_HTML_DIR).set_report_env_on_html(
+                env_info=env_info)
             # 从allure-html测试报告获取测试结果
             results = get_test_results_from_from_allure_report(ALLURE_HTML_DIR)
             # 复制http_server.exe以及双击查看报告.bat文件到allure-html根目录下，用于支撑电脑在未安装allure服务的情况下打开allure-html报告
             # 注意：ZIP文件的名称包含某些特殊字符，会导致无法使用.bat文件打开allure-html报告， 例如空格，/ 等
             allure_config_path = os.path.join(CONF_DIR, "allure_config")
-            copy_file(src_file_path=os.path.join(allure_config_path, [i for i in os.listdir(allure_config_path) if i.endswith(".exe")][0]),
+            copy_file(src_file_path=os.path.join(allure_config_path,
+                                                 [i for i in os.listdir(allure_config_path) if i.endswith(".exe")][0]),
                       dest_dir_path=ALLURE_HTML_DIR)
-            copy_file(src_file_path=os.path.join(allure_config_path, [i for i in os.listdir(allure_config_path) if i.endswith(".bat")][0]),
+            copy_file(src_file_path=os.path.join(allure_config_path,
+                                                 [i for i in os.listdir(allure_config_path) if i.endswith(".bat")][0]),
                       dest_dir_path=ALLURE_HTML_DIR)
             # 压缩allure-html报告为一个压缩文件zip
-            allure_zip_path = os.path.join(REPORT_DIR, f'{ENV_INFO["report_name"]}{str(current_time)}.zip')
+            allure_zip_path = os.path.join(REPORT_DIR, f'autotest_{str(current_time)}.zip')
             zip_file(in_path=ALLURE_HTML_DIR, out_path=allure_zip_path)
             send_result(results=results, attachment_path=allure_zip_path)
         else:
-            report_path = os.path.join(REPORT_DIR, ENV_INFO["report_name"] + str(current_time) + ".html")
+            report_path = os.path.join(REPORT_DIR, "autotest_" + str(current_time) + ".html")
             pytest_html_config_path = os.path.join(CONF_DIR, "pytest_html_config")
             report_css = os.path.join(pytest_html_config_path, "pytest_html_report.css")
             arg_list.extend([f'--html={report_path}', f"--css={report_css}"])

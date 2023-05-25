@@ -7,7 +7,7 @@
 
 from loguru import logger
 from common_utils.yagmail_handle import YagEmailServe
-from config.global_vars import NotificationType
+from config.models import NotificationType
 from config.settings import SEND_RESULT_TYPE, email, ding_talk, wechat, email_subject, email_content, ding_talk_title, \
     ding_talk_content, wechat_content
 from common_utils.dingding_handle import DingTalkBot

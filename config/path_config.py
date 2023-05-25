@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2023/5/16 11:12
 # @Author  : chenyinhua
-# @File    : project_path.py
+# @File    : path_config.py
 # @Software: PyCharm
 # @Desc:
 

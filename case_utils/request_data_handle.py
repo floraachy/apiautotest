@@ -131,6 +131,7 @@ class RequestPreDataHandle:
         if self.request_data.get("assert_response", None):
             self.request_data["assert_response"] = eval_data_process(
                 data_replace(content=self.request_data.get("assert_response", None), source=GLOBAL_VARS))
+        # 由于数据库断言里面的变量需要请求响应后进行提取，因此目前不进行处理
 
 
 # ---------------------------------------- 进行请求，请求后的参数提取处理----------------------------------------#
@@ -148,7 +149,7 @@ class RequestHandle:
         """
         response = BaseRequest.send_request(self.case_data)
         self.case_data["extract"] = self.after_extract(response, self.case_data.get("extract", None))
-        # 从全局变量中获取最新值，替换数据库断言中的参数
+        # 处理数据库断言 - 从全局变量中获取最新值，替换数据库断言中的参数
         if self.case_data.get('assert_sql', None):
             self.case_data["assert_sql"] = eval_data_process(
                 data_replace(content=self.case_data["assert_sql"], source=GLOBAL_VARS))

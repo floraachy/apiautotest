@@ -29,7 +29,7 @@ def get_test_results_from_pytest_html_report(html_report_path):
             "Python": "python_version",
             "开始时间": "start_time",
             "项目名称": "project_name",
-            "项目环境": "project_env"
+            "项目环境": "run_env"
         }
         for key, value in enumerate(new_environment_info):
             if value in info_mapping:

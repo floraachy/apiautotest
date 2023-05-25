@@ -7,7 +7,7 @@
 
 import json
 import allure
-from config.global_vars import AllureAttachmentType
+from config.models import AllureAttachmentType
 import os
 
 

@@ -12,7 +12,6 @@ from common_utils.data_handle import json_extractor, re_extract
 from loguru import logger
 from case_utils.request_data_handle import response_type
 from common_utils.mysql_handle import MysqlServer
-from config.settings import db_info
 
 
 def assert_response(response: Response, expected: dict) -> None:
@@ -85,10 +84,10 @@ def assert_response(response: Response, expected: dict) -> None:
                 "=====================================================")
 
 
-def assert_sql(env, expected: dict):
+def assert_sql(db_info, expected: dict):
     """
     数据库断言
-    :param env: 当前所处环境
+    :param db_info: 数据库配置信息
     :param expected: 预期结果，从excel中或者yaml读取、或者手动传入,格式如下：
     {
     'eq':
@@ -104,11 +103,7 @@ def assert_sql(env, expected: dict):
         allure_step(step_title='判断是否存在数据库断言',
                     content='当前用例无数据库断言')
         return
-    try:
-        # 拿不到数据库配置，则不进行数据库断言
-        db = db_info["test" if env.lower() == "test" else "live"]
-        db_host = db["db_host"]
-    except KeyError:
+    if not db_info:
         logger.error("当前环境无数据库配置，跳过数据库断言！")
         allure_step(step_title='判断是否存在数据库配置',
                     content='当前环境无数据库配置，跳过数据库断言！}')
@@ -121,7 +116,7 @@ def assert_sql(env, expected: dict):
             if _k == "sql":
                 try:
                     # 查询数据库，获取查询结果
-                    sql_result = MysqlServer(**db).query_one(_v)
+                    sql_result = MysqlServer(**db_info).query_one(_v)
                     logger.info(f'数据库响应断言 -|- SQL：{_v} || 查询结果：{sql_result}')
                     allure_step(step_title=f'数据库断言',
                                 content=f'SQL：{_v} || 查询结果：{sql_result}')

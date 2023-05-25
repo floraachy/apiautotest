@@ -1,60 +1,37 @@
 # -*- coding: utf-8 -*-
-# @Version: Python 3.9
-# @Time    : 2023/1/31 14:31
+# @Time    : 2023/5/25 14:52
 # @Author  : chenyinhua
 # @File    : global_vars.py
 # @Software: PyCharm
-# @Desc: 全局变量
-
-from enum import Enum, unique  # python 3.x版本才能使用
-
-# 定义一个全局变量，作用于接口关联数据存储
+# @Desc:
+# 定义一个全局变量，用于存储运行过程中相关数据
 GLOBAL_VARS = {}
 
+ENV_VARS = {
+    "common": {
+        "report_title": "自动化测试报告",
+        "project_name": "GitLink 确实开源",
+        "tester": "陈银花",
+        "department": "开源中心"
+    },
+    "test": {
+        # 示例测试环境及示例测试账号
+        "host": "https://testforgeplus.trustie.net/",
+        "login": "auotest",
+        "password": "12345678",
+        "nickname": "AutoTest",
+        "user_id": "84954",
+        "project_id": "",
+        "project": ""
 
-class CaseFileType(Enum):
-    """
-    用例数据可存储文件的类型枚举
-    """
-    YAML = 1
-    EXCEL = 2
-    ALL = 0
-
-
-class NotificationType(Enum):
-    """ 自动化通知方式 """
-    DEFAULT = 0
-    DING_TALK = 1
-    WECHAT = 2
-    EMAIL = 3
-    ALL = 4
-
-
-@unique  # 枚举类装饰器，确保只有一个名称绑定到任何一个值。
-class AllureAttachmentType(Enum):
-    """
-    allure 报告的文件类型枚举
-    """
-    TEXT = "txt"
-    CSV = "csv"
-    TSV = "tsv"
-    URI_LIST = "uri"
-
-    HTML = "html"
-    XML = "xml"
-    JSON = "json"
-    YAML = "yaml"
-    PCAP = "pcap"
-
-    PNG = "png"
-    JPG = "jpg"
-    SVG = "svg"
-    GIF = "gif"
-    BMP = "bmp"
-    TIFF = "tiff"
-
-    MP4 = "mp4"
-    OGG = "ogg"
-    WEBM = "webm"
-
-    PDF = "pdf"
+    },
+    "live": {
+        "host": "https://www.gitlink.org.cn",
+        "login": "******",
+        "password": "******",
+        "nickname": "******",
+        "user_id": "******",
+        "project_id": "",
+        "project": ""
+    }
+}

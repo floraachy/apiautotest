@@ -7,10 +7,10 @@
 # @Desc: 生成测试用例文件并返回用例数据
 
 import os
-from config.project_path import CASE_TEMPLATE_DIR, DATA_DIR, AUTO_CASE_DIR
+from config.path_config import CASE_TEMPLATE_DIR, DATA_DIR, AUTO_CASE_DIR
 from common_utils.excel_handle import ExcelHandle
 from common_utils.yaml_handle import YamlHandle
-from config.global_vars import CaseFileType
+from config.models import CaseFileType
 from config.settings import CASE_FILE_TYPE
 from string import Template
 from loguru import logger

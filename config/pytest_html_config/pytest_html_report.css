@@ -1,0 +1,54 @@
+/* change pytest-html test report style */
+@charset "UTF-8";
+body {
+    font-size: 16px;
+}
+
+
+h1 {
+     text-align: center;
+     color: #2084D9;
+     font-size: 30px;
+}
+
+
+h2 {
+    font-size: 24px;
+    color: #2084D9;
+}
+
+
+a {
+    color: #466AFF;
+}
+
+span {
+    font-size: 20px;
+}
+
+
+#environment td {
+    padding: 10px;
+}
+
+
+#results-table {
+   font-size: 16px;
+   table-layout:fixed;
+}
+
+#results-table td{
+    word-break:break-all;
+    word-wrap:break-word;
+}
+
+#results-table th{
+    font-size: 20px;
+    background-color: #2084D9;
+    color: #FFFFFF;
+}
+
+td {
+    color: #000000;
+}
+

@@ -30,7 +30,7 @@ from case_utils.get_results_handle import get_test_results_from_pytest_html_repo
     get_test_results_from_from_allure_report
 from case_utils.send_result_handle import send_result
 from case_utils.allure_handle import AllureReportBeautiful
-from common_utils.files_handle import zip_file
+from common_utils.files_handle import zip_file, copy_file
 
 
 @click.command()
@@ -86,6 +86,7 @@ def run(env, m, report):
         # 执行指定测试用例
         if m is not None:
             arg_list.append(f"-m {m}")
+        current_time = datetime.now().strftime("%Y-%m-%d+%H_%M_%S")
         if report.lower() == "allure":
             arg_list.extend(['-q', '--cache-clear', f'--alluredir={ALLURE_RESULTS_DIR}', '--clean-alluredir'])
             """
@@ -110,16 +111,23 @@ def run(env, m, report):
             # 往allure测试报告中写入环境配置相关信息
             ENV_INFO["project_env"] = env
             AllureReportBeautiful(allure_html_path=ALLURE_HTML_DIR).set_report_env_on_html(env_info=ENV_INFO)
-            # 发送从allure-html获取的测试报告
+            # 从allure-html测试报告获取测试结果
             results = get_test_results_from_from_allure_report(ALLURE_HTML_DIR)
+            # 复制http_server.exe以及双击查看报告.bat文件到allure-html根目录下，用于支撑电脑在未安装allure服务的情况下打开allure-html报告
+            # 注意：ZIP文件的名称包含某些特殊字符，会导致无法使用.bat文件打开allure-html报告， 例如空格，/ 等
+            allure_config_path = os.path.join(CONF_DIR, "allure_config")
+            copy_file(src_file_path=os.path.join(allure_config_path, [i for i in os.listdir(allure_config_path) if i.endswith(".exe")][0]),
+                      dest_dir_path=ALLURE_HTML_DIR)
+            copy_file(src_file_path=os.path.join(allure_config_path, [i for i in os.listdir(allure_config_path) if i.endswith(".bat")][0]),
+                      dest_dir_path=ALLURE_HTML_DIR)
             # 压缩allure-html报告为一个压缩文件zip
-            allure_zip_path = os.path.join(REPORT_DIR, f'{ENV_INFO["report_name"]}.zip')
+            allure_zip_path = os.path.join(REPORT_DIR, f'{ENV_INFO["report_name"]}{str(current_time)}.zip')
             zip_file(in_path=ALLURE_HTML_DIR, out_path=allure_zip_path)
             send_result(results=results, attachment_path=allure_zip_path)
         else:
-            current_time = datetime.now().strftime("%Y-%m-%d %H_%M_%S")
             report_path = os.path.join(REPORT_DIR, ENV_INFO["report_name"] + str(current_time) + ".html")
-            report_css = os.path.join(CONF_DIR, "pytest_html_report.css")
+            pytest_html_config_path = os.path.join(CONF_DIR, "pytest_html_config")
+            report_css = os.path.join(pytest_html_config_path, "pytest_html_report.css")
             arg_list.extend([f'--html={report_path}', f"--css={report_css}"])
             pytest.main(args=arg_list)
             logger.debug("-------测试完成，发送测试报告-------")

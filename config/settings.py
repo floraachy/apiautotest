@@ -11,7 +11,7 @@
 CASE_FILE_TYPE = 1
 
 # 0表示默认不发送任何通知， 1代表钉钉通知，2代表企业微信通知， 3代表邮件通知， 4代表所有途径都发送通知
-SEND_RESULT_TYPE = 4
+SEND_RESULT_TYPE = 0
 
 # 测试报告的定制化信息展示
 ENV_INFO = {

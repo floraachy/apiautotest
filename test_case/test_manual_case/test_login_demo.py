@@ -31,32 +31,27 @@ cases = YamlHandle(filename=os.path.join(DATA_DIR, "test_login_demo.yaml")).read
 def test_login_demo(case, extra):
     logger.info("-----------------------------START-开始执行用例-----------------------------")
     logger.debug(f"当前执行的用例数据:{case}")
-    try:
-        # 给当前测试方法添加文档注释
-        add_docstring(case.get("title", ""))(test_login_demo)
-        # 添加用例标题作为allure中显示的用例标题
-        allure_title(case.get("title", ""))
-        if case.get("run", None):
-            # 处理请求前的用例数据
-            case_data = RequestPreDataHandle(case).request_data_handle()
-            # 将用例数据显示在pytest-html报告中
-            extra.append(extras.text(str(case_data), name="用例数据"))
-            # 发送请求
-            response = RequestHandle(case_data).http_request()
-            # 将响应数据显示在pytest-html报告中
-            extra.append(extras.text(str(response.text), name="响应数据"))
-            # 进行响应断言
-            assert_response(response, case_data["assert_response"])
-            # 进行数据库断言
-            assert_sql(db_info[GLOBAL_VARS["env_key"]], case_data["assert_sql"])
-            # 断言成功后进行参数提取
-            after_request_extract(response, case_data.get("extract", None))
-        else:
-            reason = f"标记了该用例为false，不执行\\n"
-            logger.warning(f"{reason}")
-            pytest.skip(reason)
-    except Exception as e:
-        logger.error(f"用例执行过程中报错：{e}")
-        raise e
-    finally:
-        logger.info("-----------------------------END-用例执行结束-----------------------------")
+    # 给当前测试方法添加文档注释
+    add_docstring(case.get("title", ""))(test_login_demo)
+    # 添加用例标题作为allure中显示的用例标题
+    allure_title(case.get("title", ""))
+    if case.get("run", None):
+        # 处理请求前的用例数据
+        case_data = RequestPreDataHandle(case).request_data_handle()
+        # 将用例数据显示在pytest-html报告中
+        extra.append(extras.text(str(case_data), name="用例数据"))
+        # 发送请求
+        response = RequestHandle(case_data).http_request()
+        # 将响应数据显示在pytest-html报告中
+        extra.append(extras.text(str(response.text), name="响应数据"))
+        # 进行响应断言
+        assert_response(response, case_data["assert_response"])
+        # 进行数据库断言
+        assert_sql(db_info[GLOBAL_VARS["env_key"]], case_data["assert_sql"])
+        # 断言成功后进行参数提取
+        after_request_extract(response, case_data.get("extract", None))
+    else:
+        reason = f"标记了该用例为false，不执行\\n"
+        logger.warning(f"{reason}")
+        pytest.skip(reason)
+    logger.info("-----------------------------END-用例执行结束-----------------------------")

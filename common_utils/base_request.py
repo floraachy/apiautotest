@@ -36,6 +36,7 @@ class BaseRequest:
                         f"请求路径: {req_data.get('url', None)}\n" \
                         f"请求方式: {req_data.get('method', None)}\n" \
                         f"请求头:   {req_data.get('headers', None)}\n" \
+                        f"请求Cookies:   {req_data.get('cookies', None)}\n" \
                         f"请求关键字: {req_data.get('pk', None)}\n" \
                         f"请求内容: {req_data.get('payload', None)}\n" \
                         f"请求文件: {req_data.get('files', None)}\n" \
@@ -46,11 +47,13 @@ class BaseRequest:
                 pk=req_data.get("pk", None),
                 header=req_data.get("headers"),
                 payload=req_data.get("payload"),
-                files=req_data.get("files")
+                files=req_data.get("files"),
+                cookies=req_data.get("cookies")
             )
             logger.info(f"\n======================================================\n" \
                         "-------------End：请求后--------------------\n"
                         f"响应数据: {res.text}\n" \
+                        f"响应码: {res.status_code}\n" \
                         "=====================================================")
         except requests.exceptions.RequestException as e:
             logger.error(f"请求出错，{str(e)}")
@@ -60,7 +63,7 @@ class BaseRequest:
 
     @classmethod
     def send_api_request(cls, url: str, method: str, pk: str, header: Dict[str, str] = None, payload=None,
-                         files=None) -> Response:
+                         files=None, cookies=None) -> Response:
         """
         发送请求
         :param method: 请求方法
@@ -75,27 +78,29 @@ class BaseRequest:
         session = cls.get_session()
 
         if pk.lower() == 'params':
-            res = session.request(method=method, url=url, params=payload, headers=headers)
+            res = session.request(method=method, url=url, params=payload, headers=headers, cookies=cookies)
         elif pk.lower() == 'data':
             if files:
                 if not isinstance(files, dict):
                     raise ValueError('data参数必须为dict')
                 encoder = MultipartEncoder(fields=files, boundary='------------------------' + str(time.time()))
                 headers['Content-Type'] = encoder.content_type
-                res = session.request(method=method, url=url, data=encoder.to_string(), headers=headers)
+                res = session.request(method=method, url=url, data=encoder.to_string(), headers=headers,
+                                      cookies=cookies)
             else:
                 headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
-                res = session.request(method=method, url=url, data=payload, headers=headers)
+                res = session.request(method=method, url=url, data=payload, headers=headers, cookies=cookies)
         elif pk.lower() == 'json':
             if files:
                 if not isinstance(files, dict):
                     raise ValueError('json参数必须为dict')
                 encoder = MultipartEncoder(fields=files, boundary='------------------------' + str(time.time()))
                 headers['Content-Type'] = encoder.content_type
-                res = session.request(method=method, url=url, json=encoder.to_string(), headers=headers)
+                res = session.request(method=method, url=url, json=encoder.to_string(), headers=headers,
+                                      cookies=cookies)
             else:
                 headers['Content-Type'] = 'application/json'
-                res = session.request(method=method, url=url, json=payload, headers=headers)
+                res = session.request(method=method, url=url, json=payload, headers=headers, cookies=cookies)
         else:
             raise ValueError('pk可选关键字为params, json, data')
 

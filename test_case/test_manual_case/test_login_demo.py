@@ -13,7 +13,7 @@ from common_utils.yaml_handle import YamlHandle
 from config.path_config import DATA_DIR
 from case_utils.assert_handle import assert_response, assert_sql
 from loguru import logger
-from case_utils.request_data_handle import RequestPreDataHandle, RequestHandle
+from case_utils.request_data_handle import RequestPreDataHandle, RequestHandle, after_request_extract
 from pytest_html import extras  # 往pytest-html报告中填写额外的内容
 from common_utils.func_handle import add_docstring
 from case_utils.allure_handle import allure_title
@@ -42,13 +42,15 @@ def test_login_demo(case, extra):
             # 将用例数据显示在pytest-html报告中
             extra.append(extras.text(str(case_data), name="用例数据"))
             # 发送请求
-            response = RequestHandle(case_data).send_request_extract()
+            response = RequestHandle(case_data).http_request()
             # 将响应数据显示在pytest-html报告中
             extra.append(extras.text(str(response.text), name="响应数据"))
             # 进行响应断言
             assert_response(response, case_data["assert_response"])
             # 进行数据库断言
             assert_sql(db_info[GLOBAL_VARS["env_key"]], case_data["assert_sql"])
+            # 断言成功后进行参数提取
+            after_request_extract(response, case_data.get("extract", None))
         else:
             reason = f"标记了该用例为false，不执行\\n"
             logger.warning(f"{reason}")

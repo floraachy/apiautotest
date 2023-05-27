@@ -6,9 +6,7 @@
 # @Software: PyCharm
 # @Desc: 处理request请求前后的用例数据
 import json
-
 import requests
-
 from common_utils.data_handle import eval_data_process, data_replace
 from config.global_vars import GLOBAL_VARS
 from requests import Response
@@ -107,14 +105,17 @@ class RequestPreDataHandle:
         pass
 
     def cookies_handle(self):
+        """
+        requests模块中，cookies参数要求是Dict or CookieJar object
+        """
         try:
             # 从用例数据中获取cookies， 处理cookies
             if self.request_data.get("cookies", None):
-                # 检测替换后的cookies是否为字典类型，如果不是，则使用json.loads转换
+                # 通过全局变量替换cookies，得到的是一个str类型
                 cookies = data_replace(content=self.request_data.get("cookies"), source=GLOBAL_VARS)
                 if isinstance(cookies, str):
-                    # 使用json的loads函数，把str转化为字典，再将字典恢复成原来的cookies
-                    self.request_data["cookies"] = requests.utils.cookiejar_from_dict(json.loads(cookies))
+                    # 如果是字符串类型，就转成字典
+                    self.request_data["cookies"] = json.loads(cookies)
                 else:
                     self.request_data["cookies"] = cookies
         except Exception as e:
@@ -122,11 +123,22 @@ class RequestPreDataHandle:
             print(f"处理cookies报错了：{e}")
 
     def headers_handle(self):
+        """
+        headers里面传cookies，要求cookies类型是str
+        """
         try:
             # 从用例数据中获取header， 处理header
             if self.request_data.get("headers", None):
                 self.request_data["headers"] = eval_data_process(
                     data_replace(content=self.request_data.get("headers"), source=GLOBAL_VARS))
+                # 如果请求头中有cookies，需要进行单独处理
+                if self.request_data["headers"].get("cookies", None):
+                    cookies = self.request_data["headers"]["cookies"]
+                    if isinstance(cookies, dict):
+                        # 如果是字典类型，就转成字符串
+                        self.request_data["headers"]["cookies"] = json.dumps(cookies)
+                    else:
+                        self.request_data["headers"]["cookies"] = cookies
         except Exception as e:
             logger.error(f"处理header报错了：{e}")
             print(f"处理header报错了：{e}")

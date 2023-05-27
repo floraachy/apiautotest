@@ -6,10 +6,36 @@ case_common:
 # 用例数据
 case_info:
 - feature: 新建项目
-  title: 正确输入各项必填参数，新建项目成功（不校验数据库）
+  title: 正确输入各项必填参数，新建项目成功（不校验数据库, header里面传cookies）
   url: /api/projects.json
   method: POST
-  headers: {"Content-Type": "application/json; charset=utf-8;"}
+  headers:
+    Content-Type: application/json; charset=utf-8;
+    cookies: ${login_cookie}
+
+  cookies:
+  pk: json
+  payload:
+    "user_id": ${user_id}
+    "name": ${faker.name().replace(" ", "").replace(".", "")}
+    "repository_name": ${faker.name().replace(" ", "").replace(".", "")}
+  files:
+  extract:
+    project_id: $.id
+    project_name: $.name
+    project_identifier: $.identifier
+  run: True
+  assert_response:
+    eq:
+      http_code: 200
+      $.login: ${login}
+  assert_sql:
+- feature: 新建项目
+  title: 正确输入各项必填参数，新建项目成功（不校验数据库，单独传cookies）
+  url: /api/projects.json
+  method: POST
+  headers:
+    Content-Type: application/json; charset=utf-8;
   cookies: ${login_cookie}
   pk: json
   payload:

@@ -4,9 +4,9 @@
 # @File    : yagmail_handle.py
 # @Software: PyCharm
 # @Desc: 通过第三方模块yagmail发送邮件
+from loguru import logger
 
 import yagmail
-from loguru import logger
 import os
 
 
@@ -31,23 +31,37 @@ class YagEmailServe:
         }
         :return:
         """
-        logger.debug("------------ 连接邮件服务器 ---------------")
-        yag = yagmail.SMTP(
-            user=self.user,
-            password=self.password,
-            host=self.host)
-        logger.debug("------------ 开始发送邮件 ---------------")
-        # 如果存在附件，则与邮件内容一起发送附件，否则仅发送邮件内容
-        if os.path.exists(info['attachments']):
-            yag.send(
-                to=info['to'],
-                subject=info['subject'],
-                contents=info['contents'],
-                attachments=info['attachments'])
-        else:
-            yag.send(
-                to=info['to'],
-                subject=info['subject'],
-                contents=info['contents'])
-        logger.debug("------------ 邮件发送完毕，关闭邮件服务器连接 ---------------")
-        yag.close()
+        try:
+            logger.debug("\n======================================================\n" \
+                         "-------------Start：发送邮件--------------------\n"
+                         f"用户名: {self.user}\n" \
+                         f"密码: {self.password}\n" \
+                         f"host: {self.host}\n" \
+                         f"host: {self.host}\n" \
+                         f"邮件内容: {info}\n" \
+                         "=====================================================")
+            yag = yagmail.SMTP(
+                user=self.user,
+                password=self.password,
+                host=self.host)
+            # 如果存在附件，则与邮件内容一起发送附件，否则仅发送邮件内容
+            if os.path.exists(info['attachments']):
+                yag.send(
+                    to=info['to'],
+                    subject=info['subject'],
+                    contents=info['contents'],
+                    attachments=info['attachments'])
+            else:
+                yag.send(
+                    to=info['to'],
+                    subject=info['subject'],
+                    contents=info['contents'])
+            yag.close()
+            logger.debug("\n======================================================\n" \
+                         "-------------End：发送邮件--------------------\n"
+                         "发送邮件成功\n" \
+                         "=====================================================")
+            print("发送邮件成功")
+        except Exception as e:
+            logger.error(f"发送邮件失败，错误信息: {e}")
+            print(f"发送邮件失败，错误信息: {e}")

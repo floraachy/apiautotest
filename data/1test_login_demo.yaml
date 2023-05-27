@@ -6,7 +6,34 @@ case_common:
 # 用例数据
 case_info:
 - feature: 登录
-  title: 用户名密码正确，登录成功
+  title: 用户名密码正确，登录成功(不校验数据库)
+  url: /api/accounts/login.json
+  method: POST
+  headers: {"Content-Type": "application/json; charset=utf-8;"}
+  cookies:
+  pk: json
+  payload: { "login": "${login}","password": "${password}","autologin": 1 }
+  files:
+  extract:
+    nickname: $.username
+    login: $.login
+    user_id: $.user_id
+  run: False
+  assert_response:
+    eq:
+      http_code: 200
+      $.user_id: ${user_id}
+    in:
+      $.login: ${login}
+    gt:
+      $.user_id: 84955
+    lt:
+      $.user_id: 84953
+    not:
+      $.user_id: 85390
+  assert_sql:
+- feature: 登录
+  title: 用户名密码正确，登录成功（校验数据库）
   url: /api/accounts/login.json
   method: POST
   headers: {"Content-Type": "application/json; charset=utf-8;"}

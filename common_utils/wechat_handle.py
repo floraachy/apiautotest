@@ -6,10 +6,10 @@
 # @Desc: 企业微信机器人
 import os
 from requests import request
-from loguru import logger
 import base64
 import hashlib
 import re
+from loguru import logger
 
 
 class WechatBot:
@@ -34,6 +34,11 @@ class WechatBot:
         发送微信消息
         :payload: 请求json数据
         """
+        logger.debug("\n======================================================\n" \
+                     "-------------Start：发送企业微信消息--------------------\n"
+                     f"Webhook_Url: {self.webhook_url}\n" \
+                     f"内容: {payload}\n" \
+                     "=====================================================")
         response = request(
             url=self.webhook_url,
             json=payload,
@@ -41,13 +46,18 @@ class WechatBot:
             method="POST"
         )
         if response.json().get("errcode") == 0:
-            logger.debug(f"通过企业微信发送{payload.get('msgtype', '')}消息成功：{response.json()}")
+            logger.debug("\n======================================================\n" \
+                         "-------------End：发送企业微信消息--------------------\n"
+                         f"通过企业微信发送{payload.get('msgtype', '')}消息成功：{response.json()}\n" \
+                         "=====================================================")
+            print(f"通过企业微信发送{payload.get('msgtype', '')}消息成功：{response.json()}")
             return True
         else:
             logger.error(f"通过企业微信发送{payload.get('msgtype', '')}消息失败：{response.text}")
+            print(f"通过企业微信发送{payload.get('msgtype', '')}消息失败：{response.text}")
             return False
 
-    def send_text(self, content, mentioned_list=[], mentioned_mobile_list=[]):
+    def send_text(self, content, mentioned_list=None, mentioned_mobile_list=None):
         """
         发送文本消息
         :param content: 文本内容，最长不超过2048个字节，必须是utf8编码
@@ -145,10 +155,10 @@ class WechatBot:
         response = request(url=url, method="POST", files=files, headers=headers)
         if response.json().get("errcode") == 0:
             media_id = response.json().get("media_id")
-            logger.debug(f"上传文件成功，media_id= {media_id}")
+            print(f"上传文件成功，media_id= {media_id}")
             return media_id
         else:
-            logger.error(f"上传文件失败：{response.text}")
+            print(f"上传文件失败：{response.text}")
             return False
 
     def send_file(self, media_id):

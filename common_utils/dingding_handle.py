@@ -11,8 +11,8 @@ import base64
 import urllib.parse
 import time
 import urllib.request
-from loguru import logger
 from requests import request
+from loguru import logger
 
 
 class DingTalkBot:
@@ -58,6 +58,11 @@ class DingTalkBot:
         发送钉钉消息
         :payload: 请求json数据
         """
+        logger.debug("\n======================================================\n" \
+                     "-------------Start：发送钉钉消息--------------------\n"
+                     f"Webhook_Url: {self.webhook_url}\n" \
+                     f"内容: {payload}\n" \
+                     "=====================================================")
         response = request(
             url=self.webhook_url,
             json=payload,
@@ -65,10 +70,15 @@ class DingTalkBot:
             method="POST"
         )
         if response.json().get("errcode") == 0:
-            logger.debug(f"通过钉钉机器人发送{payload.get('msgtype', '')}消息成功：{response.json()}")
+            logger.debug("\n======================================================\n" \
+                         "-------------End：发送钉钉消息--------------------\n"
+                         f"通过钉钉机器人发送{payload.get('msgtype', '')}消息成功：{response.json()}\n" \
+                         "=====================================================")
+            print(f"通过钉钉机器人发送{payload.get('msgtype', '')}消息成功：{response.json()}")
             return True
         else:
             logger.error(f"通过钉钉机器人发送{payload.get('msgtype', '')}消息失败：{response.text}")
+            print(f"通过钉钉机器人发送{payload.get('msgtype', '')}消息失败：{response.text}")
             return False
 
     def send_text(self, content, mobiles=None, is_at_all=False):
@@ -98,7 +108,7 @@ class DingTalkBot:
                 "isAtAll": is_at_all
             }
         }
-        return self.send_message(payload, "send_text")
+        return self.send_message(payload)
 
     def send_link(self, title, text, message_url, pic_url=None):
         """

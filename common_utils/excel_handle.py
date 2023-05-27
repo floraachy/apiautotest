@@ -7,7 +7,6 @@
 # @Desc: 使用openpyxl对excel进行读写操作
 
 import openpyxl
-from loguru import logger
 
 
 class ExcelHandle:
@@ -29,10 +28,9 @@ class ExcelHandle:
         wb.save(self.filename)
         return self.filename
 
-    # add by xiahb
     def read_sheet(self, sheet, workbook):
         """
-        读取一个sheet的内容
+        读取指定表单的内容
         :param sheet: 表单名称
         :param workbook: 工作簿对象
         :return: sheet数据列表
@@ -88,11 +86,11 @@ class ExcelHandle:
         sheets = workbook.sheetnames
         if sheet_name in sheets:
             sheet = workbook[sheet_name]
-            logger.info(f"往表单【{sheet_name}】中写入数据")
+            print(f"往表单【{sheet_name}】中写入数据")
         else:
             # 如果表单为空，就默认使用第一个表单
             sheet = workbook.active
-            logger.info(f"表单【{sheet_name}】不存在，默认往第一个表单中写入数据")
+            print(f"表单【{sheet_name}】不存在，默认往第一个表单中写入数据")
 
         sheet.cell(row=row, column=column, value=data)
         # 更上面写法效果一样 sheet.cell(row=row, column=column).value = data

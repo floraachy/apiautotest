@@ -22,6 +22,16 @@ class MysqlServer:
         """
         初始化方法中， 连接mysql数据库， 根据ssh参数决定是否走SSH隧道方式连接mysql数据库
         """
+        logger.debug("\n======================================================\n" \
+                     "-------------数据库配置信息--------------------\n"
+                     f"db_host: {db_host}\n" \
+                     f"db_port: {db_port}\n" \
+                     f"db_user: {db_user}\n" \
+                     f"db_pwd: {db_pwd}\n" \
+                     f"db_database: {db_database}\n" \
+                     f"ssh: {ssh}\n" \
+                     f"kwargs: {kwargs}\n" \
+                     "=====================================================")
         self.server = None
         try:
             if ssh:
@@ -48,6 +58,7 @@ class MysqlServer:
             self.cursor = self.conn.cursor()
         except Exception as e:
             logger.error(f"数据库连接失败：{e}")
+            print(f"数据库连接失败：{e}")
 
     def query_all(self, sql):
         """
@@ -63,7 +74,8 @@ class MysqlServer:
             self.close()
             return self.verify(data)
         except Exception as e:
-            logger.error(f"查询所有符合sql条件的数据报错: {e}")
+            logger.error(f"{sql} --> 报错: {e}")
+            print(f"{sql} --> 报错: {e}")
             raise e
 
     def query_one(self, sql):
@@ -81,6 +93,7 @@ class MysqlServer:
             return self.verify(data)
         except Exception as e:
             logger.error(f"{sql} --> 报错: {e}")
+            print(f"{sql} --> 报错: {e}")
             raise e
 
     def insert(self, sql):
@@ -96,6 +109,7 @@ class MysqlServer:
             self.close()
         except Exception as e:
             logger.error(f"{sql} --> 报错: {e}")
+            print(f"{sql} --> 报错: {e}")
             raise e
 
     def update(self, sql):
@@ -111,6 +125,7 @@ class MysqlServer:
             self.close()
         except Exception as e:
             logger.error(f"{sql} --> 报错: {e}")
+            print(f"{sql} --> 报错: {e}")
             raise e
 
     def query(self, sql, one=True):
@@ -127,6 +142,7 @@ class MysqlServer:
                 return self.query_all(sql)
         except Exception as e:
             logger.error(f"{sql} --> 报错: {e}")
+            print(f"{sql} --> 报错: {e}")
             raise e
 
     def close(self):

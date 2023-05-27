@@ -5,7 +5,6 @@
 # @Software: PyCharm
 # @Desc: 处理文件相关操作
 import os
-from loguru import logger
 import zipfile
 import shutil
 
@@ -76,7 +75,7 @@ def zip_file(in_path: str, out_path: str):
     """
     # 如果传入的路径是一个目录才进行压缩操作
     if os.path.isdir(in_path):
-        logger.debug("目标路径是一个目录，开始进行压缩......")
+        print("目标路径是一个目录，开始进行压缩......")
         # 写入
         zip = zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED)
         for path, dirnames, filenames in os.walk(in_path):
@@ -88,9 +87,9 @@ def zip_file(in_path: str, out_path: str):
                         path, filename), os.path.join(
                         fpath, filename))
         zip.close()
-        logger.debug("压缩完成！")
+        print("压缩完成！")
     else:
-        logger.error("目标路径不是一个目录，请检查！")
+        print("目标路径不是一个目录，请检查！")
 
 
 def delete_dir_file(file_path):
@@ -100,7 +99,7 @@ def delete_dir_file(file_path):
     """
     paths = os.listdir(file_path)
     if paths:
-        logger.debug("目标目录存在文件或目录，进行删除操作")
+        print("目标目录存在文件或目录，进行删除操作")
         for item in paths:
             path = os.path.join(file_path, item)
             # 如果目标路径是一个文件，使用os.remove删除
@@ -110,7 +109,7 @@ def delete_dir_file(file_path):
             if os.path.isdir(path):
                 os.rmdir(path)
     else:
-        logger.debug("目标目录不存在文件或目录，不需要删除")
+        print("目标目录不存在文件或目录，不需要删除")
 
 
 def copy_file(src_file_path, dest_dir_path):
@@ -134,5 +133,3 @@ def copy_file(src_file_path, dest_dir_path):
         return "复制成功"
     except Exception as e:
         return f"复制失败：{e}"
-
-

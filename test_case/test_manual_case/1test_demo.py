@@ -15,8 +15,8 @@ import allure
 from case_utils.allure_handle import allure_title, allure_step
 
 # 读取用例数据
-cases = [{"title": "demo case 01", "user": "flora1", "age": 17, "run": True},
-         {"title": "demo case 02", "user": "lucy", "age": 17, "run": True}]
+cases = [{"title": "demo case 01", "user": "flora1", "age": 17, "run": False},
+         {"title": "demo case 02", "user": "lucy", "age": 17, "run": False}]
 
 
 @allure.story("demo模块")

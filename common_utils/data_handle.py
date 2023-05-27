@@ -5,11 +5,11 @@
 # @File    : data_handle.py
 # @Software: PyCharm
 # @Desc: 数据处理
-from loguru import logger
 from jsonpath import jsonpath
 import re
 from faker import Faker
 from string import Template
+from loguru import logger
 
 faker = Faker()
 
@@ -21,22 +21,38 @@ def data_replace(content, source):
     :param source: 需要替换字符串的来源
     return content： 替换表达式后的字符串
     """
-    if content is None:
-        return None
-    logger.debug(f"-----Start-----开始进行字符串替换: 初始字符串为：{content}")
-    if len(content) != 0:
-        # safe_substitute() 方法会保留没有被替换的占位符，不会抛出 KeyError 异常。
-        # 所以，如果 content 中不存在占位符，使用 safe_substitute() 方法进行替换后，得到的结果和原始字符串是一样的。
-        content = Template(str(content)).safe_substitute(source)
-        for func in re.findall('\\${(.*?)}', content):
-            content = content.replace('${%s}' % func, exec_func(func))
-            try:
+    try:
+        if content is None:
+            return None
+        logger.debug("\n======================================================\n" \
+                     "-------------Start：数据替换--------------------\n"
+                     f"初始字符串: {content}\n" \
+                     "=====================================================")
+        print(f"-----Start-----数据替换: 初始字符串为：{content}")
+        if len(content) != 0:
+            # safe_substitute() 方法会保留没有被替换的占位符，不会抛出 KeyError 异常。
+            # 所以，如果 content 中不存在占位符，使用 safe_substitute() 方法进行替换后，得到的结果和原始字符串是一样的。
+            content = Template(str(content)).safe_substitute(source)
+            for func in re.findall('\\${(.*?)}', content):
                 content = content.replace('${%s}' % func, exec_func(func))
-            except Exception as e:
-                logger.error(f"-----END-----替换数据时出现了异常：{e}")
-                return f"-----END-----替换数据时出现了异常：{e}"
-        logger.debug(f"-----End-----字符串替换完成: 新字符串为：{content}")
-        return content
+                try:
+                    content = content.replace('${%s}' % func, exec_func(func))
+                except Exception as e:
+                    logger.error(f"\n======================================================\n" \
+                                 "-------------End：数据替换--------------------\n"
+                                 f"替换数据时出现了异常：{e}" \
+                                 "=====================================================")
+                    print(f"-----END-----替换数据时出现了异常：{e}")
+                    return e
+            logger.debug("\n======================================================\n" \
+                         "-------------End：数据替换--------------------\n"
+                         f"新字符串：{content}\n" \
+                         "=====================================================")
+            print(f"-----End-----数据替换完成: 新字符串为：{type(content)} || {content}\n")
+            return content
+    except Exception as e:
+        logger.error(f"进行数据替换时报错：{e}")
+        print(f"进行数据替换时报错：{e}")
 
 
 def json_extractor(obj: dict, expr: str = '.'):
@@ -47,10 +63,17 @@ def json_extractor(obj: dict, expr: str = '.'):
     """
     try:
         result = jsonpath(obj, expr)[0]
-        logger.debug("提取响应内容成功，提取表达式为： {} 提取值为 {}".format(expr, result))
+        logger.debug("\n======================================================\n" \
+                     "-------------Start：json_extractor--------------------\n"
+                     f"提取表达式为： {expr} 提取值为 {result}\n" \
+                     "=====================================================")
+        print("提取响应内容成功，提取表达式为： {} 提取值为 {}".format(expr, result))
     except Exception as e:
-        logger.exception(e)
-        logger.exception(f'未提取到内容，请检查表达式是否错误！提取表达式为：{expr} 提取数据为 {obj}')
+        logger.debug("\n======================================================\n" \
+                     "-------------End：json_extractor--------------------\n"
+                     f"提取表达式为： {expr} 提取数据为 {obj}\n， 错误信息为：{e}\n" \
+                     "=====================================================")
+        print(f'未提取到内容，请检查表达式是否错误！提取表达式为：{expr} 提取数据为 {obj}， 错误信息为：{e}')
         result = None
     return result
 
@@ -63,10 +86,18 @@ def re_extract(obj: str, expr: str = '.'):
     """
     try:
         result = re.findall(expr, obj)[0]
+        logger.debug("\n======================================================\n" \
+                     "-------------Start：re_extract--------------------\n"
+                     f"提取表达式为： {expr} 提取值为： {result}\n" \
+                     "=====================================================")
+        print("提取响应内容成功，提取表达式为： {} 提取值为： {}".format(expr, result))
     except Exception as e:
+        logger.debug(f"\n======================================================\n" \
+                     "-------------End：re_extract--------------------\n"
+                     f"提取表达式为： {expr} 提取数据为：{obj}\n， 错误信息为：{e}\n" \
+                     "=====================================================")
+        print(f'未提取到内容，请检查表达式是否错误！提取表达式为：{expr} 提取数据为 {obj}， 错误信息为：{e}')
         result = None
-        logger.exception(e)
-        logger.exception(f'未提取到内容，请检查表达式是否错误！提取表达式为：{expr} 提取数据为 {obj}')
     return result
 
 
@@ -76,6 +107,10 @@ def exec_func(func) -> str:
     : return 返回的转换成函数执行的结果,已字符串格式返回
     """
     result = eval(func)
+    logger.debug("\n======================================================\n" \
+                 "-------------exec_func--------------------\n"
+                 f"函数： {func} 执行结果： {result}\n" \
+                 "=====================================================")
     return str(result)
 
 

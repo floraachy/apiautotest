@@ -13,6 +13,8 @@ from config.settings import SEND_RESULT_TYPE, email, ding_talk, wechat, email_su
 from common_utils.dingding_handle import DingTalkBot
 from common_utils.wechat_handle import WechatBot
 from common_utils.data_handle import data_replace
+from case_utils.get_results_handle import get_test_results_from_pytest_html_report, \
+    get_test_results_from_from_allure_report
 
 
 def send_email(user, pwd, host, subject, content, to, attachments):
@@ -68,14 +70,25 @@ def send_wechat(webhook_url, content, attachment=None):
         logger.error(f"发送企业微信通知异常， 错误信息：{e}")
 
 
-def send_result(results, attachment_path=None):
+def send_result(report_path, report_type="allure", attachment_path=None):
     """
     根据用户配置，采取指定方式，发送测试结果
+    :param report_path: 报告路径
+    :param report_type: 报告类型，根据报告类型获取不同的测试结果， 类型可选值：allure, pytest-html
+    :param attachment_path: 发送的附件， pytest-html就是报告本身作为附件发送， allure是压缩包发送
     """
     # 默认不发送任何通知
     if SEND_RESULT_TYPE == NotificationType.DEFAULT.value:
-        pass
-
+        logger.info(f"SEND_RESULT_TYPE={SEND_RESULT_TYPE}， 配置了不发送任何邮件")
+        print(f"SEND_RESULT_TYPE={SEND_RESULT_TYPE}， 配置了不发送任何邮件")
+        return
+    if report_type.lower() == "allure":
+        results = get_test_results_from_from_allure_report(report_path)
+    elif report_type.lower() == "pytest_html":
+        results = get_test_results_from_pytest_html_report(report_path)
+    else:
+        logger.error(f"report_type={report_type}， 需要发送的报告类型错误，请检查一下配置信息，支持的类型为：allure, pytest-html")
+        return
     # 建立发送消息的内容、函数以及参数的映射关系
     notification_mappings = {
         NotificationType.EMAIL.value: {
@@ -113,7 +126,7 @@ def send_result(results, attachment_path=None):
         notification = notification_mappings[SEND_RESULT_TYPE]
         # 获取消息内容并替换
         notification['sender_args']['content'] = data_replace(notification['sender_args']['content'],
-                                                           source=results)
+                                                              source=results)
         # 获取消息发送函数
         sender = notification['sender']
         # 获取对应消息发送函数的参数
@@ -126,12 +139,10 @@ def send_result(results, attachment_path=None):
         for notification in notification_mappings.values():
             # 获取消息内容并替换
             notification['sender_args']['content'] = data_replace(notification['sender_args']['content'],
-                                                               source=results)
+                                                                  source=results)
             # 获取消息发送函数
             sender = notification['sender']
             # 获取对应消息发送函数的参数
             sender_args = notification['sender_args']
             # 调用消息发送函数
             sender(**sender_args)
-
-

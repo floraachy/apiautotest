@@ -6,7 +6,6 @@
 # @Software: PyCharm
 # @Desc: 处理request请求前后的用例数据
 import json
-import requests
 from common_utils.data_handle import eval_data_process, data_replace
 from config.global_vars import GLOBAL_VARS
 from requests import Response

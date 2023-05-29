@@ -140,120 +140,37 @@ allure-pytest = "==2.9.45"
 ### 3. 编写测试用例数据用于测试方法自动创建  `data`  `test_case.test_auto_case`
 - 在目录`data`下新建一个YAML/Excel文件。按照如下字段要求进行测试用例数据添加
 - 注意：如果需要自动创建测试用例文件，YAML/Excel文件的文件名需要以"test"开头。
-<table>
-	<tr>
-	    <th colspan="2">用例参数</th>
-	    <th>用例参数描述</th>
-	    <th>数据类型</th>  
-            <th>备注</th>  
-	</tr >
-	<tr >
-	    <td rowspan="3">case_common</td>
-	    <td>allure_epic</td>
-	    <td>用作于@allure.epic()装饰器中的内容</td>
-            <td>string</td>
-            <td>如果是使用Excel管理用例数据，这个目前是写死的。可在case_utils.case_handle.py中更改</td> 
-	</tr>
-	<tr>
-	    <td>allure_feature</td>
-	    <td>用作于@allure.feature()装饰器中的内容</td>
-            <td>string</td>
-            <td>如果是使用Excel管理用例数据， 这个用的是excel的表单名称</td>
-	</tr>
-	<tr>
-	    <td>allure_story</td>
-	    <td>用作于@allure.story()装饰器中的内容</td>
-            <td>string</td>
-            <td>如果是使用Excel管理用例数据， 这个用的是excel的表单名称</td>
-	</tr>
-        <tr >
-	    <td rowspan="13">case_info</td>
-	    <td>feature</td>
-	    <td>用例所属模块， 类似于@allure.feature()</td>
-            <td>string</td>
-            <td></td> 
-	</tr>
-        <tr>
-	    <td>title</td>
-	    <td>用例标题</td>
-            <td>string</td>
-            <td></td>
-	</tr>
-        <tr>
-	    <td>run</td>
-	    <td>是否执行用例，为空或者True都会执行</td>
-            <td>string</td>
-            <td>Bool/None</td>
-	</tr>
-        <tr>
-	    <td>url</td>
-	    <td>请求路径（可填写全路径 或者 资源路径）。通常我们填写资源路径。在用例执行前，会针对路径进行处理。具体可见case_utils.request_data_handle.py.RequestPreDataHandle.url_handle</td>
-            <td>string</td>
-            <td>请求路径=基准路径（host/base_url）+资源路径(url)</td>
-	</tr>
-        <tr>
-	    <td>method</td>
-	    <td>请求方式，例如：GET, POST, DELETE, PUT, PATCH等</td>
-            <td>string</td>
-            <td></td>
-	</tr>
-        <tr>
-	    <td>headers</td>
-	    <td>请求头</td>
-            <td>dict</td>
-            <td></td>
-	</tr>
-        <tr>
-	    <td>cookies</td>
-	    <td>请求cookies</td>
-            <td>string/None</td>
-            <td></td>
-	</tr>
-        <tr>
-	    <td>pk</td>
-	    <td>请求数据类型：params, json, file, data</td>
-            <td>string</td>
-            <td></td>
-	</tr>
-        <tr>
-	    <td>payload</td>
-	    <td>请求参数</td>
-            <td>string</td>
-            <td></td>
-	</tr>
-        <tr>
-	    <td>files</td>
-	    <td>上传附件接口所需的文件绝对路径</td>
-            <td>string/None</td>
-            <td></td>
-	</tr>
-        <tr>
-	    <td>extract</td>
-	    <td>后置提取参数</td>
-            <td>dict/None</td>
-            <td></td>
-	</tr>
-        <tr>
-	    <td>assert_response</td>
-	    <td>响应断言</td>
-            <td>dict/None</td>
-            <td></td>
-	</tr>
-        <tr>
-	    <td>assert_sql</td>
-	    <td>数据库断言</td>
-            <td>dict/None</td>
-            <td></td>
-	</tr>
-</table>
+
 
 ### 4. 编写测试用例数据用于手动编写测试用例方法 `data`  `test_case.test_manual_case`
 - 原则上，如果是手动编写测试用例（python代码）， 测试用例数据文件不要以"test"开头。 如果以“test”开头，可能导致用例运行多次。
-1）在目录`data`下新建一个YAML/Excel文件，按照上述要求编写测试用例数据
+1）在目录`data`下新建一个YAML/Excel文件，按照要求编写测试用例数据
 2）在test_case.test_manual_case下新建一个以"test"开头的测试方法，进行测试用例方法编写。
 
+### 5. 用例中相关字段的介绍
 
-## 七、运行自动化测试
+```yaml
+- case_common ：公共参数
+	- allure_epic：用作于@allure.epic()装饰器中的内容。如果是使用Excel管理用例数据，这个目前是写死的。可在case_utils.case_handle.py中更改。
+	- allure_feature：用作于@allure.feature()装饰器中的内容。如果是使用Excel管理用例数据， 这个用的是excel的表单名称。
+	- allure_story：用作于@allure.story()装饰器中的内容。如果是使用Excel管理用例数据， 这个用的是excel的表单名称。
+- case_info：用例数据
+	- feature：用例所属模块， 类似于@allure.feature()。
+	- title：用例标题
+	- run：是否执行用例，为空或者True都会执行，为False则不执行。
+	- url：请求路径（可填写全路径 或者 资源路径）。通常我们填写资源路径。在用例执行前，会针对路径进行处理。具体可见case_utils.request_data_handle.py.RequestPreDataHandle.url_handle。注：请求路径=基准路径（host/base_url）+资源路径(url)。
+	- method：请求方式，例如：GET, POST, DELETE, PUT, PATCH等
+	- headers：请求头，注意如果在headers里面防止cookies，其值类型需要是字符串
+	- cookies：请求cookies，格式是：DICT， CookieJar对象
+	- pk：请求数据类型：params, json, file, data
+	- payload：请求参数
+	- files：上传附件接口所需的文件绝对路径
+	- extract：后置提取参数
+	- assert_response：响应断言
+	- assert_sql：数据库断言
+```
+
+## 六、运行自动化测试
 ### 1.  激活已存在的虚拟环境
 - （如果不存在会创建一个）：pipenv shell （必须在项目根目录下执行）
 
@@ -269,6 +186,242 @@ allure-pytest = "==2.9.45"
 - 如果pycharm.interpreter拥有了框架所需的所有依赖包，可以通过pycharm直接在`run.py`中右键运行
 
 
+## 七 、详细功能说明
+### 1. 用例中如何生成随机数据
+在测试过程中，可能涉及到一些特殊场景，需要生成定制化的数据。每次运行测试，都需要按照指定规则随机生成。
+例如：`data/test_new_project_demo.yaml` 中payload.name就是使用Faker随机生成的。
+我这里写了一个表达式：`${faker.name().replace(" ", "").replace(".", "")}`
+- 在测试方法中`case_data = RequestPreDataHandle(case).request_data_handle()`会进行用例数据处理
+- 处理过程中会调用`common_utils.data_handle.data_replace`进行数据处理
+- 在`common_utils.data_handle `有导入Faker包，并且初始化了faker对象。因此上述表达式能成功运行获取其结果
+
+这里需要注意以下几点：
+- 如果是python自带的一些方法，不需要额外导包，或者写方法，就会直接处理。
+- Faker这个Python库，已经可以满足生成各种各样的伪数据，这个我已经在`common_utils.data_handle `中定义好了。
+- 如果还有一些其他的定制化数据，可以在`common_utils.data_handle `中进行添加。
+
+### 2. 用例中如何提取响应数据作为全局变量并使用
+在测试过程中，通常下一个接口需要用到上一个接口的响应数据，这个时候就涉及到参数的提取。
+我们在用例数据中定义了参数：`extract`进行后置参数的提取，根据接口返回数据的类型（JSON或者Text）采取不同的方法，从响应数据中提取参数，保存在全局变量中。
+例如：
+- 登录接口中定义了需要提取的参数：`data/test_login_demo.yaml`
+```yaml
+  extract:
+    nickname: $.username
+    login: $.login
+    user_id: $.user_id
+```
+- 请求结束后，`case_utils/request_data_handle.py.after_request_extract`就会接口返回数据的类型（JSON或者Text）采取不同的方法，从响应数据中提取参数，保存在全局变量中。
+- 下一个接口需要用到user_id，只需要在用例中以如下格式书写`${user_id}`即可。
+```yaml
+  payload:
+    "user_id": ${user_id}
+    "name": ${faker.name().replace(" ", "").replace(".", "")}
+    "repository_name": ${faker.name().replace(" ", "").replace(".", "")}
+```
+
+### 3. 如何进行响应数据断言
+以下是支持的几种响应断言：
+|  断言方式 |  说明  |
+| ------------ | ------------ |
+| eq |  相等，判断预期结果是否等于实际结果 |
+| in  |  包含， 判断实际结果是否包含预期结果 |
+| gt |  大于， 判断预期结果是否大于实际结果 |
+| lt  |  小于， 判断预期结果是否小于实际结果 |
+| not | 非，判断预期结果不等于实际结果  |
+
+以下是响应断言示例：
+```yaml
+  assert_response:
+    eq:
+      http_code: 200
+      $.user_id: ${user_id}
+    in:
+      $.login: ${login}
+    gt:
+      $.user_id: 84955
+    lt:
+      $.user_id: 84953
+    not:
+      $.user_id: 85390
+```
+- 预期结果：http_code；实际结果：200；  会从接口获取响应码，判断预期结果是否等于实际结果。
+- 预期结果：`$.user_id`， 实际结果：`${user_id}`； 会从接口响应数据中通过表达式`$.user_id`提取user_id作为预期结果， 从全局变量中替换变量`${user_id}`获取user_id作为实际结果，判断预期结果是否等于实际结果。
+- 预期结果：`$.login`， 实际结果：`${login}`； 会从接口响应数据中通过表达式`$.login`提取login作为预期结果， 从全局变量中替换变量`${login}`获取login作为实际结果，判断实际结果是否包含预期结果。
+-  预期结果：`$.user_id`， 实际结果：84955； 会从接口响应数据中通过表达式`$.user_id`提取user_id作为预期结果，判断预期结果是否大于实际结果。
+-  预期结果：`$.user_id`， 实际结果：84953； 会从接口响应数据中通过表达式`$.user_id`提取user_id作为预期结果，判断预期结果是否小于实际结果。
+-  预期结果：`$.user_id`， 实际结果：85390； 会从接口响应数据中通过表达式`$.user_id`提取user_id作为预期结果，判断预期结果是否不等于实际结果。
+
+
+### 4. 如何进行数据库断言
+以下是支持的几种数据库断言：
+|  断言方式 |  说明  |
+| ------------ | ------------ |
+| len |  数据库SQL查询结果的数量 是否 等于预期结果 |
+| eq  | 从数据库SQL查询结果中通过jsonpath表达式提取值，判断是否等于预期结果  |
+|...... | 其他断言方式待扩展 |
+
+以下是数据库断言示例-1：
+```yaml
+  assert_sql:
+    eq:
+      sql: select count(*) from tokens where user_id=${user_id};
+      len: 1
+```
+- sql表示需要查询的SQL， 这里调用的是`common_utils/mysql_handle.py.MysqlServer.query_one`, 返回的数据类型是字典。
+- len:1， 判断的是查询结果的个数是否等于1.
+- 该场景一般用于某操作往数据库中插入了一条数据，判断是否插入成功，而不需要去校验其数据准确性。
+- 例如上述数据库断言示例中，我是去查询tokens中是否存在指定user_id的数据，其实际场景是只要登录成功，就会往token表里面插入登录用户的token。因此要判断实际是否登录成功，只需要判断表里面有没有针对该用户插入一条数据即可。
+
+
+以下是数据库断言示例-2：
+```yaml
+  assert_sql:
+    eq:
+      sql: select id, `name`, identifier from projects where user_id=${user_id} ORDER BY created_on DESC;
+      $.id: ${project_id}
+      $.name: ${project_name}
+      $.identifier: ${project_identifier}
+```
+-  sql表示需要查询的SQL， 这里调用的是`common_utils/mysql_handle.py.MysqlServer.query_one`, 返回的数据类型是字典。
+- 这里是在projects表里面查询指定用户创建的项目信息（id, `name`, identifier），并按创建时间倒序排序。
+- 预期结果：`$.id`， 实际结果：`${project_id}`， 从数据库查询结果中通过表达式`$.id`提取id作为实际结果， 从全局变量中替换变量`${project_id}`获取project_id作为实际结果，判断预期结果是否等于实际结果。
+- 预期结果：`$.name`， 实际结果：`${project_name}`， 从数据库查询结果中通过表达式`$.name`提取name作为实际结果， 从全局变量中替换变量`${project_name}`获取project_name作为实际结果，判断预期结果是否等于实际结果。
+- 预期结果：`$.identifier`， 实际结果：`${project_identifier}`， 从数据库查询结果中通过表达式`$.identifier`提取identifier作为实际结果， 从全局变量中替换变量`${project_identifier}`获取project_identifier作为实际结果，判断预期结果是否等于实际结果。
+
+注意：
+- 关于数据库断言，需要考虑实际使用场景，来综合考虑调整。这里我考虑的可能还有局限性。欢迎大家来反馈。
+- 另外，其实sql有很大程度影响数据库断言的走向， 我们写sql的时候尽量写的精准一些。
+
+### 5. 配置邮箱通知
+- 首先我们需要在配置文件`config/settings.py`中选择邮件发送方式：SEND_RESULT_TYPE = 3
+- 获取邮件的相关信息，并填写到配置文件`config/settings.py`中。这些配置信息可以从邮箱设置中获取。不知道如何配置的，可以直接互联网上搜索。
+
+```python
+# 发送邮件的相关配置信息
+email = {
+    "user": "******",  # 发件人邮箱
+    "password": "******",  # 发件人邮箱授权码/发件人邮箱密码
+    "host": "smtp.qq.com",
+    "to": ["******", "******"]  # 收件人邮箱
+}
+
+```
+
+- 在配置文件`config/settings.py`中配置邮件发送的标题以及内容。
+注意：
+1）以下`${变量名}`是已经定义好的。只能减，不能增。
+2）邮件标题以及内容也可自行调整。
+
+```python
+# ------------------------------------ 邮件通知内容 ----------------------------------------------------#
+email_subject = f"接口自动化报告"
+email_content = """
+           各位同事, 大家好:
+
+           自动化用例于 <strong>${start_time} </strong> 开始运行，运行时长：<strong>${run_time} s</strong>， 目前已执行完成。
+           ---------------------------------------------------------------------------------------------------------------
+           测试人：<strong> ${tester} </strong> 
+           所属部门：<strong> ${department} </strong>
+           项目环境：<strong> ${run_env} </strong>
+           ---------------------------------------------------------------------------------------------------------------
+           执行结果如下:
+           &nbsp;&nbsp;用例运行总数:<strong> ${total} 个</strong>
+           &nbsp;&nbsp;通过用例个数（passed）: <strong><font color="green" >${passed} 个</font></strong>
+           &nbsp;&nbsp;失败用例个数（failed）: <strong><font color="red" >${failed} 个</font></strong>
+           &nbsp;&nbsp;异常用例个数（error）: <strong><font color="orange" >${broken} 个</font></strong>
+           &nbsp;&nbsp;跳过用例个数（skipped）: <strong><font color="grey" >${skipped} 个</font></strong>
+           &nbsp;&nbsp;失败重试用例个数 * 次数之和（rerun）: <strong>${rerun} 个</strong>
+           &nbsp;&nbsp;成  功   率:<strong> <font color="green" >${pass_rate} %</font></strong>
+
+           **********************************
+           附件为具体的测试报告，详细情况可下载附件查看， 非相关负责人员可忽略此消息。谢谢。
+       """
+```
+
+
+### 6. 配置钉钉通知
+- 首先我们需要在配置文件`config/settings.py`中选择钉钉发送方式：SEND_RESULT_TYPE = 1
+- 获取钉钉的相关信息，并填写到配置文件`config/settings.py`中。具体可以参考：[钉钉机器人](https://blog.csdn.net/FloraCHY/article/details/130618777?spm=1001.2014.3001.5502 "钉钉机器人")
+
+```python
+# ------------------------------------ 钉钉相关配置 ----------------------------------------------------#
+ding_talk = {
+    "webhook_url": "https://oapi.dingtalk.com/robot/send?access_token=***********",
+    "secret": "***********"
+}
+
+```
+- 在配置文件`config/settings.py`中配置钉钉发送的标题以及内容。
+注意：
+1）以下`${变量名}`是已经定义好的。只能减，不能增。
+2）邮件标题以及内容也可自行调整。
+```python
+# ------------------------------------ 钉钉通知内容 ----------------------------------------------------#
+ding_talk_title = f"接口自动化报告"
+ding_talk_content = """
+           各位同事, 大家好:
+
+           ### 自动化用例于 ${start_time} 开始运行，运行时长：${run_time} s， 目前已执行完成。
+            ---------------------------------------------------------------------------------------------------------------
+           #### 测试人： ${tester}
+           #### 所属部门： ${department}
+           #### 项目环境： ${run_env} 
+           ---------------------------------------------------------------------------------------------------------------
+           #### 执行结果如下:
+           - 用例运行总数: ${total} 个
+           - 通过用例个数（passed）: ${passed} 个
+           - 失败用例个数（failed）: ${failed} 个
+           - 异常用例个数（error）: ${broken} 个
+           - 跳过用例个数（skipped）: ${skipped} 个
+           - 失败重试用例个数 * 次数之和（rerun）: ${rerun} 个
+           - 成  功   率: ${pass_rate} %
+
+           **********************************
+           附件为具体的测试报告，详细情况可下载附件查看， 非相关负责人员可忽略此消息。谢谢。
+       """
+```
+
+
+### 7. 配置企业微信通知
+- 首先我们需要在配置文件`config/settings.py`中选择企业微信发送方式：SEND_RESULT_TYPE = 2
+- 获取企业微信的相关信息，并填写到配置文件`config/settings.py`中。具体可以参考：[企业微信](https://blog.csdn.net/FloraCHY/article/details/130624354?spm=1001.2014.3001.5502 "企业微信")
+```python
+# ------------------------------------ 企业微信相关配置 ----------------------------------------------------#
+wechat = {
+    "webhook_url": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=********",
+}
+```
+- 在配置文件`config/settings.py`中配置企业微信发送内容。
+注意：
+1）以下`${变量名}`是已经定义好的。只能减，不能增。
+2）邮件标题以及内容也可自行调整。
+
+```python
+# ------------------------------------ 企业微信通知内容 ----------------------------------------------------#
+wechat_content = """
+           各位同事, 大家好:
+
+           ### 自动化用例于 ${start_time} 开始运行，运行时长：${run_time} s， 目前已执行完成。
+           --------------------------------
+           #### 测试人： ${tester}
+           #### 所属部门： ${department}
+           #### 项目环境： ${run_env} 
+           --------------------------------
+           #### 执行结果如下:
+           - 用例运行总数: ${total} 个
+           - 通过用例个数（passed）:<font color=\"info\"> ${passed} 个</font>
+           - 失败用例个数（failed）: <font color=\"warning\"> ${failed}  个</font>
+           - 异常用例个数（error）: <font color=\"warning\"> ${broken} 个</font>
+           - 跳过用例个数（skipped）: <font color=\"comment\"> ${skipped} 个</font>
+           - 失败重试用例个数 * 次数之和（rerun）: <font color=\"comment\"> ${rerun} 个</font>
+           - 成  功   率: <font color=\"info\"> ${pass_rate} % </font>
+
+           **********************************
+           附件为具体的测试报告，详细情况可下载附件查看， 非相关负责人员可忽略此消息。谢谢。
+       """
+
+```
 
 ## 初始化项目可能遇到的问题
 ### 1. 测试机安装的是python3.7，但是本框架要求3.9.5，怎么办？

@@ -12,7 +12,6 @@ case_info:
   headers:
     Content-Type: application/json; charset=utf-8;
     cookies: ${login_cookie}
-
   cookies:
   pk: json
   payload:

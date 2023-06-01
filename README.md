@@ -156,17 +156,22 @@ pip install pipenv
 1) ENV_VARS["common"]是一些公共参数，如报告标题，报告名称，测试者，测试部门。后续会显示在测试报告上。如果还有其他，可自行添加
 2）ENV_VARS["test"]是保存test环境的一些测试数据。ENV_VARS["live"]是保存live环境的一些测试数据。如果还有其他环境可以继续增加，例如增加ENV_VARS["dev"] = {"host": "", ......}
 
-### 3. 编写测试用例数据用于测试方法自动创建  `data`  `test_case.test_auto_case`
+### 3. 删除框架中的示例用例数据
+1）删除 `data`目录下所有的YAML和EXCEL文件
+2）删除 `test_case/test_manual_case`目录下所有手动编写的用例
+
+### 4. 编写测试用例（两种方式任选其一或者都选）
+#### 1 自动生成测试用例  `data`  `test_case.test_auto_case`
 - 在目录`data`下新建一个YAML/Excel文件。按照如下字段要求进行测试用例数据添加
 - 注意：如果需要自动创建测试用例文件，YAML/Excel文件的文件名需要以"test"开头。
 
 
-### 4. 编写测试用例数据用于手动编写测试用例方法 `data`  `test_case.test_manual_case`
+#### 2. 手动编写测试用例 `data`  `test_case.test_manual_case`
 - 原则上，如果是手动编写测试用例（python代码）， 测试用例数据文件不要以"test"开头。 如果以“test”开头，可能导致用例运行多次。
 1）在目录`data`下新建一个YAML/Excel文件，按照要求编写测试用例数据
 2）在test_case.test_manual_case下新建一个以"test"开头的测试方法，进行测试用例方法编写。
 
-### 5. 用例中相关字段的介绍
+### 6. 用例中相关字段的介绍
 
 ```yaml
 - case_common ：公共参数
@@ -204,8 +209,20 @@ pip install pipenv
 注意：
 - 如果pycharm.interpreter拥有了框架所需的所有依赖包，可以通过pycharm直接在`run.py`中右键运行
 
+## 七、查看测试报告
+### pytest-html测试报告
+如果是pytest-html生成的测试报告，直接打开`outputs`目录下的`.html`报告即可。支持通过任意浏览器打开查看
 
-## 七 、详细功能说明
+### Allure测试报告
+1. 如果是Allure生成的测试报告，支持通过pycharm，点击`outputs/report/allure_html/index.html`打开查看测试报告
+2. 如果不通过pycharm打开，直接通过文件夹打开，windows系统环境下，可以点击`outputs/report/allure_html/双击打开Allure报告.bat`打开查看测试报告
+
+注意：
+- 通过点击`outputs/report/allure_html/双击打开Allure报告.bat`打开测试报告的方法，暂时不支持mac系统
+- 如果通过点击`outputs/report/allure_html/双击打开Allure报告.bat`打开测试报告，命令窗口显示乱码，或者打不开，可以把`.bat`的文件名称修改为英文的名称，里面的所有中文注释全部移除，再次尝试
+
+
+## 八 、详细功能说明
 ### 1. 用例中如何生成随机数据
 在测试过程中，可能涉及到一些特殊场景，需要生成定制化的数据。每次运行测试，都需要按照指定规则随机生成。
 例如：`data/test_new_project_demo.yaml` 中payload.name就是使用Faker随机生成的。

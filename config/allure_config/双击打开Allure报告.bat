@@ -29,7 +29,7 @@ if defined chrome_path (
     ::打印启动web信息
     echo start a webserver ...
     ::启动一个web服务监听5001端口，在后台运行。默认用当前文件夹的index.html作为首页
-    start /b http-server.exe -port 5001
+    start /b http_server.exe -port 5001
     ::使用默认浏览器打开web服务的地址并等待浏览器关闭
     start /WAIT msedge.exe http://127.0.0.1:5001
 )

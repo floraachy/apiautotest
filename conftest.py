@@ -11,16 +11,10 @@ from config.global_vars import ENV_VARS, GLOBAL_VARS
 import pytest
 from py._xmlgen import html  # 安装pytest-html，版本最好是2.1.1
 from time import strftime
+import re
 
 
 # ------------------------------------- START: 报告处理 ---------------------------------------#
-def pytest_collection_modifyitems(items):
-    """# 测试用例执行收集完成时，将收集到的item的name和nodeid的中文显示在控制台上"""
-    for item in items:
-        item.name = item.name.encode("utf-8").decode("unicode-escape")
-        item._nodeid = item._nodeid.encode("utf-8").decode("unicode_escape")
-
-
 @pytest.mark.hookwrapper
 def pytest_runtest_makereport(item, call):
     """设置列"用例描述"的值为用例的标题title"""
@@ -28,9 +22,10 @@ def pytest_runtest_makereport(item, call):
     # 获取调用结果的测试报告，返回一个report对象
     # report对象的属性包括when（steup, call, teardown三个值）、nodeid(测试用例的名字)、outcome(用例的执行结果，passed,failed)
     report = outcome.get_result()
-    # 将测试方法的文档注释作为结果表的Description的值，如果文档注释为空，则测试方法名作为结果表的Description的值
-    report.description = str(item.function.__doc__)
-    report.nodeid = report.nodeid.encode("utf-8").decode("unicode_escape")
+    # 将测试用例的title作为测试报告"用例描述"列的值。
+    # 注意参数传递时需要这样写：@pytest.mark.parametrize("case", cases, ids=["{}".format(case["title"]) for case in cases])
+    report.description = re.findall('\[(.*?)\]', report.nodeid)[0]
+    report.func = report.nodeid.split("[")[0]
 
 
 def pytest_html_report_title(report):
@@ -73,10 +68,13 @@ def pytest_html_results_table_header(cells):
     """
     修改结果表的表头
     """
+    cells.pop(1)  # 移除 "Test" 列
     # 往表格中增加一列"用例描述"，并且给"用例描述"增加排序
     cells.insert(0, html.th('用例描述', class_="sortable", col="name"))
+    # 往表格中增加一列"用例方法"，并且给"用例方法"增加排序
+    cells.insert(1, html.th('用例方法', class_="sortable", col="name"))
     # 往表格中增加一列"执行时间"，并且给"执行时间"增加排序
-    cells.insert(1, html.th('执行时间', class_="sortable time", col="time"))
+    cells.insert(2, html.th('执行时间', class_="sortable time", col="time"))
 
 
 @pytest.mark.optionalhook
@@ -84,10 +82,13 @@ def pytest_html_results_table_row(report, cells):
     """
     修改结果表的表头后给对应的行增加值
     """
+    cells.pop(1)  # 移除 "Test" 列
     # 往列"用例描述"插入每行的值
     cells.insert(0, html.td(report.description))
+    # 往列"用例方法"插入每行的值
+    cells.insert(1, html.td(report.func))
     # 往列"执行时间"插入每行的值
-    cells.insert(1, html.td(strftime("%Y-%m-%d %H:%M:%S"), class_="col-time"))
+    cells.insert(2, html.td(strftime("%Y-%m-%d %H:%M:%S"), class_="col-time"))
 
 
 def pytest_html_results_table_html(report, data):

@@ -7,6 +7,8 @@
 # @Desc: 全局变量
 
 from enum import Enum, unique  # python 3.x版本才能使用
+from typing import Text, Dict, Callable, Union, Optional, List, Any
+from pydantic import BaseModel
 
 
 class CaseFileType(Enum):
@@ -55,3 +57,57 @@ class AllureAttachmentType(Enum):
     WEBM = "webm"
 
     PDF = "pdf"
+
+
+class TestCaseEnum(Enum):
+    FEATURE = ("feature", False)
+    TITLE = ("title", True)
+    URL = ("url", True)
+    METHOD = ("method", True)
+    HEADERS = ("headers", True)
+    COOKIES = ("cookies", False)
+    RUN = ("run", False)
+    REQUEST_TYPE = ("request_type", True)
+    PAYLOAD = ("payload", False)
+    FILES = ("files", False)
+    EXTRACT = ("extract", False)
+    ASSERT_RESPONSE = ("assert_response", True)
+    ASSERT_SQL = ("assert_sql", False)
+
+
+class TestCase(BaseModel):
+    feature: Union[None, Text] = None
+    title: Text
+    url: Text
+    method: Text
+    headers: Union[None, Dict, Text] = {}
+    cookies: Union[None, Dict, Text]
+    request_type: Text
+    run: Union[None, bool, Text] = None
+    payload: Any = None
+    files: Any = None
+    extract: Union[None, Dict, Text] = None
+    assert_response: Union[None, Dict, Text]
+    assert_sql: Union[None, Dict, Text] = None
+
+
+class Method(Enum):
+    GET = "GET"
+    POST = "POST"
+    PUT = "PUT"
+    PATCH = "PATCH"
+    DELETE = "DELETE"
+    HEAD = "HEAD"
+    OPTION = "OPTION"
+
+
+class RequestType(Enum):
+    """
+    request请求发送，请求参数的数据类型
+    """
+    JSON = "JSON"
+    PARAMS = "PARAMS"
+    DATA = "DATA"
+    FILE = 'FILE'
+    EXPORT = "EXPORT"
+    NONE = "NONE"

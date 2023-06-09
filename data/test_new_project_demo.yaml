@@ -1,19 +1,21 @@
 # 公共参数
 case_common:
-  allure_epic: GitLink接口  # 敏捷里面的概念，定义史诗，相当于module级的标签, 往下是 feature
+  allure_epic: GitLink接口（自动生成用例）  # 敏捷里面的概念，定义史诗，相当于module级的标签, 往下是 feature
   allure_feature: 开源项目模块  # 功能点的描述，相当于class级的标签, 理解成模块往下是 story
   allure_story: 新建项目接口    # 故事，可以理解为场景，相当于method级的标签, 往下是 title
+
 # 用例数据
-case_info:
-- feature: 新建项目
+case_new_project_demo_01:
+  feature: 新建项目
   title: 正确输入各项必填参数，新建项目成功（不校验数据库, header里面传cookies）
+  run: True
   url: /api/projects.json
   method: POST
   headers:
     Content-Type: application/json; charset=utf-8;
     cookies: ${login_cookie}
   cookies:
-  pk: json
+  request_type: json
   payload:
     "user_id": ${user_id}
     "name": ${faker.name().replace(" ", "").replace(".", "")}
@@ -23,20 +25,22 @@ case_info:
     project_id: $.id
     project_name: $.name
     project_identifier: $.identifier
-  run: True
   assert_response:
     eq:
       http_code: 200
       $.login: ${login}
   assert_sql:
-- feature: 新建项目
+
+case_new_project_demo_02:
+  feature: 新建项目
   title: 正确输入各项必填参数，新建项目成功（不校验数据库，单独传cookies）
+  run: True
   url: /api/projects.json
   method: POST
   headers:
     Content-Type: application/json; charset=utf-8;
   cookies: ${login_cookie}
-  pk: json
+  request_type: json
   payload:
     "user_id": ${user_id}
     "name": ${faker.name().replace(" ", "").replace(".", "")}
@@ -46,19 +50,21 @@ case_info:
     project_id: $.id
     project_name: $.name
     project_identifier: $.identifier
-  run: True
   assert_response:
     eq:
       http_code: 200
       $.login: ${login}
   assert_sql:
-- feature: 新建项目
+
+case_new_project_demo_03:
+  feature: 新建项目
   title: 正确输入各项必填参数，新建项目成功（校验数据库）
+  run: False
   url: /api/projects.json
   method: POST
   headers: {"Content-Type": "application/json; charset=utf-8;"}
   cookies:
-  pk: json
+  request_type: json
   payload:
     "user_id": ${user_id}
     "name": ${faker.name().replace(" ", "").replace(".", "")}
@@ -68,14 +74,13 @@ case_info:
     project_id: $.id
     project_name: $.name
     project_identifier: $.identifier
-  run: False
   assert_response:
     eq:
       http_code: 200
       $.login: ${login}
   assert_sql:
     eq:
-      sql: select id, `name`, identifier from projects where user_id=${user_id} ORDER BY created_on DESC;
+      sql: select id,`name`, identifier from projects where user_id=${user_id} ORDER BY created_on DESC;
       $.id: ${project_id}
       $.name: ${project_name}
       $.identifier: ${project_identifier}

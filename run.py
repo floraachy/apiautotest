@@ -20,7 +20,7 @@ import shutil
 import pytest
 from config.path_config import REPORT_DIR, LOG_DIR, AUTO_CASE_DIR, CONF_DIR, LIB_DIR, ALLURE_RESULTS_DIR, \
     ALLURE_HTML_DIR
-from case_utils.case_handle import get_case_data
+from case_utils.case_fun_handle import generate_cases
 from loguru import logger
 import click
 from config.settings import LOG_LEVEL
@@ -55,6 +55,11 @@ def run(env, m, report):
               |_|
               Starting      ...     ...     ...
             """)
+        # ------------------------ 设置全局变量 ------------------------
+        # 根据指定的环境参数，将运行环境所需相关配置数据保存到GLOBAL_VARS
+        GLOBAL_VARS["env_key"] = env.lower()
+        for k, v in ENV_VARS[env.lower()].items():
+            GLOBAL_VARS[k] = v
         # ------------------------ 自动生成测试用例 ------------------------
         # 删除原有的测试用例，以便生成新的测试用例
         if os.path.exists(AUTO_CASE_DIR):
@@ -62,7 +67,7 @@ def run(env, m, report):
             shutil.rmtree(AUTO_CASE_DIR)
 
         # 根据data里面的yaml/excel文件，自动生成测试用例
-        get_case_data()
+        generate_cases()
 
         # ------------------------ pytest执行测试用例 ------------------------
         """
@@ -80,10 +85,6 @@ def run(env, m, report):
             "--reruns=3", "--reruns-delay=2"
         """
         arg_list = []
-        # 根据指定的环境参数，将运行环境所需相关配置数据保存到GLOBAL_VARS
-        GLOBAL_VARS["env_key"] = env.lower()
-        for k, v in ENV_VARS[env.lower()].items():
-            GLOBAL_VARS[k] = v
         # 执行指定测试用例
         if m is not None:
             arg_list.append(f"-m {m}")

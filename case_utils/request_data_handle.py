@@ -30,7 +30,7 @@ class RequestPreDataHandle:
                      f"请求方式: {type(request_data.get('method', None))} || {request_data.get('method', None)}\n" \
                      f"请求头:   {type(request_data.get('headers', None))} || {request_data.get('headers', None)}\n" \
                      f"请求cookies: {type(request_data.get('cookies', None))} || {request_data.get('cookies', None)}\n" \
-                     f"请求类型: {type(request_data.get('pk', None))} || {request_data.get('pk', None)}\n" \
+                     f"请求类型: {type(request_data.get('request_type', None))} || {request_data.get('request_type', None)}\n" \
                      f"请求内容: {type(request_data.get('payload', None))} || {request_data.get('payload', None)}\n" \
                      f"请求文件: {type(request_data.get('files', None))} || {request_data.get('files', None)}\n" \
                      f"后置提取参数: {type(request_data.get('extract', None))} || {request_data.get('extract', None)}\n" \
@@ -58,7 +58,7 @@ class RequestPreDataHandle:
                      f"请求方式: {type(self.request_data.get('method', None))} || {self.request_data.get('method', None)}\n" \
                      f"请求头:   {type(self.request_data.get('headers', None))} || {self.request_data.get('headers', None)}\n" \
                      f"请求cookies: {type(self.request_data.get('cookies', None))} || {self.request_data.get('cookies', None)}\n" \
-                     f"请求类型: {type(self.request_data.get('pk', None))} || {self.request_data.get('pk', None)}\n" \
+                     f"请求类型: {type(self.request_data.get('request_type', None))} || {self.request_data.get('request_type', None)}\n" \
                      f"请求内容: {type(self.request_data.get('payload', None))} || {self.request_data.get('payload', None)}\n" \
                      f"请求文件: {type(self.request_data.get('files', None))} || {self.request_data.get('files', None)}\n" \
                      f"后置提取参数: {type(self.request_data.get('extract', None))} || {self.request_data.get('extract', None)}\n" \
@@ -204,7 +204,7 @@ class RequestHandle:
                     f"请求方式: {type(self.case_data.get('method', None))} || {self.case_data.get('method', None)}\n" \
                     f"请求头:   {type(self.case_data.get('headers', None))} || {self.case_data.get('headers', None)}\n" \
                     f"请求cookies: {type(self.case_data.get('cookies', None))} || {self.case_data.get('cookies', None)}\n" \
-                    f"请求类型: {type(self.case_data.get('pk', None))} || {self.case_data.get('pk', None)}\n" \
+                    f"请求类型: {type(self.case_data.get('request_type', None))} || {self.case_data.get('request_type', None)}\n" \
                     f"请求内容: {type(self.case_data.get('payload', None))} || {self.case_data.get('payload', None)}\n" \
                     f"请求文件: {type(self.case_data.get('files', None))} || {self.case_data.get('files', None)}\n" \
                     f"请求响应数据: {response.text}\n" \

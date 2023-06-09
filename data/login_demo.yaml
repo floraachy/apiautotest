@@ -1,24 +1,24 @@
 # 公共参数
 case_common:
-  allure_epic: GitLink接口  # 敏捷里面的概念，定义史诗，相当于module级的标签, 往下是 feature
+  allure_epic: GitLink接口（手动编写用例）  # 敏捷里面的概念，定义史诗，相当于module级的标签, 往下是 feature
   allure_feature: 登录模块  # 功能点的描述，相当于class级的标签, 理解成模块往下是 story
   allure_story: 登录接口    # 故事，可以理解为场景，相当于method级的标签, 往下是 title
 # 用例数据
-case_info:
-- feature: 登录
+case_login_demo_01:
+  feature: 登录
   title: 用户名密码正确，登录成功(不校验数据库)
+  run: True
   url: /api/accounts/login.json
   method: POST
   headers: {"Content-Type": "application/json; charset=utf-8;"}
   cookies:
-  pk: json
+  request_type: json
   payload: { "login": "${login}","password": "${password}","autologin": 1 }
   files:
   extract:
     nickname: $.username
     login: $.login
     user_id: $.user_id
-  run: False
   assert_response:
     eq:
       http_code: 200
@@ -32,20 +32,22 @@ case_info:
     not:
       $.user_id: 85390
   assert_sql:
-- feature: 登录
+
+case_login_demo_02:
+  feature: 登录
   title: 用户名密码正确，登录成功（校验数据库）
+  run: False
   url: /api/accounts/login.json
   method: POST
   headers: {"Content-Type": "application/json; charset=utf-8;"}
   cookies:
-  pk: json
+  request_type: json
   payload: { "login": "${login}","password": "${password}","autologin": 1 }
   files:
   extract:
     nickname: $.username
     login: $.login
     user_id: $.user_id
-  run: False
   assert_response:
     eq:
       http_code: 200
@@ -62,17 +64,18 @@ case_info:
     eq:
       sql: select count(*) from tokens where user_id=${user_id};
       len: 1
-- feature: 登录
+case_login_demo_03:
+  feature: 登录
   title: 用户名正确，密码错误，登录失败
+  run: False
   url: /api/accounts/login.json
   method: POST
   headers: {"Content-Type": "application/json; charset=utf-8;"}
   cookies:
-  pk: json
+  request_type: json
   payload: { "login": "chytest10","password": "password111","autologin": 1 }
   files:
   extract:
-  run: False
   assert_response:
     eq:
       http_code: 200

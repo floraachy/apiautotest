@@ -13,6 +13,18 @@ from loguru import logger
 from common_utils.base_request import BaseRequest
 
 
+@pytest.fixture(scope="function", autouse=True)
+def case_skip(request):
+    """处理跳过用例"""
+    # 使用 request.getfixturevalue() 方法来获取测试用例函数的参数值
+    # 注意这里的"case"需要与@pytest.mark.parametrize("case", cases)中传递的保持一致
+    case = request.getfixturevalue("case")
+    if case.get("run") is None or case.get("run") is False:
+        reason = f"{case.get('title')}: 标记了该用例为false，不执行\\n"
+        logger.warning(f"{reason}")
+        pytest.skip(reason)
+
+
 @pytest.fixture(scope="session", autouse=True)
 def login_init():
     """
@@ -28,7 +40,7 @@ def login_init():
     req_data = {
         "url": host + "/api/accounts/login.json",
         "method": "POST",
-        "pk": "json",
+        "request_type": "json",
         "headers": {"Content-Type": "application/json; charset=utf-8;"},
         "payload": {"login": login, "password": password, "autologin": 1}
     }

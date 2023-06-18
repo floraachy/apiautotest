@@ -88,6 +88,7 @@ class CaseDataCheck:
                     'cookies': self.case_data.get(TestCaseEnum.COOKIES.value[0]),
                     'request_type': self.get_request_type,
                     'payload': self.case_data.get(TestCaseEnum.PAYLOAD.value[0]),
+                    'files': self.case_data.get(TestCaseEnum.FILES.value[0]),
                     'extract': self.case_data.get(TestCaseEnum.EXTRACT.value[0]),
                     "assert_response": self.get_assert_response,
                     "assert_sql": self.case_data.get(TestCaseEnum.ASSERT_SQL.value[0]),

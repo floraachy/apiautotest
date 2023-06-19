@@ -1,15 +1,18 @@
-import requests
-from requests import Response
-from requests_toolbelt import MultipartEncoder  # 第三方模块：pip install requests_toolbelt
-from typing import Dict, Union
 import time
+from typing import Dict, Union
+import requests
 from loguru import logger
+from requests import Response
+from requests_toolbelt import MultipartEncoder
 
 
 class BaseRequest:
     """
     进行请求
     """
+
+    TIMEOUT = 5
+
     session = None
 
     @classmethod
@@ -30,28 +33,28 @@ class BaseRequest:
         :return: 响应对象
         """
         try:
-            logger.debug("\n======================================================\n" \
-                         "-------------Start：请求前--------------------\n"
-                         f"用例标题: {req_data.get('title', None)}\n" \
-                         f"请求路径: {req_data.get('url', None)}\n" \
-                         f"请求方式: {req_data.get('method', None)}\n" \
-                         f"请求头:   {req_data.get('headers', None)}\n" \
-                         f"请求Cookies:   {req_data.get('cookies', None)}\n" \
-                         f"请求关键字: {req_data.get('request_type', None)}\n" \
-                         f"请求内容: {req_data.get('payload', None)}\n" \
-                         f"请求文件: {req_data.get('files', None)}\n" \
-                         "=====================================================")
-            print("\n======================================================\n" \
-                  "-------------Start：请求前--------------------\n"
-                  f"用例标题: {req_data.get('title', None)}\n" \
-                  f"请求路径: {req_data.get('url', None)}\n" \
-                  f"请求方式: {req_data.get('method', None)}\n" \
-                  f"请求头:   {req_data.get('headers', None)}\n" \
-                  f"请求Cookies:   {req_data.get('cookies', None)}\n" \
-                  f"请求关键字: {req_data.get('request_type', None)}\n" \
-                  f"请求内容: {req_data.get('payload', None)}\n" \
-                  f"请求文件: {req_data.get('files', None)}\n" \
-                  "=====================================================")
+            logger.debug("\n" + "=" * 80
+                         + "\n-------------Start：请求前--------------------\n"
+                           f"用例标题: {req_data.get('title', None)}\n"
+                           f"请求路径: {req_data.get('url', None)}\n"
+                           f"请求方式: {req_data.get('method', None)}\n"
+                           f"请求头:   {req_data.get('headers', None)}\n"
+                           f"请求Cookies:   {req_data.get('cookies', None)}\n"
+                           f"请求关键字: {req_data.get('request_type', None)}\n"
+                           f"请求内容: {req_data.get('payload', None)}\n"
+                           f"请求文件: {req_data.get('files', None)}\n"
+                         + "=" * 80)
+            print("\n" + "=" * 80
+                  + "\n-------------Start：请求前--------------------\n"
+                    f"用例标题: {req_data.get('title', None)}\n"
+                    f"请求路径: {req_data.get('url', None)}\n"
+                    f"请求方式: {req_data.get('method', None)}\n"
+                    f"请求头:   {req_data.get('headers', None)}\n"
+                    f"请求Cookies:   {req_data.get('cookies', None)}\n"
+                    f"请求关键字: {req_data.get('request_type', None)}\n"
+                    f"请求内容: {req_data.get('payload', None)}\n"
+                    f"请求文件: {req_data.get('files', None)}\n"
+                  + "=" * 80)
             res = cls.send_api_request(
                 url=req_data.get("url"),
                 method=req_data.get("method").lower(),
@@ -61,16 +64,16 @@ class BaseRequest:
                 files=req_data.get("files", None),
                 cookies=req_data.get("cookies", None)
             )
-            logger.debug("\n======================================================\n" \
-                         "-------------End：请求后--------------------\n"
-                         f"响应数据: {res.text}\n" \
-                         f"响应码: {res.status_code}\n" \
-                         "=====================================================")
-            print("\n======================================================\n" \
-                  "-------------End：请求后--------------------\n"
-                  f"响应数据: {res.text}\n" \
-                  f"响应码: {res.status_code}\n" \
-                  "=====================================================")
+            logger.debug("\n" + "=" * 80
+                         + "\n-------------End：请求后--------------------\n"
+                           f"响应数据: {res.text}\n"
+                           f"响应码: {res.status_code}\n"
+                         + "=" * 80)
+            print("\n" + "=" * 80
+                  + "\n-------------End：请求后--------------------\n"
+                    f"响应数据: {res.text}\n"
+                    f"响应码: {res.status_code}\n"
+                  + "=" * 80)
         except requests.exceptions.RequestException as e:
             logger.error(f"请求出错，{str(e)}")
             print(f"请求出错，{str(e)}")
@@ -95,33 +98,44 @@ class BaseRequest:
         headers = header or {}
         session = cls.get_session()
 
-        if request_type and request_type.lower() == 'params':
-            res = session.request(method=method, url=url, params=payload, headers=headers, cookies=cookies, timeout=5)
-        elif request_type and request_type.lower() == 'data':
-            if files:
-                if not isinstance(files, dict):
-                    raise ValueError('data参数必须为dict')
-                encoder = MultipartEncoder(fields=files, boundary='------------------------' + str(time.time()))
-                headers['Content-Type'] = encoder.content_type
-                res = session.request(method=method, url=url, data=encoder.to_string(), headers=headers,
-                                      cookies=cookies, timeout=5)
+        if request_type:
+            if request_type.lower() == 'params':
+                res = session.request(method=method, url=url, params=payload, headers=headers, cookies=cookies,
+                                      timeout=cls.TIMEOUT)
+                return res
+            elif request_type.lower() == 'data':
+                res = session.request(method=method, url=url, data=payload, headers=headers, cookies=cookies,
+                                      timeout=cls.TIMEOUT)
+                return res
+            elif request_type.lower() == 'json':
+                res = session.request(method=method, url=url, json=payload, headers=headers, cookies=cookies,
+                                      timeout=cls.TIMEOUT)
+                return res
+            elif request_type.lower() == 'file':
+                if files:
+                    if payload:
+                        if isinstance(files, dict):
+                            for k, v in payload.items():
+                                files[k] = v
+                        elif isinstance(files, list):
+                            # TODO 这里是应对多文件上传的情况，暂时没有接口帮助验证是否真正上传了多个文件，有可能只上传成功了一个
+                            for k, v in payload.items():
+                                files.append((k, v))
+                    encoder = MultipartEncoder(fields=files, boundary='------------------------' + str(time.time()))
+                    headers['Content-Type'] = encoder.content_type
+                    res = session.request(method=method, url=url, data=encoder.to_string(), headers=headers,
+                                          cookies=cookies, timeout=cls.TIMEOUT)
+                    return res
+                else:
+                    logger.error('上传的文件不能为空')
+                    print('上传的文件不能为空')
             else:
-                headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
-                res = session.request(method=method, url=url, data=payload, headers=headers, cookies=cookies, timeout=5)
-        elif request_type and request_type.lower() == 'json':
-            if files:
-                if not isinstance(files, dict):
-                    raise ValueError('json参数必须为dict')
-                encoder = MultipartEncoder(fields=files, boundary='------------------------' + str(time.time()))
-                headers['Content-Type'] = encoder.content_type
-                res = session.request(method=method, url=url, json=encoder.to_string(), headers=headers,
-                                      cookies=cookies, timeout=5)
-            else:
-                headers['Content-Type'] = 'application/json'
-                res = session.request(method=method, url=url, json=payload, headers=headers, cookies=cookies, timeout=5)
+                logger.error('request_type可选关键字为params, json, data, file')
+                print('request_type可选关键字为params, json, data, file')
+                raise ValueError('request_type可选关键字为params, json, data, file')
         else:
-            logger.error('request_type可选关键字为params, json, data')
-            print('request_type可选关键字为params, json, data')
-            raise ValueError('request_type可选关键字为params, json, data')
+            logger.error('request_type参数不能为空')
+            print('request_type参数不能为空')
+            raise ValueError('request_type参数不能为空')
 
-        return res
+

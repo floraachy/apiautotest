@@ -17,8 +17,11 @@ COMMON_DIR = os.path.join(BASE_DIR, "common_utils")
 # 配置模块目录
 CONF_DIR = os.path.join(BASE_DIR, "config")
 
-# 数据模块目录
+# 测试数据模块目录
 DATA_DIR = os.path.join(BASE_DIR, "data")
+
+# 测试文件模块目录
+FILES_DIR = os.path.join(BASE_DIR, "files")
 
 # 日志/报告保存目录
 OUT_DIR = os.path.join(BASE_DIR, "outputs")

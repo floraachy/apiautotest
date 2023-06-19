@@ -133,3 +133,16 @@ def copy_file(src_file_path, dest_dir_path):
         return "复制成功"
     except Exception as e:
         return f"复制失败：{e}"
+
+
+def get_file_field(file_path):
+    """
+    获取文件名称和二进制内容
+    :param: file_path: 文件路径
+    """
+    # 处理文件绝对路径
+    file_name = os.path.basename(file_path)
+    # 获取文件二进制内容
+    with open(file_path, 'rb') as f:
+        file_content = f.read()
+    return (file_name, file_content)

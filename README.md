@@ -77,6 +77,7 @@
 ├────outputs/
 │    └────report/  保存测试报告的目录
 │     └────log/   保存日志文件的目录
+├────files 存放测试过程中需要上传的文件
 ├────Pipfile
 ├────pytest.ini
 ├────README.md
@@ -95,7 +96,6 @@
 
 ## 四、依赖库
 ```
-python_version = "3.9"
 pymysql = "*"
 loguru = "*"
 requests-toolbelt = "*"
@@ -112,6 +112,8 @@ pytest = "==6.2.5"
 pytest-html = "==2.1.1"
 pytest-rerunfailures = "*"
 allure-pytest = "==2.9.45"
+pydantic = "*"
+xpinyin = "*"
 ```
 
 
@@ -474,6 +476,162 @@ wechat_content = """
        """
 
 ```
+
+### 7. 上传文件接口支持
+#### 熟悉接口
+- 确定上传文件接口的URL
+- 确定上传文件接口的METHOD
+- 确定上传文件接口请求头里面的Content-Type， 我这边调试的接口都是：multipart/form-data;
+- 确定上传文件接口请求参数， 我调试的接口有两种参数形式：
+
+```python
+# 第一种
+file: 文件二进制内容
+	
+	
+# 第二种
+file: 文件二进制内容
+language: zh
+```
+#### 文件上传的逻辑
+`common_utils/base_request.py` 中封装的request请求，是使用`from requests_toolbelt import MultipartEncoder`进行文件上传的。
+
+- 针对单文件上传，我们需要传递一个字典，参考如下：
+```python
+field = {
+	{
+		'file': (filename, file_content),   # file是接口中文件参数的名称， filename是文件名，file_content是文件二进制内容
+		"key": v    # 这里是文件上传的其他参数
+	}
+}
+```
+
+- 针对多文件上传，我们需要传递一个列表嵌套元祖，参考如下：
+```python
+field =[
+	('file', (filename, file_content)),  # file是接口中文件参数的名称， filename是文件名，file_content是文件二进制内容
+	('file', (filename, file_content)), # 这里是文件上传的其他参数
+	(k, v)  
+	]
+```
+
+
+#### 上传文件，不带其他参数
+- 我们需要设置： request_type=file
+- 然后在files中按照如下格式书写：{接口中文件参数的名称:"文件路径地址"/["文件地址1", "文件地址2"]}
+
+- 参考如下：
+
+```yaml
+# 公共参数
+case_common:
+  allure_epic: GitLink接口（手动编写用例）
+  allure_feature: 上传文件模块
+  allure_story: 上传文件
+
+# 用例数据
+case_upload_demo_01:
+  feature: 上传文件
+  title: 测试单文件上传
+  run: True
+  url: /api/attachments.json
+  method: POST
+  headers:
+    cookies: ${login_cookie}
+  cookies:
+  request_type: file
+  payload:
+  files:
+    file: TOC出库订单导入模板(2).xlsx   # 此处file对应接口中文件参数的名称
+  extract:
+    file_id: $.id
+  assert_response:
+    eq:
+      http_code: 200
+  assert_sql:
+
+case_upload_demo_02:
+  feature: 上传文件
+  title: 测试多文件上传(该接口不支持多文件上传，这是一个示例)
+  run: False
+  url: /api/attachments.json
+  method: POST
+  headers:
+    cookies: ${login_cookie}
+  cookies:
+  request_type: file
+  payload:
+  files:
+    file:
+      - 导入TOC订单.xls
+      - toc.xls
+  extract:
+    file_id: $.id
+  assert_response:
+    eq:
+      http_code: 200
+  assert_sql:
+```
+
+#### 上传文件，带其他参数
+- 我们需要设置： request_type=file
+- 然后在files中按照如下格式书写：{接口中文件参数的名称:"文件路径地址"/["文件地址1", "文件地址2"]}
+- 由于请求参数里面还传递了`language:zh`， 因此我们需要写在`payload`中
+- 在`common_utils/base_request.py` 中，我们会将`language:zh`以元祖形式处理到files里面
+
+- 参考如下：
+
+```yaml
+# 公共参数
+case_common:
+  allure_epic: OWMS系统（自动生成用例）  # 敏捷里面的概念，定义史诗，相当于module级的标签, 往下是 feature
+  allure_feature: 出库模块  # 功能点的描述，相当于class级的标签, 理解成模块往下是 story
+  allure_story: TOC扫描签出接口    # 故事，可以理解为场景，相当于method级的标签, 往下是 title
+
+# 用例数据
+case_import_toc_01:
+  feature: OMS系统
+  title: 导入TOC订单（01）
+  run: True
+  url:  /oms/retailGoodsTmp/selfImportExcel
+  method: POST
+  headers:
+    Cookietoken: ${oms_cookieToken}
+  request_type: file
+  payload:
+    language: zh
+  files:
+    file: TOC出库订单导入模板(2).xlsx
+  extract:
+  assert_response:
+    eq:
+      $.msg: 成功
+  assert_sql:
+
+case_import_toc_02:
+  feature: OMS系统
+  title: 导入TOC订单（02）
+  run: True
+  url:  /oms/retailGoodsTmp/selfImportExcel
+  method: POST
+  headers:
+    Cookietoken: ${oms_cookieToken}
+  request_type: file
+  payload:
+    language: zh
+  files:
+    file:
+      - 导入TOC订单.xls
+      - toc.xls
+  extract:
+  assert_response:
+    eq:
+      $.msg: 成功
+  assert_sql:
+```
+
+
+
 
 ## 初始化项目可能遇到的问题
 ### 1. 测试机安装的是python3.7，但是本框架要求3.9.5，怎么办？

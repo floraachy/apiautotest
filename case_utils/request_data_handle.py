@@ -6,6 +6,8 @@
 # @Software: PyCharm
 # @Desc: 处理request请求前后的用例数据
 import json
+import os.path
+from common_utils.files_handle import get_file_field
 from common_utils.data_handle import eval_data_process, data_replace
 from config.global_vars import GLOBAL_VARS
 from requests import Response
@@ -13,6 +15,7 @@ from loguru import logger
 from common_utils.data_handle import json_extractor, re_extract
 from case_utils.allure_handle import allure_step
 from common_utils.base_request import BaseRequest
+from config.path_config import FILES_DIR
 
 
 # ---------------------------------------- 请求前的数据处理----------------------------------------#
@@ -107,29 +110,31 @@ class RequestPreDataHandle:
         """
         requests模块中，cookies参数要求是Dict or CookieJar object
         """
+        cookies = self.request_data.get("cookies", None)
         try:
             # 从用例数据中获取cookies， 处理cookies
-            if self.request_data.get("cookies", None):
+            if cookies:
                 # 通过全局变量替换cookies，得到的是一个str类型
-                cookies = data_replace(content=self.request_data.get("cookies"), source=GLOBAL_VARS)
+                cookies = data_replace(content=cookies, source=GLOBAL_VARS)
                 if isinstance(cookies, str):
                     # 如果是字符串类型，就转成字典
                     self.request_data["cookies"] = json.loads(cookies)
                 else:
                     self.request_data["cookies"] = cookies
         except Exception as e:
-            logger.error(f"处理cookies报错了：{e}")
-            print(f"处理cookies报错了：{e}")
+            logger.error(f"处理{cookies}报错了：{e}")
+            print(f"处理{cookies}报错了：{e}")
 
     def headers_handle(self):
         """
         headers里面传cookies，要求cookies类型是str
         """
+        headers = self.request_data.get("headers", None)
         try:
             # 从用例数据中获取header， 处理header
-            if self.request_data.get("headers", None):
+            if headers:
                 self.request_data["headers"] = eval_data_process(
-                    data_replace(content=self.request_data.get("headers"), source=GLOBAL_VARS))
+                    data_replace(content=headers, source=GLOBAL_VARS))
                 # 如果请求头中有cookies，需要进行单独处理
                 if self.request_data["headers"].get("cookies", None):
                     cookies = self.request_data["headers"]["cookies"]
@@ -139,44 +144,75 @@ class RequestPreDataHandle:
                     else:
                         self.request_data["headers"]["cookies"] = cookies
         except Exception as e:
-            logger.error(f"处理header报错了：{e}")
-            print(f"处理header报错了：{e}")
+            logger.error(f"处理{headers}报错了：{e}")
+            print(f"处理{headers}报错了：{e}")
 
     def payload_handle(self):
+        # 处理请求参数payload
+        payload = self.request_data.get("payload", None)
         try:
-            # 处理请求参数payload
-            if self.request_data.get("payload", None):
+            if payload:
                 self.request_data["payload"] = eval_data_process(
-                    data_replace(content=self.request_data.get("payload"), source=GLOBAL_VARS))
+                    data_replace(content=payload, source=GLOBAL_VARS))
         except Exception as e:
-            logger.error(f"处理payload报错了：{e}")
-            print(f"处理payload报错了：{e}")
+            logger.error(f"处理{payload}报错了：{e}")
+            print(f"处理{payload}报错了：{e}")
 
     def files_handle(self):
-        # 处理文件
-        # TODO 暂时还没想好怎么处理
-        pass
+        """
+        格式：接口中文件参数的名称:"文件路径地址"/["文件地址1", "文件地址2"]
+        例如：{"file": "test_demo.py"}
+        或者
+        {"file": ["test_demo_01.py", "test_demo_02.py"]}
+        """
+        # 处理请求参数files参数
+        files = self.request_data.get("files", None)
+        try:
+            if files:
+                for k, v in files.items():
+                    # ------------------ 处理多文件的情况 ------------------
+                    # 这里需要注意：不一定所有接口都支持多文件上传
+                    _files = []
+                    if isinstance(v, list):
+                        for file in v:
+                            # 处理文件绝对路径
+                            file_path = os.path.join(FILES_DIR, file)
+                            # 多文件上传需要是元祖[('file', (filename, file_content)), ('file', (filename, file_content))]
+                            _files.append((k, get_file_field(file_path)))
+                        self.request_data["files"] = _files
+                    else:
+                        # ------------------ 处理单文件的情况 ------------------
+                        # 处理文件绝对路径
+                        file_path = os.path.join(FILES_DIR, v)
+                        # 单文件上传需要是字典{'file': (filename, file_content)}
+                        self.request_data["files"] = {k: get_file_field(file_path)}
+                logger.debug(f"处理完成后的file:{self.request_data['files']}")
+        except Exception as e:
+            logger.error(f"处理{files}报错了：{e}")
+            print(f"处理{files}报错了：{e}")
 
     def extract_handle(self):
+        # 处理后置提取参数
+        extract = self.request_data.get("extract", None)
         try:
-            # 处理后置提取参数
-            if self.request_data.get("extract", None):
+            if extract:
                 # 仅提取参数中的python表达式，不需要进行数据替换
-                self.request_data["extract"] = eval_data_process(self.request_data.get("extract"))
+                self.request_data["extract"] = eval_data_process(extract)
         except Exception as e:
-            logger.error(f"处理extract报错了：{e}")
-            print(f"处理extract报错了：{e}")
+            logger.error(f"处理{extract}报错了：{e}")
+            print(f"处理{extract}报错了：{e}")
 
     def assert_handle(self):
+        # 处理响应断言参数
+        assert_response = self.request_data.get("assert_response", None)
         try:
-            # 处理响应断言参数
-            if self.request_data.get("assert_response", None):
+            if assert_response:
                 self.request_data["assert_response"] = eval_data_process(
-                    data_replace(content=self.request_data.get("assert_response"), source=GLOBAL_VARS))
+                    data_replace(content=assert_response, source=GLOBAL_VARS))
             # 由于数据库断言里面的变量需要请求响应后进行提取，因此目前不进行处理
         except Exception as e:
-            logger.error(f"处理assert报错了：{e}")
-            print(f"处理assert报错了：{e}")
+            logger.error(f"处理{assert_response}报错了：{e}")
+            print(f"处理{assert_response}报错了：{e}")
 
 
 # ---------------------------------------- 进行请求，请求后的参数提取处理----------------------------------------#
@@ -272,3 +308,7 @@ def response_type(response: Response) -> str:
         return "json"
     except:
         return "str"
+
+if __name__ == '__main__':
+    test = RequestPreDataHandle(request_data={"files": {"file": ["导入TOC订单.xls", "toc.xls"]}})
+    test.files_handle()

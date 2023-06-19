@@ -42,10 +42,10 @@ def run(env, m, report):
         # 捕获所有日志
         logger.add(os.path.join(LOG_DIR, "runtime_{time}_all.log"), enqueue=True, encoding="utf-8", rotation="00:00",
                    format="{time:YYYY-MM-DD HH:mm:ss} {level} From {module}.{function} : {message}")
-        # 仅捕获指定级别日志
-        logger.add(os.path.join(LOG_DIR, "runtime_{time}.log"), enqueue=True, encoding="utf-8", rotation="00:00",
-                   level=LOG_LEVEL.upper(),
-                   format="{time:YYYY-MM-DD HH:mm:ss} {level} From {module}.{function} : {message}")
+        # # 仅捕获指定级别日志
+        # logger.add(os.path.join(LOG_DIR, "runtime_{time}.log"), enqueue=True, encoding="utf-8", rotation="00:00",
+        #            level=LOG_LEVEL.upper(),
+        #            format="{time:YYYY-MM-DD HH:mm:ss} {level} From {module}.{function} : {message}")
         logger.info("""
                          _    _         _      _____         _
           __ _ _ __ (_)  / \\  _   _| |_ __|_   _|__  ___| |_
@@ -58,8 +58,9 @@ def run(env, m, report):
         # ------------------------ 设置全局变量 ------------------------
         # 根据指定的环境参数，将运行环境所需相关配置数据保存到GLOBAL_VARS
         GLOBAL_VARS["env_key"] = env.lower()
-        for k, v in ENV_VARS[env.lower()].items():
-            GLOBAL_VARS[k] = v
+        if ENV_VARS.get(env.lower(), None):
+            for k, v in ENV_VARS[env.lower()].items():
+                GLOBAL_VARS[k] = v
         # ------------------------ 自动生成测试用例 ------------------------
         # 删除原有的测试用例，以便生成新的测试用例
         if os.path.exists(AUTO_CASE_DIR):

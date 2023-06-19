@@ -37,7 +37,6 @@ class YagEmailServe:
                          f"用户名: {self.user}\n" \
                          f"密码: {self.password}\n" \
                          f"host: {self.host}\n" \
-                         f"host: {self.host}\n" \
                          f"邮件内容: {info}\n" \
                          "=====================================================")
             yag = yagmail.SMTP(

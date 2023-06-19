@@ -1,0 +1,48 @@
+# 公共参数
+case_common:
+  allure_epic: GitLink接口（手动编写用例）
+  allure_feature: 上传文件模块
+  allure_story: 上传文件
+
+# 用例数据
+case_upload_demo_01:
+  feature: 上传文件
+  title: 测试单文件上传
+  run: True
+  url: /api/attachments.json
+  method: POST
+  headers:
+    cookies: ${login_cookie}
+  cookies:
+  request_type: file
+  payload:
+  files:
+    file: TOC出库订单导入模板(2).xlsx
+  extract:
+    file_id: $.id
+  assert_response:
+    eq:
+      http_code: 200
+  assert_sql:
+
+case_upload_demo_02:
+  feature: 上传文件
+  title: 测试多文件上传(该接口不支持多文件上传，这是一个示例)
+  run: False
+  url: /api/attachments.json
+  method: POST
+  headers:
+    cookies: ${login_cookie}
+  cookies:
+  request_type: file
+  payload:
+  files:
+    file:
+      - 导入TOC订单.xls
+      - toc.xls
+  extract:
+    file_id: $.id
+  assert_response:
+    eq:
+      http_code: 200
+  assert_sql:

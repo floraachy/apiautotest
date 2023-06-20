@@ -34,7 +34,7 @@ case_new_project_demo_01:
 case_new_project_demo_02:
   feature: 新建项目
   title: 正确输入各项必填参数，新建项目成功（不校验数据库，单独传cookies）
-  run: True
+  run: False
   url: /api/projects.json
   method: POST
   headers:

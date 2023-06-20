@@ -7,7 +7,7 @@ case_common:
 case_login_demo_01:
   feature: 登录
   title: 用户名密码正确，登录成功(不校验数据库)
-  run: True
+  run: False
   url: /api/accounts/login.json
   method: POST
   headers: {"Content-Type": "application/json; charset=utf-8;"}

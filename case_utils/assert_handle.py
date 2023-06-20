@@ -8,7 +8,7 @@
 
 from case_utils.allure_handle import allure_step
 from requests import Response
-from common_utils.data_handle import json_extractor, re_extract
+from case_utils.data_handle import json_extractor, re_extract
 from loguru import logger
 from case_utils.request_data_handle import response_type
 from common_utils.mysql_handle import MysqlServer
@@ -30,8 +30,7 @@ def assert_response(response: Response, expected: dict) -> None:
                 f"-------------Start：响应断言--------------------\n")
     if expected is None:
         logger.info("当前用例无响应断言！")
-        allure_step(step_title='判断是否存在响应断言',
-                    content='当前用例无响应断言！')
+        allure_step(step_title='判断是否存在响应断言---->当前用例无响应断言！')
         return
     logger.debug(f"响应断言预期结果：{expected}, {type(expected)}")
     index = 0
@@ -49,8 +48,7 @@ def assert_response(response: Response, expected: dict) -> None:
                     actual = re_extract(response.text, _k)
             index += 1
             logger.info(f'第{index}个响应断言 -|- 预期结果: {_k}: {_v}, {type(_v)}   {k}   实际结果: {actual}, {type(actual)}')
-            allure_step(step_title=f'第{index}个响应断言数据',
-                        content=f'预期结果: {_k}: {_v}, {type(_v)}   {k}   实际结果: {actual}, {type(actual)}')
+            allure_step(step_title=f'第{index}个响应断言数据---->预期结果: {_k}: {_v}, {type(_v)}   {k}   实际结果: {actual}, {type(actual)}')
             try:
                 if k == "eq":  # 预期结果 = 实际结果
                     assert _v == actual
@@ -73,8 +71,7 @@ def assert_response(response: Response, expected: dict) -> None:
                                 content='目前仅支持如下关键字：eq, in, gt, lt, not')
             except AssertionError:
                 logger.error(f"第{index}个响应断言失败 -|- 预期结果: {_k}: {_v}, {type(_v)}   {k}   实际结果: {actual}, {type(actual)}")
-                allure_step(step_title=f'第{index}个响应断言失败',
-                            content=f'预期结果: {_k}: {_v}, {type(_v)}   {k}   实际结果: {actual}, {type(actual)}')
+                allure_step(step_title=f'第{index}个响应断言失败---->预期结果: {_k}: {_v}, {type(_v)}   {k}   实际结果: {actual}, {type(actual)}')
                 logger.info('\n-------------End：响应断言--------------------\n' \
                             "=====================================================")
                 raise AssertionError(
@@ -100,14 +97,12 @@ def assert_sql(db_info, expected: dict):
                 f"-------------Start：数据库断言--------------------")
     if expected is None:
         logger.info("当前用例无数据库断言！")
-        allure_step(step_title='判断是否存在数据库断言',
-                    content='当前用例无数据库断言')
+        allure_step(step_title='判断是否存在数据库断言---->当前用例无数据库断言')
         return
     if not db_info:
         logger.error("当前环境无数据库配置，跳过数据库断言！")
-        allure_step(step_title='判断是否存在数据库配置',
-                    content='当前环境无数据库配置，跳过数据库断言！}')
-        logger.info('\n-------------End：数据库断言--------------------\n' \
+        allure_step(step_title='判断是否存在数据库配置---->当前环境无数据库配置，跳过数据库断言！')
+        logger.info('\n-------------End：数据库断言--------------------\n'
                     "=====================================================")
         return
     for k, v in expected.items():
@@ -118,13 +113,13 @@ def assert_sql(db_info, expected: dict):
                     # 查询数据库，获取查询结果
                     sql_result = MysqlServer(**db_info).query_one(_v)
                     logger.info(f'数据库响应断言 -|- SQL：{_v} || 查询结果：{sql_result}')
-                    allure_step(step_title=f'数据库断言',
-                                content=f'SQL：{_v} || 查询结果：{sql_result}')
+                    allure_step(step_title=f'数据库断言---->SQL：{_v} ',
+                                content=f'查询结果：{sql_result}')
                 except Exception as e:
                     logger.error(f'数据库服务报错：{e}')
                     allure_step(step_title=f'数据库服务报错',
                                 content=f'{e} ')
-                    logger.info('\n-------------End：数据库断言--------------------\n' \
+                    logger.info('\n-------------End：数据库断言--------------------\n'
                                 "=====================================================")
                     raise AssertionError(f"数据库服务报错：{e}")
 
@@ -133,19 +128,16 @@ def assert_sql(db_info, expected: dict):
                     if _k == "len":
                         assert _v == len(sql_result)
                         logger.info(f"预期结果: {_v} ==  实际结果: {len(sql_result)}, 断言成功！")
-                        allure_step(step_title=f'---->数据库断言结果',
-                                    content=f'预期结果: {_v} ==  实际结果: {len(sql_result)}, 断言成功！')
+                        allure_step(step_title=f'数据库断言结果---->预期结果: {_v} ==  实际结果: {len(sql_result)}, 断言成功！')
                     # 如果时$.开头，则从数据库查询结果中提取相应的值作为实际结果
                     elif _k.startswith("$."):
                         actual = json_extractor(sql_result, _k)
                         assert _v == actual
                         logger.info(f"预期结果: {_v} ==  实际结果: {actual}, 断言成功！")
-                        allure_step(step_title=f'---->数据库断言结果',
-                                    content=f'预期结果: {_v} ==  实际结果: {actual}, 断言成功！')
+                        allure_step(step_title=f'数据库断言结果---->预期结果: {_v} ==  实际结果: {actual}, 断言成功！')
             except AssertionError:
                 logger.error(f"数据库断言失败 -|- 预期结果:{_v}  {k}   实际结果: {sql_result})")
-                allure_step(step_title=f'数据库断言失败',
-                            content=f'预期结果:{_v}  {k}   实际结果: {sql_result}')
+                allure_step(step_title=f'数据库断言失败---->预期结果:{_v}  {k}   实际结果: {sql_result}')
                 logger.info('\n-------------End：数据库断言--------------------\n' \
                             "=====================================================")
                 raise AssertionError(f"数据库断言失败 -|-预期结果: {_v}  {k}  实际结果: {sql_result}")

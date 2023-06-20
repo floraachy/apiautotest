@@ -21,7 +21,7 @@ from config.settings import db_info
 from config.global_vars import GLOBAL_VARS
 
 # 读取用例数据
-yaml_data = YamlHandle(filename=os.path.join(DATA_DIR, "login_demo.yaml")).read_yaml
+yaml_data = YamlHandle(filename=os.path.join(DATA_DIR, "gitlink", "login_demo.yaml")).read_yaml
 case_common = yaml_data["case_common"]
 cases = []
 for k, v in yaml_data.items():

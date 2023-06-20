@@ -12,7 +12,7 @@ from config.settings import SEND_RESULT_TYPE, email, ding_talk, wechat, email_su
     ding_talk_content, wechat_content
 from common_utils.dingding_handle import DingTalkBot
 from common_utils.wechat_handle import WechatBot
-from common_utils.data_handle import data_replace
+from case_utils.data_handle import data_handle
 from case_utils.get_results_handle import get_test_results_from_pytest_html_report, \
     get_test_results_from_from_allure_report
 
@@ -125,7 +125,7 @@ def send_result(report_path, report_type="allure", attachment_path=None):
     if SEND_RESULT_TYPE in notification_mappings:
         notification = notification_mappings[SEND_RESULT_TYPE]
         # 获取消息内容并替换
-        notification['sender_args']['content'] = data_replace(notification['sender_args']['content'],
+        notification['sender_args']['content'] = data_handle(notification['sender_args']['content'],
                                                               source=results)
         # 获取消息发送函数
         sender = notification['sender']
@@ -138,7 +138,7 @@ def send_result(report_path, report_type="allure", attachment_path=None):
         # 遍历所有消息发送方式
         for notification in notification_mappings.values():
             # 获取消息内容并替换
-            notification['sender_args']['content'] = data_replace(notification['sender_args']['content'],
+            notification['sender_args']['content'] = data_handle(notification['sender_args']['content'],
                                                                   source=results)
             # 获取消息发送函数
             sender = notification['sender']

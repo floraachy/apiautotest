@@ -8,11 +8,11 @@
 import json
 import os.path
 from common_utils.files_handle import get_file_field
-from common_utils.data_handle import eval_data_process, data_replace
+from case_utils.data_handle import eval_data_process, data_handle
 from config.global_vars import GLOBAL_VARS
 from requests import Response
 from loguru import logger
-from common_utils.data_handle import json_extractor, re_extract
+from case_utils.data_handle import json_extractor, re_extract
 from case_utils.allure_handle import allure_step
 from common_utils.base_request import BaseRequest
 from config.path_config import FILES_DIR
@@ -28,17 +28,17 @@ class RequestPreDataHandle:
     def __init__(self, request_data):
         logger.debug(f"\n======================================================\n" \
                      "-------------Start：处理用例数据前--------------------\n"
-                     f"用例标题: {type(request_data.get('title', None))} || {request_data.get('title', None)}\n" \
-                     f"请求路径: {type(request_data.get('url', None))} || {request_data.get('url', None)}\n" \
-                     f"请求方式: {type(request_data.get('method', None))} || {request_data.get('method', None)}\n" \
-                     f"请求头:   {type(request_data.get('headers', None))} || {request_data.get('headers', None)}\n" \
+                     f"用例标题(title): {type(request_data.get('title', None))} || {request_data.get('title', None)}\n" \
+                     f"请求路径(url): {type(request_data.get('url', None))} || {request_data.get('url', None)}\n" \
+                     f"请求方式(method): {type(request_data.get('method', None))} || {request_data.get('method', None)}\n" \
+                     f"请求头(headers):   {type(request_data.get('headers', None))} || {request_data.get('headers', None)}\n" \
                      f"请求cookies: {type(request_data.get('cookies', None))} || {request_data.get('cookies', None)}\n" \
-                     f"请求类型: {type(request_data.get('request_type', None))} || {request_data.get('request_type', None)}\n" \
-                     f"请求内容: {type(request_data.get('payload', None))} || {request_data.get('payload', None)}\n" \
-                     f"请求文件: {type(request_data.get('files', None))} || {request_data.get('files', None)}\n" \
-                     f"后置提取参数: {type(request_data.get('extract', None))} || {request_data.get('extract', None)}\n" \
-                     f"响应断言: {type(request_data.get('assert_response', None))} || {request_data.get('assert_response', None)}\n" \
-                     f"数据库断言: {type(request_data.get('assert_sql', None))} || {request_data.get('assert_sql', None)}\n" \
+                     f"请求类型(request_type): {type(request_data.get('request_type', None))} || {request_data.get('request_type', None)}\n" \
+                     f"请求参数(payload): {type(request_data.get('payload', None))} || {request_data.get('payload', None)}\n" \
+                     f"请求文件(files): {type(request_data.get('files', None))} || {request_data.get('files', None)}\n" \
+                     f"后置提取参数(extract): {type(request_data.get('extract', None))} || {request_data.get('extract', None)}\n" \
+                     f"响应断言(assert_response): {type(request_data.get('assert_response', None))} || {request_data.get('assert_response', None)}\n" \
+                     f"数据库断言(assert_sql): {type(request_data.get('assert_sql', None))} || {request_data.get('assert_sql', None)}\n" \
                      "=====================================================")
         self.request_data = request_data
 
@@ -56,17 +56,17 @@ class RequestPreDataHandle:
         self.assert_handle()
         logger.debug(f"\n======================================================\n" \
                      "-------------End：处理用例数据后--------------------\n"
-                     f"用例标题:  {type(self.request_data.get('title', None))} || {self.request_data.get('title', None)}\n" \
-                     f"请求路径: {type(self.request_data.get('url', None))} || {self.request_data.get('url', None)}\n" \
-                     f"请求方式: {type(self.request_data.get('method', None))} || {self.request_data.get('method', None)}\n" \
-                     f"请求头:   {type(self.request_data.get('headers', None))} || {self.request_data.get('headers', None)}\n" \
+                     f"用例标题(title):  {type(self.request_data.get('title', None))} || {self.request_data.get('title', None)}\n" \
+                     f"请求路径(url): {type(self.request_data.get('url', None))} || {self.request_data.get('url', None)}\n" \
+                     f"请求方式(method): {type(self.request_data.get('method', None))} || {self.request_data.get('method', None)}\n" \
+                     f"请求头(headers):   {type(self.request_data.get('headers', None))} || {self.request_data.get('headers', None)}\n" \
                      f"请求cookies: {type(self.request_data.get('cookies', None))} || {self.request_data.get('cookies', None)}\n" \
-                     f"请求类型: {type(self.request_data.get('request_type', None))} || {self.request_data.get('request_type', None)}\n" \
-                     f"请求内容: {type(self.request_data.get('payload', None))} || {self.request_data.get('payload', None)}\n" \
-                     f"请求文件: {type(self.request_data.get('files', None))} || {self.request_data.get('files', None)}\n" \
-                     f"后置提取参数: {type(self.request_data.get('extract', None))} || {self.request_data.get('extract', None)}\n" \
-                     f"响应断言: {type(self.request_data.get('assert_response', None))} || {self.request_data.get('assert_response', None)}\n" \
-                     f"数据库断言: {type(self.request_data.get('assert_sql', None))} || {self.request_data.get('assert_sql', None)}\n" \
+                     f"请求类型(request_type): {type(self.request_data.get('request_type', None))} || {self.request_data.get('request_type', None)}\n" \
+                     f"请求参数(payload): {type(self.request_data.get('payload', None))} || {self.request_data.get('payload', None)}\n" \
+                     f"请求文件(files): {type(self.request_data.get('files', None))} || {self.request_data.get('files', None)}\n" \
+                     f"后置提取参数(extract): {type(self.request_data.get('extract', None))} || {self.request_data.get('extract', None)}\n" \
+                     f"响应断言(assert_response): {type(self.request_data.get('assert_response', None))} || {self.request_data.get('assert_response', None)}\n" \
+                     f"数据库断言(assert_sql): {type(self.request_data.get('assert_sql', None))} || {self.request_data.get('assert_sql', None)}\n" \
                      "=====================================================")
         return self.request_data
 
@@ -76,7 +76,7 @@ class RequestPreDataHandle:
             用例数据中获取到的url(一般是不带host的，个别特殊的带有host，则不进行处理)
             """
             # 检测url中是否存在需要替换的参数，如果存在则进行替换
-            data_replace(content=self.request_data.get("url", None), source=GLOBAL_VARS)
+            data_handle(obj=self.request_data.get("url", None), source=GLOBAL_VARS)
             # 进行url处理，最终得到full_url
             host = GLOBAL_VARS.get("host", "")
             url = self.request_data.get("url", "")
@@ -115,7 +115,7 @@ class RequestPreDataHandle:
             # 从用例数据中获取cookies， 处理cookies
             if cookies:
                 # 通过全局变量替换cookies，得到的是一个str类型
-                cookies = data_replace(content=cookies, source=GLOBAL_VARS)
+                cookies = data_handle(obj=cookies, source=GLOBAL_VARS)
                 if isinstance(cookies, str):
                     # 如果是字符串类型，就转成字典
                     self.request_data["cookies"] = json.loads(cookies)
@@ -133,8 +133,7 @@ class RequestPreDataHandle:
         try:
             # 从用例数据中获取header， 处理header
             if headers:
-                self.request_data["headers"] = eval_data_process(
-                    data_replace(content=headers, source=GLOBAL_VARS))
+                self.request_data["headers"] = data_handle(obj=headers, source=GLOBAL_VARS)
                 # 如果请求头中有cookies，需要进行单独处理
                 if self.request_data["headers"].get("cookies", None):
                     cookies = self.request_data["headers"]["cookies"]
@@ -152,8 +151,7 @@ class RequestPreDataHandle:
         payload = self.request_data.get("payload", None)
         try:
             if payload:
-                self.request_data["payload"] = eval_data_process(
-                    data_replace(content=payload, source=GLOBAL_VARS))
+                self.request_data["payload"] = data_handle(obj=payload, source=GLOBAL_VARS)
         except Exception as e:
             logger.error(f"处理{payload}报错了：{e}")
             print(f"处理{payload}报错了：{e}")
@@ -207,8 +205,7 @@ class RequestPreDataHandle:
         assert_response = self.request_data.get("assert_response", None)
         try:
             if assert_response:
-                self.request_data["assert_response"] = eval_data_process(
-                    data_replace(content=assert_response, source=GLOBAL_VARS))
+                self.request_data["assert_response"] = data_handle(obj=assert_response, source=GLOBAL_VARS)
             # 由于数据库断言里面的变量需要请求响应后进行提取，因此目前不进行处理
         except Exception as e:
             logger.error(f"处理{assert_response}报错了：{e}")
@@ -231,30 +228,43 @@ class RequestHandle:
         response = BaseRequest.send_request(self.case_data)
         # 处理数据库断言 - 从全局变量中获取最新值，替换数据库断言中的参数
         if self.case_data.get('assert_sql', None):
-            self.case_data["assert_sql"] = eval_data_process(
-                data_replace(content=self.case_data["assert_sql"], source=GLOBAL_VARS))
-        logger.info(f"\n======================================================\n" \
-                    "-------------请求数据--------------------\n"
-                    f"用例标题: {type(self.case_data.get('title', None))} || {self.case_data.get('title', None)}\n" \
-                    f"请求路径: {type(self.case_data.get('url', None))} || {self.case_data.get('url', None)}\n" \
-                    f"请求方式: {type(self.case_data.get('method', None))} || {self.case_data.get('method', None)}\n" \
-                    f"请求头:   {type(self.case_data.get('headers', None))} || {self.case_data.get('headers', None)}\n" \
-                    f"请求cookies: {type(self.case_data.get('cookies', None))} || {self.case_data.get('cookies', None)}\n" \
-                    f"请求类型: {type(self.case_data.get('request_type', None))} || {self.case_data.get('request_type', None)}\n" \
-                    f"请求内容: {type(self.case_data.get('payload', None))} || {self.case_data.get('payload', None)}\n" \
-                    f"请求文件: {type(self.case_data.get('files', None))} || {self.case_data.get('files', None)}\n" \
-                    f"请求响应数据: {response.text}\n" \
-                    f"请求响应码: {response.status_code}\n" \
-                    f"响应耗时: {round(response.elapsed.total_seconds(), 2)} s || {round(response.elapsed.total_seconds() * 1000, 2)} ms\n" \
-                    "=====================================================")
-        allure_step(step_title=f"请求地址:{self.case_data['url']}")
-        allure_step(step_title=f"请求方式：{self.case_data['method']}")
-        allure_step(step_title="请求头", content=self.case_data['headers'])
+            self.case_data["assert_sql"] = data_handle(obj=self.case_data["assert_sql"], source=GLOBAL_VARS)
+        logger.info(f"\n======================================================\n"
+                    "-------------执行请求获取响应数据--------------------\n"
+                    f"用例标题(title): {type(self.case_data.get('title', None))} || {self.case_data.get('title', None)}\n"
+                    f"请求路径(url): {type(self.case_data.get('url', None))} || {self.case_data.get('url', None)}\n"
+                    f"请求方式(method): {type(self.case_data.get('method', None))} || {self.case_data.get('method', None)}\n"
+                    f"请求头(headers):   {type(self.case_data.get('headers', None))} || {self.case_data.get('headers', None)}\n"
+                    f"请求cookies: {type(self.case_data.get('cookies', None))} || {self.case_data.get('cookies', None)}\n"
+                    f"请求类型(request_type): {type(self.case_data.get('request_type', None))} || {self.case_data.get('request_type', None)}\n"
+                    f"请求参数(payload): {type(self.case_data.get('payload', None))} || {self.case_data.get('payload', None)}\n")
+        allure_step(step_title=f"请求地址(url):{self.case_data['url']}")
+        allure_step(step_title=f"请求方式(method)：{self.case_data['method']}")
+        allure_step(step_title="请求头(headers)", content=self.case_data['headers'])
         allure_step(step_title="请求Cookies", content=str(self.case_data['cookies']))
-        allure_step(step_title="请求参数", content=self.case_data['payload'])
-        allure_step(step_title="请求文件", content=self.case_data['files'])
-        allure_step(step_title="请求响应数据", content=response.text)
-        allure_step(step_title=f"请求响应码:{response.status_code}")
+        allure_step(step_title="请求参数(payload)", content=self.case_data['payload'])
+        # 处理请求里面的files，使得日志以及allure中写入的是文件，而不是文件二进制内容
+        if self.case_data.get('files', None):
+            files = self.case_data["files"]
+            if isinstance(files, list):
+                for file in files:
+                    _file = os.path.join(FILES_DIR, file[1][0])
+                    logger.info(
+                        f"\n请求文件(files): {type(_file)} || {_file}\n")
+                    allure_step(step_title="请求文件(files)", source=_file)
+            elif isinstance(files, dict):
+                dict_values = list(files.values())[0]
+                _file = os.path.join(FILES_DIR, dict_values[0])
+                logger.info(
+                    f"\n请求文件(files): {type(_file)} || {_file}\n")
+                allure_step(step_title="请求文件(files)", source=_file)
+        logger.info(
+            f"\n请求响应数据(response): {response.text}\n"
+            f"请求响应码(code): {response.status_code}\n"
+            f"响应耗时: {round(response.elapsed.total_seconds(), 2)} s || {round(response.elapsed.total_seconds() * 1000, 2)} ms\n"
+            "=====================================================")
+        allure_step(step_title="请求响应数据(response)", content=response.text)
+        allure_step(step_title=f"请求响应码(code):{response.status_code}")
         allure_step(
             step_title=f"响应耗时:{round(response.elapsed.total_seconds(), 2)} s || {round(response.elapsed.total_seconds() * 1000, 2)} ms")
         return response
@@ -308,7 +318,3 @@ def response_type(response: Response) -> str:
         return "json"
     except:
         return "str"
-
-if __name__ == '__main__':
-    test = RequestPreDataHandle(request_data={"files": {"file": ["导入TOC订单.xls", "toc.xls"]}})
-    test.files_handle()

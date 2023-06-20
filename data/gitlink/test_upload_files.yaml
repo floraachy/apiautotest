@@ -1,6 +1,6 @@
 # 公共参数
 case_common:
-  allure_epic: GitLink接口（手动编写用例）
+  allure_epic: GitLink接口(自动生成用例)
   allure_feature: 上传文件模块
   allure_story: 上传文件
 

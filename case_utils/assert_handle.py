@@ -6,11 +6,11 @@
 # @Software: PyCharm
 # @Desc: 断言
 
-from case_utils.allure_handle import allure_step
+from loguru import logger
 from requests import Response
 from case_utils.data_handle import json_extractor, re_extract
-from loguru import logger
 from case_utils.request_data_handle import response_type
+from case_utils.allure_handle import allure_step
 from common_utils.mysql_handle import MysqlServer
 
 
@@ -48,7 +48,8 @@ def assert_response(response: Response, expected: dict) -> None:
                     actual = re_extract(response.text, _k)
             index += 1
             logger.info(f'第{index}个响应断言 -|- 预期结果: {_k}: {_v}, {type(_v)}   {k}   实际结果: {actual}, {type(actual)}')
-            allure_step(step_title=f'第{index}个响应断言数据---->预期结果: {_k}: {_v}, {type(_v)}   {k}   实际结果: {actual}, {type(actual)}')
+            allure_step(
+                step_title=f'第{index}个响应断言数据---->预期结果: {_k}: {_v}, {type(_v)}   {k}   实际结果: {actual}, {type(actual)}')
             try:
                 if k == "eq":  # 预期结果 = 实际结果
                     assert _v == actual
@@ -71,7 +72,8 @@ def assert_response(response: Response, expected: dict) -> None:
                                 content='目前仅支持如下关键字：eq, in, gt, lt, not')
             except AssertionError:
                 logger.error(f"第{index}个响应断言失败 -|- 预期结果: {_k}: {_v}, {type(_v)}   {k}   实际结果: {actual}, {type(actual)}")
-                allure_step(step_title=f'第{index}个响应断言失败---->预期结果: {_k}: {_v}, {type(_v)}   {k}   实际结果: {actual}, {type(actual)}')
+                allure_step(
+                    step_title=f'第{index}个响应断言失败---->预期结果: {_k}: {_v}, {type(_v)}   {k}   实际结果: {actual}, {type(actual)}')
                 logger.info('\n-------------End：响应断言--------------------\n' \
                             "=====================================================")
                 raise AssertionError(

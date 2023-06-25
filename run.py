@@ -18,17 +18,17 @@
 import os
 import shutil
 import pytest
-from config.path_config import REPORT_DIR, LOG_DIR, AUTO_CASE_DIR, CONF_DIR, LIB_DIR, ALLURE_RESULTS_DIR, \
-    ALLURE_HTML_DIR
-from case_utils.case_fun_handle import generate_cases
 from loguru import logger
 import click
-from config.settings import LOG_LEVEL
-from config.global_vars import GLOBAL_VARS, ENV_VARS
 from datetime import datetime
+from case_utils.case_fun_handle import generate_cases
 from case_utils.platform_handle import PlatformHandle
 from case_utils.send_result_handle import send_result
 from case_utils.allure_handle import AllureReportBeautiful
+from config.path_config import REPORT_DIR, LOG_DIR, AUTO_CASE_DIR, CONF_DIR, LIB_DIR, ALLURE_RESULTS_DIR, \
+    ALLURE_HTML_DIR
+from config.settings import LOG_LEVEL
+from config.global_vars import GLOBAL_VARS, ENV_VARS
 from common_utils.files_handle import zip_file, copy_file
 
 

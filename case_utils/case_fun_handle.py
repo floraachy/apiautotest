@@ -5,19 +5,18 @@
 # @Software: PyCharm
 # @Desc:
 
-from config.path_config import DATA_DIR, CASE_TEMPLATE_DIR, AUTO_CASE_DIR
-from common_utils.excel_handle import ExcelHandle
-from common_utils.yaml_handle import YamlHandle
-from config.models import CaseFileType
-from config.settings import CASE_FILE_TYPE
-from loguru import logger
-from common_utils.files_handle import get_files
-from case_utils.case_data_analysis import CaseDataCheck
 import os
-from config.path_config import AUTO_CASE_DIR
 from string import Template
 import datetime
 from xpinyin import Pinyin  # 纯 Python 编写的中文字符串拼音转换模块，不需要依赖外部程序和词库。
+from loguru import logger
+from common_utils.excel_handle import ExcelHandle
+from common_utils.yaml_handle import YamlHandle
+from common_utils.files_handle import get_files
+from config.models import CaseFileType
+from config.settings import CASE_FILE_TYPE
+from config.path_config import DATA_DIR, CASE_TEMPLATE_DIR, AUTO_CASE_DIR
+from case_utils.case_data_analysis import CaseDataCheck
 
 """
 主要步骤：
@@ -162,7 +161,3 @@ def gen_case_file(filename, case_template_path, case_common, case_data, target_c
     # 将测试用例方法写入py文件中
     with open(os.path.join(target_case_path, func_name + '.py'), "w", encoding="utf-8") as fp:
         fp.write(my_case)
-
-
-if __name__ == '__main__':
-    generate_cases()

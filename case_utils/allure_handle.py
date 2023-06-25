@@ -7,8 +7,8 @@
 
 import json
 import allure
-from config.models import AllureAttachmentType
 import os
+from config.models import AllureAttachmentType
 
 
 def allure_title(title: str) -> None:

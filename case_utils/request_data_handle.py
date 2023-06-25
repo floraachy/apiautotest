@@ -6,15 +6,15 @@
 # @Software: PyCharm
 # @Desc: 处理request请求前后的用例数据
 import json
-import os.path
-from common_utils.files_handle import get_file_field
-from case_utils.data_handle import eval_data_process, data_handle
-from config.global_vars import GLOBAL_VARS
+import os
 from requests import Response
 from loguru import logger
+from common_utils.files_handle import get_file_field
+from common_utils.base_request import BaseRequest
+from case_utils.data_handle import eval_data_process, data_handle
 from case_utils.data_handle import json_extractor, re_extract
 from case_utils.allure_handle import allure_step
-from common_utils.base_request import BaseRequest
+from config.global_vars import GLOBAL_VARS
 from config.path_config import FILES_DIR
 
 
@@ -76,10 +76,9 @@ class RequestPreDataHandle:
             用例数据中获取到的url(一般是不带host的，个别特殊的带有host，则不进行处理)
             """
             # 检测url中是否存在需要替换的参数，如果存在则进行替换
-            data_handle(obj=self.request_data.get("url", None), source=GLOBAL_VARS)
+            url = data_handle(obj=self.request_data.get("url", None), source=GLOBAL_VARS)
             # 进行url处理，最终得到full_url
             host = GLOBAL_VARS.get("host", "")
-            url = self.request_data.get("url", "")
             # 从用例数据中获取url，如果键url不存在，则返回空字符串
             # 如果url是以http开头的，则直接使用该url，不与host进行拼接
             if url.lower().startswith("http"):

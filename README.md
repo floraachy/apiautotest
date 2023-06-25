@@ -42,13 +42,13 @@
 ├────case_utils/ 测试框架相关工具类
 │    ├────__init__.py
 │    ├────allure_handle.py  操作allure的相关方法
-│    ├────platform_handle.py  跨平台的支持allure，用于生成allure测试报告
 │    ├────assert_handle.py  断言处理， 包括响应断言和数据库断言
-│    ├────case_fun_handle.py   根据配置文件，从指定类型文件中读取用例数据，并调用生成用例文件方法，生成用例文件
 │    ├────case_data_analysis  分析用例数据是否符合规范
+│    ├────case_fun_handle.py   根据配置文件，从指定类型文件中读取用例数据，并调用生成用例文件方法，生成用例文件
 │    ├────data_handle.py    数据处理
-│    ├────request_data_handle.py   针对用例数据进行请求前后的处理
 │    ├────get_results_handle.py   从pytest-html/allure测试报告中获取测试结果
+│    ├────platform_handle.py  跨平台的支持allure，用于生成allure测试报告
+│    ├────request_data_handle.py   针对用例数据进行请求前后的处理
 │    └────send_result_handle.py   根据配置文件，从html测试报告中获取测试结果，发送指定类型的通知
 ├────common_utils/  公共的工具类
 │    ├────__init__.py
@@ -58,16 +58,24 @@
 │    ├────excel_handle.py  处理excel
 │    ├────files_handle.py   处理文件相关操作
 │    ├────func_handle.py   函数装饰器
+│    ├────http_server.py   封装的HTTP服务
+│    ├────mysql_handle.py  使用pymysql模块连接mysql数据库的公共方法
+│    ├────time_handle.py  封装处理时间操作的一些方法
 │    ├────wechat_handle.py  封装企业微信机器人
 │    ├────yagmail_handle.py  封装通过yagmail发送邮件的方法
-│    ├────time_handle.py  封装处理时间操作的一些方法
 │    └────yaml_handle.py  处理yaml文件
 ├────config/
 │    ├────__init__.py
+│    ├────allure_config/
+│    │    ├────gitlinklogo.jpg    保存用来替换allure报告的logo的，在代码中无用处
+│    │    ├────http_server.exe    http服务，用来放置在allure压缩包中，方便在不安装allure环境下打开allure报告
+│    │    ├────logo.svg   保存用来替换allure报告的logo的，在代码中无用处
+│    │    ├────双击打开Allure报告.bat    .bat文件，用来放置在allure压缩包中，方便在不安装allure环境下打开allure报告
+│    ├────pytest_html_config/
+│    │    ├────pytest_html_report.css  改变pytest-html测试报告的样式文件
 │    ├────case_template.txt  自动生成的测试用例文件模板
 │    ├────global_vars.py    保存的一些全局变量
-│    ├────project_path.py    项目路径管理
-│    ├────report.css    优化html测试报告的样式文件
+│    ├────path_config.py    项目路径管理
 │    └────settings.py   配置文件
 ├────conftest.py
 ├────data/  测试用例数据
@@ -84,11 +92,11 @@
 ├────run.py      运行入口  
 └────test_case/   测试用例
 │    ├────conftest.py
-│    ├────test_auto_case/
+│    ├────test_auto_case/     自动生成的测试用例目录
 │    │    ├────test_login_demo.py
 │    │    ├────test_login_excel_demo.py
 │    │    └────test_new_project_demo.py
-│    └────test_manual_case/
+│    └────test_manual_case/   手动编写的测试用例目录
 │    │    ├────__init__.py
 │    │    ├────test_demo.py
 │    │    └────test_login_demo.py
@@ -212,7 +220,7 @@ excel表单2名称是：示例模块
 测试用例类：TestDemoSlmkAuto
 测试用例方法：test_demo_slmk_auto
 
-## 六、运行自动化测试
+## 七、运行自动化测试
 ### 1.  激活已存在的虚拟环境
 - （如果不存在会创建一个）：pipenv shell （必须在项目根目录下执行）
 
@@ -227,7 +235,7 @@ excel表单2名称是：示例模块
 注意：
 - 如果pycharm.interpreter拥有了框架所需的所有依赖包，可以通过pycharm直接在`run.py`中右键运行
 
-## 七、查看测试报告
+## 八、查看测试报告
 ### pytest-html测试报告
 如果是pytest-html生成的测试报告，直接打开`outputs`目录下的`.html`报告即可。支持通过任意浏览器打开查看
 
@@ -240,448 +248,31 @@ excel表单2名称是：示例模块
 - 如果通过点击`outputs/report/allure_html/双击打开Allure报告.bat`打开测试报告，命令窗口显示乱码，或者打不开，可以把`.bat`的文件名称修改为英文的名称，里面的所有中文注释全部移除，再次尝试
 
 
-## 八 、详细功能说明
-### 1. 用例中如何生成随机数据
-在测试过程中，可能涉及到一些特殊场景，需要生成定制化的数据。每次运行测试，都需要按照指定规则随机生成。
-例如：`data/test_new_project_demo.yaml` 中payload.name就是使用Faker随机生成的。
-我这里写了一个表达式：`${faker.name().replace(" ", "").replace(".", "")}`
-- 在测试方法中`case_data = RequestPreDataHandle(case).request_data_handle()`会进行用例数据处理
-- 处理过程中会调用`common_utils.data_handle.data_replace`进行数据处理
-- 在`common_utils.data_handle `有导入Faker包，并且初始化了faker对象。因此上述表达式能成功运行获取其结果
+## 九 、详细功能说明
+- [如何实现动态数据的热加载？](https://www.gitlink.org.cn/zone/tester/newdetail/204)
 
-这里需要注意以下几点：
-- 如果是python自带的一些方法，不需要额外导包，或者写方法，就会直接处理。
-- Faker这个Python库，已经可以满足生成各种各样的伪数据，这个我已经在`common_utils.data_handle `中定义好了。
-- 如果还有一些其他的定制化数据，可以在`common_utils.data_handle `中进行添加。
+- [如何提取响应数据作为全局变量并使用？](https://www.gitlink.org.cn/zone/tester/newdetail/205)
 
-### 2. 用例中如何提取响应数据作为全局变量并使用
-在测试过程中，通常下一个接口需要用到上一个接口的响应数据，这个时候就涉及到参数的提取。
-我们在用例数据中定义了参数：`extract`进行后置参数的提取，根据接口返回数据的类型（JSON或者Text）采取不同的方法，从响应数据中提取参数，保存在全局变量中。
-例如：
-- 登录接口中定义了需要提取的参数：`data/test_login_demo.yaml`
-```yaml
-  extract:
-    nickname: $.username
-    login: $.login
-    user_id: $.user_id
-```
-- 请求结束后，`case_utils/request_data_handle.py.after_request_extract`就会接口返回数据的类型（JSON或者Text）采取不同的方法，从响应数据中提取参数，保存在全局变量中。
-- 下一个接口需要用到user_id，只需要在用例中以如下格式书写`${user_id}`即可。
-```yaml
-  payload:
-    "user_id": ${user_id}
-    "name": ${faker.name().replace(" ", "").replace(".", "")}
-    "repository_name": ${faker.name().replace(" ", "").replace(".", "")}
-```
+- [如何进行响应数据断言？](https://www.gitlink.org.cn/zone/tester/newdetail/206)
 
-### 3. 如何进行响应数据断言
-以下是支持的几种响应断言：
-|  断言方式 |  说明  |
-| ------------ | ------------ |
-| eq |  相等，判断预期结果是否等于实际结果 |
-| in  |  包含， 判断实际结果是否包含预期结果 |
-| gt |  大于， 判断预期结果是否大于实际结果 |
-| lt  |  小于， 判断预期结果是否小于实际结果 |
-| not | 非，判断预期结果不等于实际结果  |
+- [如何进行数据库断言？](https://www.gitlink.org.cn/zone/tester/newdetail/207)
 
-以下是响应断言示例：
-```yaml
-  assert_response:
-    eq:
-      http_code: 200
-      $.user_id: ${user_id}
-    in:
-      $.login: ${login}
-    gt:
-      $.user_id: 84955
-    lt:
-      $.user_id: 84953
-    not:
-      $.user_id: 85390
-```
-- 预期结果：http_code；实际结果：200；  会从接口获取响应码，判断预期结果是否等于实际结果。
-- 预期结果：`$.user_id`， 实际结果：`${user_id}`； 会从接口响应数据中通过表达式`$.user_id`提取user_id作为预期结果， 从全局变量中替换变量`${user_id}`获取user_id作为实际结果，判断预期结果是否等于实际结果。
-- 预期结果：`$.login`， 实际结果：`${login}`； 会从接口响应数据中通过表达式`$.login`提取login作为预期结果， 从全局变量中替换变量`${login}`获取login作为实际结果，判断实际结果是否包含预期结果。
--  预期结果：`$.user_id`， 实际结果：84955； 会从接口响应数据中通过表达式`$.user_id`提取user_id作为预期结果，判断预期结果是否大于实际结果。
--  预期结果：`$.user_id`， 实际结果：84953； 会从接口响应数据中通过表达式`$.user_id`提取user_id作为预期结果，判断预期结果是否小于实际结果。
--  预期结果：`$.user_id`， 实际结果：85390； 会从接口响应数据中通过表达式`$.user_id`提取user_id作为预期结果，判断预期结果是否不等于实际结果。
+- [如何配置邮箱通知？](https://www.gitlink.org.cn/zone/tester/newdetail/208)
 
+- [如何配置钉钉通知？](https://www.gitlink.org.cn/zone/tester/newdetail/209)
 
-### 4. 如何进行数据库断言
-以下是支持的几种数据库断言：
-|  断言方式 |  说明  |
-| ------------ | ------------ |
-| len |  数据库SQL查询结果的数量 是否 等于预期结果 |
-| eq  | 从数据库SQL查询结果中通过jsonpath表达式提取值，判断是否等于预期结果  |
-|...... | 其他断言方式待扩展 |
+- [如何配置企业微信通知？](https://www.gitlink.org.cn/zone/tester/newdetail/210)
 
-以下是数据库断言示例-1：
-```yaml
-  assert_sql:
-    eq:
-      sql: select count(*) from tokens where user_id=${user_id};
-      len: 1
-```
-- sql表示需要查询的SQL， 这里调用的是`common_utils/mysql_handle.py.MysqlServer.query_one`, 返回的数据类型是字典。
-- len:1， 判断的是查询结果的个数是否等于1.
-- 该场景一般用于某操作往数据库中插入了一条数据，判断是否插入成功，而不需要去校验其数据准确性。
-- 例如上述数据库断言示例中，我是去查询tokens中是否存在指定user_id的数据，其实际场景是只要登录成功，就会往token表里面插入登录用户的token。因此要判断实际是否登录成功，只需要判断表里面有没有针对该用户插入一条数据即可。
+- [如何测试上传文件接口？](https://www.gitlink.org.cn/zone/tester/newdetail/211)
 
+- [如何处理同一环境存在多域名的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/214)
 
-以下是数据库断言示例-2：
-```yaml
-  assert_sql:
-    eq:
-      sql: select id, `name`, identifier from projects where user_id=${user_id} ORDER BY created_on DESC;
-      $.id: ${project_id}
-      $.name: ${project_name}
-      $.identifier: ${project_identifier}
-```
--  sql表示需要查询的SQL， 这里调用的是`common_utils/mysql_handle.py.MysqlServer.query_one`, 返回的数据类型是字典。
-- 这里是在projects表里面查询指定用户创建的项目信息（id, `name`, identifier），并按创建时间倒序排序。
-- 预期结果：`$.id`， 实际结果：`${project_id}`， 从数据库查询结果中通过表达式`$.id`提取id作为实际结果， 从全局变量中替换变量`${project_id}`获取project_id作为实际结果，判断预期结果是否等于实际结果。
-- 预期结果：`$.name`， 实际结果：`${project_name}`， 从数据库查询结果中通过表达式`$.name`提取name作为实际结果， 从全局变量中替换变量`${project_name}`获取project_name作为实际结果，判断预期结果是否等于实际结果。
-- 预期结果：`$.identifier`， 实际结果：`${project_identifier}`， 从数据库查询结果中通过表达式`$.identifier`提取identifier作为实际结果， 从全局变量中替换变量`${project_identifier}`获取project_identifier作为实际结果，判断预期结果是否等于实际结果。
-
-注意：
-- 关于数据库断言，需要考虑实际使用场景，来综合考虑调整。这里我考虑的可能还有局限性。欢迎大家来反馈。
-- 另外，其实sql有很大程度影响数据库断言的走向， 我们写sql的时候尽量写的精准一些。
-
-### 5. 配置邮箱通知
-- 首先我们需要在配置文件`config/settings.py`中选择邮件发送方式：SEND_RESULT_TYPE = 3
-- 获取邮件的相关信息，并填写到配置文件`config/settings.py`中。这些配置信息可以从邮箱设置中获取。不知道如何配置的，可以直接互联网上搜索。
-
-```python
-# 发送邮件的相关配置信息
-email = {
-    "user": "******",  # 发件人邮箱
-    "password": "******",  # 发件人邮箱授权码/发件人邮箱密码
-    "host": "smtp.qq.com",
-    "to": ["******", "******"]  # 收件人邮箱
-}
-
-```
-
-- 在配置文件`config/settings.py`中配置邮件发送的标题以及内容。
-注意：
-1）以下`${变量名}`是已经定义好的。只能减，不能增。
-2）邮件标题以及内容也可自行调整。
-
-```python
-# ------------------------------------ 邮件通知内容 ----------------------------------------------------#
-email_subject = f"接口自动化报告"
-email_content = """
-           各位同事, 大家好:
-
-           自动化用例于 <strong>${start_time} </strong> 开始运行，运行时长：<strong>${run_time} s</strong>， 目前已执行完成。
-           ---------------------------------------------------------------------------------------------------------------
-           测试人：<strong> ${tester} </strong> 
-           所属部门：<strong> ${department} </strong>
-           项目环境：<strong> ${run_env} </strong>
-           ---------------------------------------------------------------------------------------------------------------
-           执行结果如下:
-           &nbsp;&nbsp;用例运行总数:<strong> ${total} 个</strong>
-           &nbsp;&nbsp;通过用例个数（passed）: <strong><font color="green" >${passed} 个</font></strong>
-           &nbsp;&nbsp;失败用例个数（failed）: <strong><font color="red" >${failed} 个</font></strong>
-           &nbsp;&nbsp;异常用例个数（error）: <strong><font color="orange" >${broken} 个</font></strong>
-           &nbsp;&nbsp;跳过用例个数（skipped）: <strong><font color="grey" >${skipped} 个</font></strong>
-           &nbsp;&nbsp;失败重试用例个数 * 次数之和（rerun）: <strong>${rerun} 个</strong>
-           &nbsp;&nbsp;成  功   率:<strong> <font color="green" >${pass_rate} %</font></strong>
-
-           **********************************
-           附件为具体的测试报告，详细情况可下载附件查看， 非相关负责人员可忽略此消息。谢谢。
-       """
-```
-
-
-### 6. 配置钉钉通知
-- 首先我们需要在配置文件`config/settings.py`中选择钉钉发送方式：SEND_RESULT_TYPE = 1
-- 获取钉钉的相关信息，并填写到配置文件`config/settings.py`中。具体可以参考：[钉钉机器人](https://blog.csdn.net/FloraCHY/article/details/130618777?spm=1001.2014.3001.5502 "钉钉机器人")
-
-```python
-# ------------------------------------ 钉钉相关配置 ----------------------------------------------------#
-ding_talk = {
-    "webhook_url": "https://oapi.dingtalk.com/robot/send?access_token=***********",
-    "secret": "***********"
-}
-
-```
-- 在配置文件`config/settings.py`中配置钉钉发送的标题以及内容。
-注意：
-1）以下`${变量名}`是已经定义好的。只能减，不能增。
-2）邮件标题以及内容也可自行调整。
-```python
-# ------------------------------------ 钉钉通知内容 ----------------------------------------------------#
-ding_talk_title = f"接口自动化报告"
-ding_talk_content = """
-           各位同事, 大家好:
-
-           ### 自动化用例于 ${start_time} 开始运行，运行时长：${run_time} s， 目前已执行完成。
-            ---------------------------------------------------------------------------------------------------------------
-           #### 测试人： ${tester}
-           #### 所属部门： ${department}
-           #### 项目环境： ${run_env} 
-           ---------------------------------------------------------------------------------------------------------------
-           #### 执行结果如下:
-           - 用例运行总数: ${total} 个
-           - 通过用例个数（passed）: ${passed} 个
-           - 失败用例个数（failed）: ${failed} 个
-           - 异常用例个数（error）: ${broken} 个
-           - 跳过用例个数（skipped）: ${skipped} 个
-           - 失败重试用例个数 * 次数之和（rerun）: ${rerun} 个
-           - 成  功   率: ${pass_rate} %
-
-           **********************************
-           附件为具体的测试报告，详细情况可下载附件查看， 非相关负责人员可忽略此消息。谢谢。
-       """
-```
-
-
-### 7. 配置企业微信通知
-- 首先我们需要在配置文件`config/settings.py`中选择企业微信发送方式：SEND_RESULT_TYPE = 2
-- 获取企业微信的相关信息，并填写到配置文件`config/settings.py`中。具体可以参考：[企业微信](https://blog.csdn.net/FloraCHY/article/details/130624354?spm=1001.2014.3001.5502 "企业微信")
-```python
-# ------------------------------------ 企业微信相关配置 ----------------------------------------------------#
-wechat = {
-    "webhook_url": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=********",
-}
-```
-- 在配置文件`config/settings.py`中配置企业微信发送内容。
-注意：
-1）以下`${变量名}`是已经定义好的。只能减，不能增。
-2）邮件标题以及内容也可自行调整。
-
-```python
-# ------------------------------------ 企业微信通知内容 ----------------------------------------------------#
-wechat_content = """
-           各位同事, 大家好:
-
-           ### 自动化用例于 ${start_time} 开始运行，运行时长：${run_time} s， 目前已执行完成。
-           --------------------------------
-           #### 测试人： ${tester}
-           #### 所属部门： ${department}
-           #### 项目环境： ${run_env} 
-           --------------------------------
-           #### 执行结果如下:
-           - 用例运行总数: ${total} 个
-           - 通过用例个数（passed）:<font color=\"info\"> ${passed} 个</font>
-           - 失败用例个数（failed）: <font color=\"warning\"> ${failed}  个</font>
-           - 异常用例个数（error）: <font color=\"warning\"> ${broken} 个</font>
-           - 跳过用例个数（skipped）: <font color=\"comment\"> ${skipped} 个</font>
-           - 失败重试用例个数 * 次数之和（rerun）: <font color=\"comment\"> ${rerun} 个</font>
-           - 成  功   率: <font color=\"info\"> ${pass_rate} % </font>
-
-           **********************************
-           附件为具体的测试报告，详细情况可下载附件查看， 非相关负责人员可忽略此消息。谢谢。
-       """
-
-```
-
-### 7. 上传文件接口支持
-#### 熟悉接口
-- 确定上传文件接口的URL
-- 确定上传文件接口的METHOD
-- 确定上传文件接口请求头里面的Content-Type， 我这边调试的接口都是：multipart/form-data;
-- 确定上传文件接口请求参数， 我调试的接口有两种参数形式：
-
-```python
-# 第一种
-file: 文件二进制内容
-	
-	
-# 第二种
-file: 文件二进制内容
-language: zh
-```
-#### 文件上传的逻辑
-`common_utils/base_request.py` 中封装的request请求，是使用`from requests_toolbelt import MultipartEncoder`进行文件上传的。
-
-- 针对单文件上传，我们需要传递一个字典，参考如下：
-```python
-field = {
-	{
-		'file': (filename, file_content),   # file是接口中文件参数的名称， filename是文件名，file_content是文件二进制内容
-		"key": v    # 这里是文件上传的其他参数
-	}
-}
-```
-
-- 针对多文件上传，我们需要传递一个列表嵌套元祖，参考如下：
-```python
-field =[
-	('file', (filename, file_content)),  # file是接口中文件参数的名称， filename是文件名，file_content是文件二进制内容
-	('file', (filename, file_content)), # 这里是文件上传的其他参数
-	(k, v)  
-	]
-```
-
-
-#### 上传文件，不带其他参数
-- 我们需要设置： request_type=file
-- 然后在files中按照如下格式书写：{接口中文件参数的名称:"文件路径地址"/["文件地址1", "文件地址2"]}
-
-- 参考如下：
-
-```yaml
-# 公共参数
-case_common:
-  allure_epic: GitLink接口（手动编写用例）
-  allure_feature: 上传文件模块
-  allure_story: 上传文件
-
-# 用例数据
-case_upload_demo_01:
-  feature: 上传文件
-  title: 测试单文件上传
-  run: True
-  url: /api/attachments.json
-  method: POST
-  headers:
-    cookies: ${login_cookie}
-  cookies:
-  request_type: file
-  payload:
-  files:
-    file: TOC出库订单导入模板(2).xlsx   # 此处file对应接口中文件参数的名称
-  extract:
-    file_id: $.id
-  assert_response:
-    eq:
-      http_code: 200
-  assert_sql:
-
-case_upload_demo_02:
-  feature: 上传文件
-  title: 测试多文件上传(该接口不支持多文件上传，这是一个示例)
-  run: False
-  url: /api/attachments.json
-  method: POST
-  headers:
-    cookies: ${login_cookie}
-  cookies:
-  request_type: file
-  payload:
-  files:
-    file:
-      - 导入TOC订单.xls
-      - toc.xls
-  extract:
-    file_id: $.id
-  assert_response:
-    eq:
-      http_code: 200
-  assert_sql:
-```
-
-#### 上传文件，带其他参数
-- 我们需要设置： request_type=file
-- 然后在files中按照如下格式书写：{接口中文件参数的名称:"文件路径地址"/["文件地址1", "文件地址2"]}
-- 由于请求参数里面还传递了`language:zh`， 因此我们需要写在`payload`中
-- 在`common_utils/base_request.py` 中，我们会将`language:zh`以元祖形式处理到files里面
-
-- 参考如下：
-
-```yaml
-# 公共参数
-case_common:
-  allure_epic: OWMS系统（自动生成用例）  # 敏捷里面的概念，定义史诗，相当于module级的标签, 往下是 feature
-  allure_feature: 出库模块  # 功能点的描述，相当于class级的标签, 理解成模块往下是 story
-  allure_story: TOC扫描签出接口    # 故事，可以理解为场景，相当于method级的标签, 往下是 title
-
-# 用例数据
-case_import_toc_01:
-  feature: OMS系统
-  title: 导入TOC订单（01）
-  run: True
-  url:  /oms/retailGoodsTmp/selfImportExcel
-  method: POST
-  headers:
-    Cookietoken: ${oms_cookieToken}
-  request_type: file
-  payload:
-    language: zh
-  files:
-    file: TOC出库订单导入模板(2).xlsx
-  extract:
-  assert_response:
-    eq:
-      $.msg: 成功
-  assert_sql:
-
-case_import_toc_02:
-  feature: OMS系统
-  title: 导入TOC订单（02）
-  run: True
-  url:  /oms/retailGoodsTmp/selfImportExcel
-  method: POST
-  headers:
-    Cookietoken: ${oms_cookieToken}
-  request_type: file
-  payload:
-    language: zh
-  files:
-    file:
-      - 导入TOC订单.xls
-      - toc.xls
-  extract:
-  assert_response:
-    eq:
-      $.msg: 成功
-  assert_sql:
-```
+- [如何处理同一套框架测试多套环境的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/215)
 
 
 
+## 十、初始化项目可能遇到的问题
+- [测试机安装的是python3.7，但是本框架要求3.9.5，怎么办？](https://www.gitlink.org.cn/zone/tester/newdetail/212)
 
-## 初始化项目可能遇到的问题
-### 1. 测试机安装的是python3.7，但是本框架要求3.9.5，怎么办？
-方法一：建议采纳此方法
-1）首先在项目根目录下打开命令窗口，移除虚拟环境：pipenv --rm
-2）安装虚拟环境时忽略锁定的版本号，同时安装依赖包：pipenv install --skip-lock
-如果使用上述命令报错：Warning: Python 3.9 was not found on your system... Neither 'pyenv' nor 'asdf' could be found to install Python.
-请使用如下命令：pipenv install --python 3.7 --skip-lock  (注意：这里的版本号，如果你的是3.8，就应该如下写命令：pipenv install --python 3.8 --skip-lock)
+- [无法安装依赖包或者安装很慢，怎么办？](https://www.gitlink.org.cn/zone/tester/newdetail/213)
 
-3）激活虚拟环境：pipenv shell
-
-4）运行框架：python run.py
-
-<br/>
-
-方法二：
-1）首先在项目根目录下打开命令窗口，移除虚拟环境：pipenv --rm
-2）更改项目根目录下的Pipfile文件
-```
-# 如下所示，3.9更改为3.7
-[requires]
-python_version = "3.7"
-```
-3）更改项目根目录下的Pipfile.lock文件
-```
-# 如下所示，3.9更改为3.7
-        "requires": {
-            "python_version": "3.7"
-        },
-```
-4）安装虚拟环境，同时安装依赖包：pipenv install
-
-5）激活虚拟环境：pipenv shell
-
-6）运行框架：python run.py
-
-### 2. 无法安装依赖包或者安装很慢，怎么办？
-检查一下Pipfile文件中的pip的安装源（位置：Pipfile）
-以下安装源均可：
-```
-pip默认的镜像地址是：https://pypi.org/simple
-清华大学：https://pypi.tuna.tsinghua.edu.cn/simple 清华大学的pip源是官网pypi的镜像，每隔5分钟同步一次，重点推荐！！！
-
-阿里云：http://mirrors.aliyun.com/pypi/simple/
-
-中国科技大学 https://pypi.mirrors.ustc.edu.cn/simple/
-
-华中理工大学：http://pypi.hustunique.com/
-
-山东理工大学：http://pypi.sdutlinux.org/
-
-豆瓣：http://pypi.douban.com/simple/
-```

@@ -1,0 +1,40 @@
+case_common:
+  allure_epic: GitLink接口(自动生成用例)
+  allure_feature: 开源夏令营模块
+  allure_story: 获取项目列表接口
+
+case_glcc_demo_01:
+  feature: GLCC
+  title: 获取已报名成功的项目数据
+  run: True
+  url: ${glcc_host}/api/applyInformation/list?curPage=1&pageSize=10000&round=2
+  method: GET
+  headers: {"Content-Type": "application/json; charset=utf-8;"}
+  cookies:
+  request_type: json
+  payload:
+  files:
+  extract:
+  assert_response:
+    eq:
+      http_code: 200
+      $.message: success
+  assert_sql:
+
+case_glcc_demo_02:
+  feature: GLCC
+  title: 获取已报名成功的课题数据
+  run: True
+  url: https://glcc.gitlink.org.cn/api/applyInformation/taskList?curPage=1&pageSize=20&userId=&round=2
+  method: GET
+  headers: {"Content-Type": "application/json; charset=utf-8;"}
+  cookies:
+  request_type: json
+  payload:
+  files:
+  extract:
+  assert_response:
+    eq:
+      http_code: 200
+      $.message: success
+  assert_sql:

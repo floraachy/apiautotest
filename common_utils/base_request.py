@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+# @Time    : 2023/6/22 14:11
+# @Author  : chenyinhua
+# @File    : base_request.py
+# @Software: PyCharm
+# @Desc: 封装的requests模块
+
 import time
 from typing import Dict, Union
 import requests

@@ -6,15 +6,15 @@
 # @Desc: 根据配置文件，发送指定通知
 
 from loguru import logger
-from common_utils.yagmail_handle import YagEmailServe
 from config.models import NotificationType
 from config.settings import SEND_RESULT_TYPE, email, ding_talk, wechat, email_subject, email_content, ding_talk_title, \
     ding_talk_content, wechat_content
-from common_utils.dingding_handle import DingTalkBot
-from common_utils.wechat_handle import WechatBot
 from case_utils.data_handle import data_handle
 from case_utils.get_results_handle import get_test_results_from_pytest_html_report, \
     get_test_results_from_from_allure_report
+from common_utils.dingding_handle import DingTalkBot
+from common_utils.wechat_handle import WechatBot
+from common_utils.yagmail_handle import YagEmailServe
 
 
 def send_email(user, pwd, host, subject, content, to, attachments):
@@ -126,7 +126,7 @@ def send_result(report_path, report_type="allure", attachment_path=None):
         notification = notification_mappings[SEND_RESULT_TYPE]
         # 获取消息内容并替换
         notification['sender_args']['content'] = data_handle(notification['sender_args']['content'],
-                                                              source=results)
+                                                             source=results)
         # 获取消息发送函数
         sender = notification['sender']
         # 获取对应消息发送函数的参数
@@ -139,7 +139,7 @@ def send_result(report_path, report_type="allure", attachment_path=None):
         for notification in notification_mappings.values():
             # 获取消息内容并替换
             notification['sender_args']['content'] = data_handle(notification['sender_args']['content'],
-                                                                  source=results)
+                                                                 source=results)
             # 获取消息发送函数
             sender = notification['sender']
             # 获取对应消息发送函数的参数

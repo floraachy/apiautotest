@@ -6,10 +6,10 @@
 # @Desc: 从测试报告中获取测试结果
 
 import os
-from common_utils.bs4_handle import SoupAPI
-import json
-from common_utils.time_handle import timestamp_strftime
 from loguru import logger
+import json
+from common_utils.bs4_handle import SoupAPI
+from common_utils.time_handle import timestamp_strftime
 
 
 def get_test_results_from_pytest_html_report(html_report_path):

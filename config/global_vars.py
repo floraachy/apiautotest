@@ -17,6 +17,7 @@ ENV_VARS = {
     "test": {
         # 示例测试环境及示例测试账号
         "host": "https://testforgeplus.trustie.net/",
+        "glcc_host": "https://testglcc.trustie.net",
         "login": "auotest",
         "password": "12345678",
         "nickname": "AutoTest",
@@ -27,6 +28,7 @@ ENV_VARS = {
     },
     "live": {
         "host": "https://www.gitlink.org.cn",
+        "glcc_host": "https://glcc.gitlink.org.cn",
         "login": "******",
         "password": "******",
         "nickname": "******",

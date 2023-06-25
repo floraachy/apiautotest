@@ -3,7 +3,7 @@
 # @Author  : chenyinhua
 # @File    : http_server.py
 # @Software: PyCharm
-# @Desc:
+# @Desc: 封装的HTTP服务
 
 import http.server
 import socketserver

@@ -2,14 +2,14 @@
 # @Time   : ${now}
 
 import pytest
-from case_utils.assert_handle import assert_response, assert_sql
 from loguru import logger
-from case_utils.request_data_handle import RequestPreDataHandle, RequestHandle, after_request_extract
-from pytest_html import extras  # 往pytest-html报告中填写额外的内容
-from case_utils.allure_handle import allure_title
 import allure
+from case_utils.assert_handle import assert_response, assert_sql
+from case_utils.request_data_handle import RequestPreDataHandle, RequestHandle, after_request_extract
+from case_utils.allure_handle import allure_title
 from config.settings import db_info
 from config.global_vars import GLOBAL_VARS
+from pytest_html import extras  # 往pytest-html报告中填写额外的内容
 
 # 用例数据
 cases = ${case_data}
@@ -20,7 +20,6 @@ cases = ${case_data}
 class ${class_title}Auto:
 
     @allure.story("${allure_story}")
-    @pytest.mark.${func_title}
     @pytest.mark.auto
     @pytest.mark.parametrize("case", cases, ids=["{}".format(case["title"]) for case in cases])
     def ${func_title}_auto(self, case, extra):

@@ -75,7 +75,7 @@ def zip_file(in_path: str, out_path: str):
     """
     # 如果传入的路径是一个目录才进行压缩操作
     if os.path.isdir(in_path):
-        print("目标路径是一个目录，开始进行压缩......")
+        print(f"目标路径:{in_path} 是一个目录，开始进行压缩......")
         # 写入
         zip = zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED)
         for path, dirnames, filenames in os.walk(in_path):
@@ -87,9 +87,9 @@ def zip_file(in_path: str, out_path: str):
                         path, filename), os.path.join(
                         fpath, filename))
         zip.close()
-        print("压缩完成！")
+        print(f"目标路径:{in_path} 压缩完成！, 压缩文件路径：{out_path}")
     else:
-        print("目标路径不是一个目录，请检查！")
+        print(f"目标路径:{in_path} 不是一个目录，请检查！")
 
 
 def delete_dir_file(file_path):
@@ -99,7 +99,7 @@ def delete_dir_file(file_path):
     """
     paths = os.listdir(file_path)
     if paths:
-        print("目标目录存在文件或目录，进行删除操作")
+        print(f"目标目录: {file_path} 存在文件或目录，进行删除操作")
         for item in paths:
             path = os.path.join(file_path, item)
             # 如果目标路径是一个文件，使用os.remove删除
@@ -109,7 +109,7 @@ def delete_dir_file(file_path):
             if os.path.isdir(path):
                 os.rmdir(path)
     else:
-        print("目标目录不存在文件或目录，不需要删除")
+        print(f"目标目录: {file_path} 不存在文件或目录，不需要删除")
 
 
 def copy_file(src_file_path, dest_dir_path):

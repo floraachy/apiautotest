@@ -5,36 +5,17 @@
 # @File    : conftest.py
 # @Software: PyCharm
 # @Desc: 这是文件的描述信息
-import os.path
 
-from config.global_vars import ENV_VARS, GLOBAL_VARS
-import pytest
-from py._xmlgen import html  # 安装pytest-html，版本最好是2.1.1
+import time
 from time import strftime
 import re
+import pytest
+from py._xmlgen import html  # 安装pytest-html，版本最好是2.1.1
+from config.global_vars import ENV_VARS, GLOBAL_VARS
+from loguru import logger
 
 
-# ------------------------------------- START: 报告处理 ---------------------------------------#
-@pytest.mark.hookwrapper
-def pytest_runtest_makereport(item, call):
-    """设置列"用例描述"的值为用例的标题title"""
-    outcome = yield
-    # 获取调用结果的测试报告，返回一个report对象
-    # report对象的属性包括when（steup, call, teardown三个值）、nodeid(测试用例的名字)、outcome(用例的执行结果，passed,failed)
-    report = outcome.get_result()
-    # 将测试用例的title作为测试报告"用例描述"列的值。
-    # 注意参数传递时需要这样写：@pytest.mark.parametrize("case", cases, ids=["{}".format(case["title"]) for case in cases])
-    report.description = re.findall('\[(.*?)\]', report.nodeid)[0]
-    report.func = report.nodeid.split("[")[0]
-
-
-def pytest_html_report_title(report):
-    """
-    修改报告标题
-    """
-    report.title = f'{ENV_VARS["common"]["project_name"]} {ENV_VARS["common"]["report_title"]}'
-
-
+# ------------------------------------- START: pytest钩子函数处理---------------------------------------#
 def pytest_configure(config):
     """
     # 在测试运行前，修改Environment部分信息，配置测试报告环境信息
@@ -45,6 +26,10 @@ def pytest_configure(config):
     # 给环境表 移除packages 及plugins
     config._metadata.pop("Packages")
     config._metadata.pop("Plugins")
+    # 向pytest的配置中添加marker
+    # TODO 暂时还没给用例添加
+    config.addinivalue_line("markers", 'smoke')
+    config.addinivalue_line("markers", '回归测试')
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -54,6 +39,74 @@ def pytest_sessionfinish(session, exitstatus):
     """
     # 给环境表 添加 项目环境
     session.config._metadata['项目环境'] = GLOBAL_VARS.get("host", "")
+
+
+@pytest.mark.hookwrapper
+def pytest_runtest_makereport(item, call):
+    """设置列"用例描述"的值为用例的标题title"""
+    outcome = yield
+    # 获取调用结果的测试报告，返回一个report对象
+    # report对象的属性包括when（steup, call, teardown三个值）、nodeid(测试用例的名字)、outcome(用例的执行结果，passed,failed)
+    report = outcome.get_result()
+    # 将测试用例的title作为测试报告"用例描述"列的值。
+    # 注意参数传递时需要这样写：@pytest.mark.parametrize("case", cases, ids=["{}".format(case["title"]) for case in cases])
+    report.description = re.findall('\\[(.*?)\\]', report.nodeid)[0]
+    report.func = report.nodeid.split("[")[0]
+
+
+def pytest_terminal_summary(terminalreporter, config):
+    """
+    收集测试结果
+    """
+    _RERUN = len([i for i in terminalreporter.stats.get('rerun', []) if i.when != 'teardown'])
+    try:
+        # 获取pytest传参--reruns的值
+        reruns_value = int(config.getoption("--reruns"))
+        _RERUN = int(_RERUN / reruns_value)
+    except Exception:
+        reruns_value = "未配置--reruns参数"
+        _RERUN = len([i for i in terminalreporter.stats.get('rerun', []) if i.when != 'teardown'])
+
+    _PASSED = len([i for i in terminalreporter.stats.get('passed', []) if i.when != 'teardown'])
+    _ERROR = len([i for i in terminalreporter.stats.get('error', []) if i.when != 'teardown'])
+    _FAILED = len([i for i in terminalreporter.stats.get('failed', []) if i.when != 'teardown'])
+    _SKIPPED = len([i for i in terminalreporter.stats.get('skipped', []) if i.when != 'teardown'])
+    _XPASSED = len([i for i in terminalreporter.stats.get('xpassed', []) if i.when != 'teardown'])
+    _XFAILED = len([i for i in terminalreporter.stats.get('xfailed', []) if i.when != 'teardown'])
+
+    _TOTAL = terminalreporter._numcollected
+    _TIMES = time.time() - terminalreporter._sessionstarttime
+    logger.info(f"\n======================================================\n"
+                "-------------测试结果--------------------\n"
+                f"用例总数: {_TOTAL}\n"
+                f"跳过用例数: {_SKIPPED}\n"
+                f"实际执行用例总数: {_TOTAL - _SKIPPED}\n\n"
+                f"异常用例数: {_ERROR}\n"
+                f"失败用例数: {_FAILED}\n"
+                f"重跑的用例数 || 重跑次数: {_RERUN} || {reruns_value}\n"
+                f"意外通过的用例数: {_XPASSED}\n"
+                f"预期失败的用例数: {_XFAILED}\n\n"
+                "用例执行时长: %.2f" % _TIMES + " s\n")
+    try:
+        _RATE = _PASSED / (_TOTAL - _SKIPPED) * 100
+        logger.info(
+            f"\n用例成功率: %.2f" % _RATE + " %\n"
+                                       "=====================================================")
+    except ZeroDivisionError:
+        logger.info(
+            f"用例成功率: 0.00 %\n"
+            "=====================================================")
+
+
+# ------------------------------------- END: pytest钩子函数处理---------------------------------------#
+
+# ------------------------------------- START: pytest-html钩子函数处理 ---------------------------------------#
+
+def pytest_html_report_title(report):
+    """
+    修改报告标题
+    """
+    report.title = f'{ENV_VARS["common"]["project_name"]} {ENV_VARS["common"]["report_title"]}'
 
 
 def pytest_html_results_summary(prefix, summary, postfix):
@@ -97,4 +150,4 @@ def pytest_html_results_table_html(report, data):
         del data[:]
         data.append(html.div("这条用例通过啦！", class_="empty log"))
 
-# ------------------------------------- END: 报告处理 ---------------------------------------#
+# ------------------------------------- END: pytest-html钩子函数处理 ---------------------------------------#

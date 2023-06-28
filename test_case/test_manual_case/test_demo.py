@@ -22,7 +22,7 @@ cases = [{"title": "demo用例01", "user": "flora", "age": 17, "run": True},
 @pytest.mark.test_demo
 @pytest.mark.parametrize("case", cases, ids=["{}".format(case["title"]) for case in cases])
 def test_demo(case, extra):
-    logger.info("-----------------------------START-开始执行用例-----------------------------")
+    logger.info("\n-----------------------------START-开始执行用例-----------------------------\n")
     logger.debug(f"当前执行的用例数据:{case}")
     # 添加用例标题作为allure中显示的用例标题
     allure_title(case.get("title", ""))
@@ -31,4 +31,4 @@ def test_demo(case, extra):
     # 在allure报告中显示请求的用例数据
     allure_step(step_title="用例数据", content=f"{case}")
     assert case["user"] == "flora"
-    logger.info("-----------------------------END-用例执行结束-----------------------------")
+    logger.info("\n-----------------------------END-用例执行结束-----------------------------\n")

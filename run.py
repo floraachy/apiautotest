@@ -31,12 +31,15 @@ pytest相关参数：以下也可通过pytest.ini配置
     –-alluredir这个选项用于指定存储测试结果的路径
 """
 
+# 标准库导入
 import os
 import shutil
+from datetime import datetime
+# 第三方库导入
 import pytest
 from loguru import logger
 import click
-from datetime import datetime
+# 本地应用/模块导入
 from case_utils.case_fun_handle import generate_cases
 from case_utils.platform_handle import PlatformHandle
 from case_utils.send_result_handle import send_result
@@ -71,7 +74,7 @@ def capture_all_logs(level=LOG_LEVEL):
     else:
         # 捕获所有日志
         logger.add(
-            os.path.join(LOG_DIR, "runtime_{time}_{level}.log"),
+            os.path.join(LOG_DIR, "runtime_{time}_all.log"),
             enqueue=True,
             encoding="utf-8",
             rotation="00:00",

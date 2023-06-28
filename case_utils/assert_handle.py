@@ -6,9 +6,11 @@
 # @Software: PyCharm
 # @Desc: 断言
 
+# 第三方库导入
 from loguru import logger
 from requests import Response
-from case_utils.data_handle import json_extractor, re_extract
+# 本地应用/模块导入
+from case_utils.extract_data_handle import json_extractor, re_extract
 from case_utils.request_data_handle import response_type
 from case_utils.allure_handle import allure_step
 from common_utils.mysql_handle import MysqlServer
@@ -53,19 +55,19 @@ def assert_response(response: Response, expected: dict) -> None:
             try:
                 if k == "eq":  # 预期结果 = 实际结果
                     assert _v == actual
-                    logger.debug(f"预期结果: {_k}: {_v} ==  实际结果: {actual}, 断言成功！")
+                    logger.success(f"预期结果: {_k}: {_v} ==  实际结果: {actual}, 断言成功！")
                 elif k == "in":  # 实际结果 包含 预期结果
                     assert _v in actual
-                    logger.debug(f"预期结果: {_k}: {_v} in  实际结果: {actual}, 断言成功！")
+                    logger.success(f"预期结果: {_k}: {_v} in  实际结果: {actual}, 断言成功！")
                 elif k == "gt":  # 预期结果 > 实际结果 (值应该为数值型)
                     assert _v > actual
-                    logger.debug(f"预期结果: {_k}: {_v} >  实际结果: {actual}, 断言成功！")
+                    logger.success(f"预期结果: {_k}: {_v} >  实际结果: {actual}, 断言成功！")
                 elif k == "lt":  # 预期结果 < 实际结果 (值应该为数值型)
                     assert _v < actual
-                    logger.debug(f"预期结果: {_k}: {_v} <  实际结果: {actual}, 断言成功！")
+                    logger.success(f"预期结果: {_k}: {_v} <  实际结果: {actual}, 断言成功！")
                 elif k == "not":  # 预期结果 != 实际结果
                     assert _v != actual
-                    logger.debug(f"预期结果: {_k}: {_v} !=  实际结果: {actual}, 断言成功！")
+                    logger.success(f"预期结果: {_k}: {_v} !=  实际结果: {actual}, 断言成功！")
                 else:
                     logger.error(f"判断关键字: {k} 错误！, 目前仅支持如下关键字：eq, in, gt, lt, not")
                     allure_step(step_title=f'判断关键字: {k} 错误！',
@@ -129,13 +131,13 @@ def assert_sql(db_info, expected: dict):
                 if k == "eq":  # 预期结果 = 实际结果
                     if _k == "len":
                         assert _v == len(sql_result)
-                        logger.info(f"预期结果: {_v} ==  实际结果: {len(sql_result)}, 断言成功！")
+                        logger.success(f"预期结果: {_v} ==  实际结果: {len(sql_result)}, 断言成功！")
                         allure_step(step_title=f'数据库断言结果---->预期结果: {_v} ==  实际结果: {len(sql_result)}, 断言成功！')
                     # 如果时$.开头，则从数据库查询结果中提取相应的值作为实际结果
                     elif _k.startswith("$."):
                         actual = json_extractor(sql_result, _k)
                         assert _v == actual
-                        logger.info(f"预期结果: {_v} ==  实际结果: {actual}, 断言成功！")
+                        logger.success(f"预期结果: {_v} ==  实际结果: {actual}, 断言成功！")
                         allure_step(step_title=f'数据库断言结果---->预期结果: {_v} ==  实际结果: {actual}, 断言成功！')
             except AssertionError:
                 logger.error(f"数据库断言失败 -|- 预期结果:{_v}  {k}   实际结果: {sql_result})")

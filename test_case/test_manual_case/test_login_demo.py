@@ -38,7 +38,7 @@ class TestLoginDemo:
     @pytest.mark.auto
     @pytest.mark.parametrize("case", cases, ids=["{}".format(case["title"]) for case in cases])
     def test_login_demo_auto(self, case, extra):
-        logger.info("-----------------------------START-开始执行用例-----------------------------")
+        logger.info("\n-----------------------------START-开始执行用例-----------------------------\n")
         logger.debug(f"当前执行的用例数据:{case}")
         # 添加用例标题作为allure中显示的用例标题
         allure_title(case.get("title", ""))
@@ -56,4 +56,4 @@ class TestLoginDemo:
         assert_sql(db_info[GLOBAL_VARS["env_key"]], case_data["assert_sql"])
         # 断言成功后进行参数提取
         after_request_extract(response, case_data.get("extract", None))
-        logger.info("-----------------------------END-用例执行结束-----------------------------")
+        logger.info("\n-----------------------------END-用例执行结束-----------------------------\n")

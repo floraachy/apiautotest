@@ -5,14 +5,18 @@
 # @File    : request_data_handle.py
 # @Software: PyCharm
 # @Desc: 处理request请求前后的用例数据
+
+# 标准库导入
 import json
 import os
+# 第三方库导入
 from requests import Response
 from loguru import logger
+# 本地应用/模块导入
 from common_utils.files_handle import get_file_field
 from common_utils.base_request import BaseRequest
 from case_utils.data_handle import eval_data_process, data_handle
-from case_utils.data_handle import json_extractor, re_extract
+from case_utils.extract_data_handle import json_extractor, re_extract
 from case_utils.allure_handle import allure_step
 from config.global_vars import GLOBAL_VARS
 from config.path_config import FILES_DIR

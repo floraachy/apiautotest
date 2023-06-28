@@ -6,13 +6,16 @@
 # @Software: PyCharm
 # @Desc: 这是文件的描述信息
 
+# 标准库导入
+import re
 import time
 from time import strftime
-import re
-import pytest
-from py._xmlgen import html  # 安装pytest-html，版本最好是2.1.1
-from config.global_vars import ENV_VARS, GLOBAL_VARS
+# 第三方库导入
 from loguru import logger
+from py._xmlgen import html  # 安装pytest-html，版本最好是2.1.1
+import pytest
+# 本地应用/模块导入
+from config.global_vars import ENV_VARS, GLOBAL_VARS
 
 
 # ------------------------------------- START: pytest钩子函数处理---------------------------------------#
@@ -76,24 +79,24 @@ def pytest_terminal_summary(terminalreporter, config):
 
     _TOTAL = terminalreporter._numcollected
     _TIMES = time.time() - terminalreporter._sessionstarttime
-    logger.info(f"\n======================================================\n"
-                "-------------测试结果--------------------\n"
-                f"用例总数: {_TOTAL}\n"
-                f"跳过用例数: {_SKIPPED}\n"
-                f"实际执行用例总数: {_TOTAL - _SKIPPED}\n\n"
-                f"异常用例数: {_ERROR}\n"
-                f"失败用例数: {_FAILED}\n"
-                f"重跑的用例数 || 重跑次数: {_RERUN} || {reruns_value}\n"
-                f"意外通过的用例数: {_XPASSED}\n"
-                f"预期失败的用例数: {_XFAILED}\n\n"
-                "用例执行时长: %.2f" % _TIMES + " s\n")
+    logger.success(f"\n======================================================\n"
+                   "-------------测试结果--------------------\n"
+                   f"用例总数: {_TOTAL}\n"
+                   f"跳过用例数: {_SKIPPED}\n"
+                   f"实际执行用例总数: {_TOTAL - _SKIPPED}\n\n"
+                   f"异常用例数: {_ERROR}\n"
+                   f"失败用例数: {_FAILED}\n"
+                   f"重跑的用例数(--reruns的值): {_RERUN}({reruns_value})\n"
+                   f"意外通过的用例数: {_XPASSED}\n"
+                   f"预期失败的用例数: {_XFAILED}\n\n"
+                   "用例执行时长: %.2f" % _TIMES + " s\n")
     try:
         _RATE = _PASSED / (_TOTAL - _SKIPPED) * 100
-        logger.info(
+        logger.success(
             f"\n用例成功率: %.2f" % _RATE + " %\n"
                                        "=====================================================")
     except ZeroDivisionError:
-        logger.info(
+        logger.critical(
             f"用例成功率: 0.00 %\n"
             "=====================================================")
 

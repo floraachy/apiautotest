@@ -24,11 +24,12 @@
 ## 二、实现功能
 
 * 通过session会话方式，解决了登录之后cookie关联处理
+* 数据库断言: 直接在测试用例中写入查询的sql即可断言，无需编写代码 
+* 动态多断言: 如接口需要同时校验响应数据和sql校验，支持多场景断言
 * 框架天然支持接口动态传参、关联灵活处理
 * 支持测试数据分析，测试数据不符合规范有预警机制
 * 测试数据隔离, 实现数据驱动
 * 自动生成用例代码: 测试人员在yaml/excel文件中填写好测试用例, 程序可以直接生成用例代码，纯小白也能使用
-* 动态多断言: 支持响应断言和数据库断言
 * 多种报告随心选择：框架支持pytest-html以及Allure测试报告，可以动态配置所需报告
 * 日志模块: 采用loguru管理日志，可以输出更为优雅，简洁的日志
 * 钉钉、企业微信通知: 支持多种通知场景，执行成功之后，可选择发送钉钉、或者企业微信、邮箱通知
@@ -46,6 +47,7 @@
 │    ├────case_data_analysis  分析用例数据是否符合规范
 │    ├────case_fun_handle.py   根据配置文件，从指定类型文件中读取用例数据，并调用生成用例文件方法，生成用例文件
 │    ├────data_handle.py    数据处理
+│    ├────extract_data_handle.py    提取数据的一些方法
 │    ├────get_results_handle.py   从pytest-html/allure测试报告中获取测试结果
 │    ├────platform_handle.py  跨平台的支持allure，用于生成allure测试报告
 │    ├────request_data_handle.py   针对用例数据进行请求前后的处理
@@ -177,24 +179,24 @@ pip install pipenv
 ### 5. 用例中相关字段的介绍
 
 ```yaml
-- case_common ：公共参数
-	- allure_epic：用作于@allure.epic()装饰器中的内容。如果是使用Excel管理用例数据，这个目前是写死的。可在case_utils.case_handle.py中更改。
-	- allure_feature：用作于@allure.feature()装饰器中的内容。如果是使用Excel管理用例数据， 这个用的是excel的表单名称。
-	- allure_story：用作于@allure.story()装饰器中的内容。如果是使用Excel管理用例数据， 这个用的是excel的表单名称。
-- case_info：用例数据
-	- feature：用例所属模块， 类似于@allure.feature()。
-	- title：用例标题
-	- run：是否执行用例，为空或者True都会执行，为False则不执行。
-	- url：请求路径（可填写全路径 或者 资源路径）。通常我们填写资源路径。在用例执行前，会针对路径进行处理。具体可见case_utils.request_data_handle.py.RequestPreDataHandle.url_handle。注：请求路径=基准路径（host/base_url）+资源路径(url)。
-	- method：请求方式，例如：GET, POST, DELETE, PUT, PATCH等
-	- headers：请求头，注意如果在headers里面防止cookies，其值类型需要是字符串
-	- cookies：请求cookies，格式是：DICT， CookieJar对象
-	- request_type：请求数据类型：params, json, file, data
-	- payload：请求参数
-	- files：上传附件接口所需的文件绝对路径
-	- extract：后置提取参数
-	- assert_response：响应断言
-	- assert_sql：数据库断言
+case_common ：公共参数
+  allure_epic：用作于@allure.epic()装饰器中的内容。
+  allure_feature：用作于@allure.feature()装饰器中的内容。
+  allure_story：用作于@allure.story()装饰器中的内容。
+case_001：用例ID
+  feature：用例所属模块， 类似于@allure.feature()。
+  title：用例标题
+  run：是否执行用例，为空或者True都会执行，为False则不执行。
+  url：请求路径（可填写全路径 或者 资源路径）。通常我们填写资源路径。在用例执行前，会针对路径进行处理。具体可见case_utils.request_data_handle.py.RequestPreDataHandle.url_handle。注：请求路径=基准路径（host/base_url）+资源路径(url)。
+  method：请求方式，例如：GET, POST, DELETE, PUT, PATCH等
+  headers：请求头，注意如果在headers里面防止cookies，其值类型需要是字符串
+  cookies：请求cookies，格式是：DICT， CookieJar对象
+  request_type：请求数据类型：params, json, file, data
+  payload：请求参数
+  files: 需要上传的文件，参考如下传参：{接口中文件参数的名称:”文件路径地址”/[“文件地址1”, “文件地址2”]}
+  extract：后置提取参数
+  assert_response：响应断言
+  assert_sql：数据库断言
 ```
 ### 6. Excel用例单独说明
 框架支持excel多表单自动生成测试用例，每一个表单作为一个测试用例模块。
@@ -268,6 +270,8 @@ excel表单2名称是：示例模块
 - [如何处理同一环境存在多域名的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/214)
 
 - [如何处理同一套框架测试多套环境的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/215)
+
+- [如何处理用例中需要依赖登录的token/cookies的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/228)
 
 
 

@@ -18,8 +18,8 @@ case_new_project_demo_01:
   request_type: json
   payload:
     "user_id": ${user_id}
-    "name": ${faker.name().replace(" ", "").replace(".", "")}
-    "repository_name": ${faker.name().replace(" ", "").replace(".", "")}
+    "name": ${generate_name(len='zh')}
+    "repository_name": ${generate_identifier()}
   files:
   extract:
     project_id: $.id
@@ -34,7 +34,7 @@ case_new_project_demo_01:
 case_new_project_demo_02:
   feature: 新建项目
   title: 正确输入各项必填参数，新建项目成功（不校验数据库，单独传cookies）
-  run: False
+  run: True
   url: /api/projects.json
   method: POST
   headers:
@@ -43,8 +43,8 @@ case_new_project_demo_02:
   request_type: json
   payload:
     "user_id": ${user_id}
-    "name": ${faker.name().replace(" ", "").replace(".", "")}
-    "repository_name": ${faker.name().replace(" ", "").replace(".", "")}
+    "name": ${generate_name(generate_name(len="zh"))}
+    "repository_name": ${generate_identifier()}
   files:
   extract:
     project_id: $.id
@@ -67,8 +67,8 @@ case_new_project_demo_03:
   request_type: json
   payload:
     "user_id": ${user_id}
-    "name": ${faker.name().replace(" ", "").replace(".", "")}
-    "repository_name": ${faker.name().replace(" ", "").replace(".", "")}
+    "name": ${generate_name()}
+    "repository_name": ${generate_identifier()}
   files:
   extract:
     project_id: $.id
@@ -84,3 +84,53 @@ case_new_project_demo_03:
       $.id: ${project_id}
       $.name: ${project_name}
       $.identifier: ${project_identifier}
+
+case_new_project_demo_04:
+  feature: 新建项目
+  title: 正确输入各项必填参数，新建项目成功（04）
+  run: True
+  url: /api/projects.json
+  method: POST
+  headers:
+    Content-Type: application/json; charset=utf-8;
+  cookies: ${login_cookie}
+  request_type: json
+  payload:
+    "user_id": ${user_id}
+    "name": ${faker.name()}
+    "repository_name": ${generate_identifier()}
+  files:
+  extract:
+    project_id: $.id
+    project_name: $.name
+    project_identifier: $.identifier
+  assert_response:
+    eq:
+      http_code: 200
+      $.login: ${login}
+  assert_sql:
+
+case_new_project_demo_05:
+  feature: 新建项目
+  title: 正确输入各项必填参数，新建项目成功（05）
+  run: True
+  url: /api/projects.json
+  method: POST
+  headers:
+    Content-Type: application/json; charset=utf-8;
+  cookies: ${login_cookie}
+  request_type: json
+  payload:
+    "user_id": ${user_id}
+    "name": ${fk_zh.name()}
+    "repository_name": ${generate_identifier()}
+  files:
+  extract:
+    project_id: $.id
+    project_name: $.name
+    project_identifier: $.identifier
+  assert_response:
+    eq:
+      http_code: 200
+      $.login: ${login}
+  assert_sql:

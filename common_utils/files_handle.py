@@ -4,6 +4,8 @@
 # @File    : files_handle.py
 # @Software: PyCharm
 # @Desc: 处理文件相关操作
+
+# 标准库导入
 import os
 import zipfile
 import shutil
@@ -146,3 +148,16 @@ def get_file_field(file_path):
     with open(file_path, 'rb') as f:
         file_content = f.read()
     return (file_name, file_content)
+
+
+def get_relative_path(file_path, directory_path):
+    """
+    os.path.relpath()是Python中os.path模块提供的一个函数，用于计算两个路径之间的相对路径。
+    例如：file_path=data/gitlink/project/test_login_demo.yaml， directory_path=data， 将返回/gitlink/project
+    :param: file_path: 文件路径
+    :param: directory_path: 相对于目录路径
+    """
+    # 获取file_path相对于directory_path的相对路径
+    relative_path = os.path.relpath(os.path.abspath(file_path), os.path.abspath(directory_path))
+    # 如果相对路径中包含文件名，则去除文件名部分并返回
+    return os.path.dirname(relative_path)

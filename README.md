@@ -16,7 +16,7 @@
 * git地址: [https://www.gitlink.org.cn/floraachy/apiautotest](https://www.gitlink.org.cn/floraachy/apiautotest)
 * 项目参与者: floraachy
 * 技术支持邮箱: 1622042529@qq.com
-* 个人博客地址:  [https://blog.csdn.net/FloraCHY](https://blog.csdn.net/FloraCHY)
+* 软件测试社区:  [https://www.gitlink.org.cn/zone/tester](https://www.gitlink.org.cn/zone/tester)
 
 对于框架任何问题，欢迎联系我！
 
@@ -251,42 +251,42 @@ excel表单2名称是：示例模块
 
 
 ## 九 、详细功能说明
-- [如何实现动态数据、随机数据的热加载？](https://www.gitlink.org.cn/zone/tester/newdetail/204)
+- [如何实现动态数据、随机数据的热加载？](https://www.gitlink.org.cn/zone/tester/newdetail/236)
 我们有些特殊的场景，可能会涉及到一些定制化的数据，每次执行数据，需要按照指定规则随机生成，实时加载数据，那么这部分应该如何处理呢？
-
-- [如何提取响应数据作为全局变量并使用？](https://www.gitlink.org.cn/zone/tester/newdetail/205)
-在测试过程中，通常下一个接口需要用到上一个接口的响应数据，这个时候就涉及到参数的提取。
-
-- [如何进行响应数据断言？](https://www.gitlink.org.cn/zone/tester/newdetail/206)
-持5种响应断言方式：eq， in， gt， lt， not。
-
-- [如何进行数据库断言？](https://www.gitlink.org.cn/zone/tester/newdetail/207)
-目前暂时支持两种数据库断言方式：len， eq。其他方式待扩展。
-
-- [如何配置邮箱通知？](https://www.gitlink.org.cn/zone/tester/newdetail/208)
-我们通过第三方模块yagmail发送邮件。
-
-- [如何配置钉钉通知？](https://www.gitlink.org.cn/zone/tester/newdetail/209)
-我们通过封装钉钉机器人发送钉钉通知。
-
-- [如何配置企业微信通知？](https://www.gitlink.org.cn/zone/tester/newdetail/210)
-过封装企业微信机器人发送通知。
-
-- [如何测试上传文件接口？](https://www.gitlink.org.cn/zone/tester/newdetail/211)
-我们通过MultipartEncoder的方式进行文件上传。
-
-- [如何处理同一环境存在多域名的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/214)
+  
+- [如何处理同一环境存在多域名的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/234)
 很多公司，通常一套环境是由多个微服务组成。每一个微服务具备不同的域名。那么针对这种同一环境存在多域名的情况，我们应该如何处理呢？
 
-- [如何处理同一套框架测试多套环境的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/215)
+- [如何处理同一套框架测试多套环境的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/233)
 假如我想要我的自动化代码分别在不同环境执行，如何处理呢？
 
-- [如何处理用例中需要依赖登录的token/cookies的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/228)
+- [如何处理用例中需要依赖登录的token/cookies的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/235)
 我们进行测试的时候，很多接口都是需要先登录之后再进行操作。但是我们不可能每测试一次接口，都登录一次吧，这样有点冗余了。那么，针对这种情况如何处理呢？
+  
+- [如何测试上传文件接口？](https://www.gitlink.org.cn/zone/tester/newdetail/238)
+我们通过MultipartEncoder的方式进行文件上传。
+
+- [如何提取响应数据作为全局变量并使用？](https://www.gitlink.org.cn/zone/tester/newdetail/237)
+在测试过程中，通常下一个接口需要用到上一个接口的响应数据，这个时候就涉及到参数的提取。
+
+- [如何进行响应数据断言？](https://www.gitlink.org.cn/zone/tester/newdetail/239)
+持5种响应断言方式：eq， in， gt， lt， not。
+
+- [如何进行数据库断言？](https://www.gitlink.org.cn/zone/tester/newdetail/240)
+目前暂时支持两种数据库断言方式：len， eq。其他方式待扩展。
+
+- [如何配置邮箱通知？](https://www.gitlink.org.cn/zone/tester/newdetail/242)
+我们通过第三方模块yagmail发送邮件。
+
+- [如何配置钉钉通知？](https://www.gitlink.org.cn/zone/tester/newdetail/243)
+我们通过封装钉钉机器人发送钉钉通知。
+
+- [如何配置企业微信通知？](https://www.gitlink.org.cn/zone/tester/newdetail/241)
+我们通过封装企业微信机器人发送通知。
 
 
 
 ## 十、初始化项目可能遇到的问题
-- [测试机安装的是python3.7，但是本框架要求3.9.5，怎么办？](https://www.gitlink.org.cn/zone/tester/newdetail/212)
-- [无法安装依赖包或者安装很慢，怎么办？](https://www.gitlink.org.cn/zone/tester/newdetail/213)
+- [测试机安装的是python3.7，但是本框架要求3.9.5，怎么办？](https://www.gitlink.org.cn/zone/tester/newdetail/245)
+- [无法安装依赖包或者安装很慢，怎么办？](https://www.gitlink.org.cn/zone/tester/newdetail/244)
 

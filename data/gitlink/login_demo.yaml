@@ -3,11 +3,16 @@ case_common:
   allure_epic: GitLink接口（手动编写用例）  # 敏捷里面的概念，定义史诗，相当于module级的标签, 往下是 feature
   allure_feature: 登录模块  # 功能点的描述，相当于class级的标签, 理解成模块往下是 story
   allure_story: 登录接口    # 故事，可以理解为场景，相当于method级的标签, 往下是 title
+  case_markers: # pytest框架的标记  pytest.mark.
+   - glcc: glcc相关的接口
+   - get_project
+   - skip: 跳过执行该用例
+
 # 用例数据
 case_login_demo_01:
   feature: 登录
   title: 用户名密码正确，登录成功(不校验数据库)
-  run: False
+  run: True
   url: /api/accounts/login.json
   method: POST
   headers: {"Content-Type": "application/json; charset=utf-8;"}

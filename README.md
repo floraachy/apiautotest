@@ -28,6 +28,7 @@
 * 动态多断言: 如接口需要同时校验响应数据和sql校验，支持多场景断言
 * 框架天然支持接口动态传参、关联灵活处理
 * 支持测试数据分析，测试数据不符合规范有预警机制
+* 支持通过用例数据动态配置pytest.mark， 包括自定义标记，pytest.mark.skip以及pytest,mark.usefixtues
 * 测试数据隔离, 实现数据驱动
 * 自动生成用例代码: 测试人员在yaml/excel文件中填写好测试用例, 程序可以直接生成用例代码，纯小白也能使用
 * 多种报告随心选择：框架支持pytest-html以及Allure测试报告，可以动态配置所需报告
@@ -183,6 +184,8 @@ case_common ：公共参数
   allure_epic：用作于@allure.epic()装饰器中的内容。
   allure_feature：用作于@allure.feature()装饰器中的内容。
   allure_story：用作于@allure.story()装饰器中的内容。
+  case_markers: 给测试方法添加标记，支持自定义标记，skip, usefixtures。 格式是列表嵌套字符串或者字典。例如：['glcc', {'skip': '跳过执行该用例'}]
+                  
 case_001：用例ID
   feature：用例所属模块， 类似于@allure.feature()。
   title：用例标题
@@ -193,7 +196,7 @@ case_001：用例ID
   cookies：请求cookies，格式是：DICT， CookieJar对象
   request_type：请求数据类型：params, json, file, data
   payload：请求参数
-  files: 需要上传的文件，参考如下传参：{接口中文件参数的名称:”文件路径地址”/[“文件地址1”, “文件地址2”]}
+  files: 需要上传的文件，参考如下传参：{接口中文件参数的名称:'文件路径地址'/['文件地址1', '文件地址2']}
   extract：后置提取参数
   assert_response：响应断言
   assert_sql：数据库断言
@@ -251,42 +254,46 @@ excel表单2名称是：示例模块
 
 
 ## 九 、详细功能说明
-- [如何实现动态数据、随机数据的热加载？](https://www.gitlink.org.cn/zone/tester/newdetail/204)
+- [如何实现动态数据、随机数据的热加载？](https://www.gitlink.org.cn/zone/tester/newdetail/236)
 我们有些特殊的场景，可能会涉及到一些定制化的数据，每次执行数据，需要按照指定规则随机生成，实时加载数据，那么这部分应该如何处理呢？
-
-- [如何提取响应数据作为全局变量并使用？](https://www.gitlink.org.cn/zone/tester/newdetail/205)
-在测试过程中，通常下一个接口需要用到上一个接口的响应数据，这个时候就涉及到参数的提取。
-
-- [如何进行响应数据断言？](https://www.gitlink.org.cn/zone/tester/newdetail/206)
-持5种响应断言方式：eq， in， gt， lt， not。
-
-- [如何进行数据库断言？](https://www.gitlink.org.cn/zone/tester/newdetail/207)
-目前暂时支持两种数据库断言方式：len， eq。其他方式待扩展。
-
-- [如何配置邮箱通知？](https://www.gitlink.org.cn/zone/tester/newdetail/208)
-我们通过第三方模块yagmail发送邮件。
-
-- [如何配置钉钉通知？](https://www.gitlink.org.cn/zone/tester/newdetail/209)
-我们通过封装钉钉机器人发送钉钉通知。
-
-- [如何配置企业微信通知？](https://www.gitlink.org.cn/zone/tester/newdetail/210)
-过封装企业微信机器人发送通知。
-
-- [如何测试上传文件接口？](https://www.gitlink.org.cn/zone/tester/newdetail/211)
-我们通过MultipartEncoder的方式进行文件上传。
-
-- [如何处理同一环境存在多域名的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/214)
+  
+- [如何处理同一环境存在多域名的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/234)
 很多公司，通常一套环境是由多个微服务组成。每一个微服务具备不同的域名。那么针对这种同一环境存在多域名的情况，我们应该如何处理呢？
 
-- [如何处理同一套框架测试多套环境的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/215)
+- [如何处理同一套框架测试多套环境的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/233)
 假如我想要我的自动化代码分别在不同环境执行，如何处理呢？
 
-- [如何处理用例中需要依赖登录的token/cookies的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/228)
+- [如何处理用例中需要依赖登录的token/cookies的情况？](https://www.gitlink.org.cn/zone/tester/newdetail/235)
 我们进行测试的时候，很多接口都是需要先登录之后再进行操作。但是我们不可能每测试一次接口，都登录一次吧，这样有点冗余了。那么，针对这种情况如何处理呢？
+  
+- [如何测试上传文件接口？](https://www.gitlink.org.cn/zone/tester/newdetail/238)
+我们通过MultipartEncoder的方式进行文件上传。
+
+- [如何通过用例数据动态配置pytest.mark](https://www.gitlink.org.cn/zone/tester/newdetail/257)
+在测试过程中，我们经常需要对测试用例进行分类，运行时仅执行这一类用例。为了实现这一功能，我在测试用例中引入了添加pytest的自定义标记的功能，同时扩展支持了pytest.mark.skip以及pytest,mark.usefixtues。
+注意：目前这一功能，仅支持通过YAML格式编写用例。EXCEL用例暂时不支持。
+
+- [如何提取响应数据作为全局变量并使用？](https://www.gitlink.org.cn/zone/tester/newdetail/237)
+在测试过程中，通常下一个接口需要用到上一个接口的响应数据，这个时候就涉及到参数的提取。
+
+- [如何进行响应数据断言？](https://www.gitlink.org.cn/zone/tester/newdetail/239)
+目前支持5种响应断言方式：eq， in， gt， lt， not。
+
+- [如何进行数据库断言？](https://www.gitlink.org.cn/zone/tester/newdetail/240)
+目前暂时支持两种数据库断言方式：len， eq。其他方式待扩展。
+
+- [如何配置邮箱通知？](https://www.gitlink.org.cn/zone/tester/newdetail/242)
+我们通过第三方模块yagmail发送邮件。
+
+- [如何配置钉钉通知？](https://www.gitlink.org.cn/zone/tester/newdetail/243)
+我们通过封装钉钉机器人发送钉钉通知。
+
+- [如何配置企业微信通知？](https://www.gitlink.org.cn/zone/tester/newdetail/241)
+我们通过封装企业微信机器人发送通知。
 
 
 
 ## 十、初始化项目可能遇到的问题
-- [测试机安装的是python3.7，但是本框架要求3.9.5，怎么办？](https://www.gitlink.org.cn/zone/tester/newdetail/212)
-- [无法安装依赖包或者安装很慢，怎么办？](https://www.gitlink.org.cn/zone/tester/newdetail/213)
+- [测试机安装的是python3.7，但是本框架要求3.9.5，怎么办？](https://www.gitlink.org.cn/zone/tester/newdetail/245)
+- [无法安装依赖包或者安装很慢，怎么办？](https://www.gitlink.org.cn/zone/tester/newdetail/244)
 

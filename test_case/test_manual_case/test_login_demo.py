@@ -34,8 +34,7 @@ for k, v in yaml_data.items():
 class TestLoginDemo:
 
     @allure.story(case_common["allure_story"])
-    @pytest.mark.test_login_demo
-    @pytest.mark.auto
+    @pytest.mark.test_demo
     @pytest.mark.parametrize("case", cases, ids=["{}".format(case["title"]) for case in cases])
     def test_login_demo_auto(self, case, extra):
         logger.info("\n-----------------------------START-开始执行用例-----------------------------\n")

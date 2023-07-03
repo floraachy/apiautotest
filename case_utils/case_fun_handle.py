@@ -8,6 +8,7 @@
 import os
 from string import Template
 import datetime
+import re
 # 第三方库导入
 from xpinyin import Pinyin  # 纯 Python 编写的中文字符串拼音转换模块，不需要依赖外部程序和词库。
 from loguru import logger
@@ -18,6 +19,7 @@ from common_utils.files_handle import get_files, get_relative_path
 from config.models import CaseFileType
 from config.settings import CASE_FILE_TYPE
 from config.path_config import DATA_DIR, CASE_TEMPLATE_DIR, AUTO_CASE_DIR
+from config.global_vars import CUSTOM_MARKERS
 from case_utils.case_data_analysis import CaseDataCheck
 
 """
@@ -138,16 +140,17 @@ def generate_cases():
     if CASE_FILE_TYPE == CaseFileType.EXCEL.value:
         # 在用例数据"DATA_DIR"目录中寻找后缀是xlsx, xls的文件
         excel_files = get_files(target=DATA_DIR, start="test_", end=".xlsx") \
-                + get_files(target=DATA_DIR, start="test_", end=".xls")
+                      + get_files(target=DATA_DIR, start="test_", end=".xls")
     elif CASE_FILE_TYPE == CaseFileType.YAML.value:
         # 在用例数据"DATA_DIR"目录中寻找后缀是yaml, yml的文件
         yaml_files = get_files(target=DATA_DIR, start="test_", end=".yaml") \
-                + get_files(target=DATA_DIR, start="test_", end=".yml")
+                     + get_files(target=DATA_DIR, start="test_", end=".yml")
     elif CASE_FILE_TYPE == CaseFileType.ALL.value:
         # 在用例数据"DATA_DIR"目录中寻找后缀是xlsx,xls, yaml, yml的文件
         excel_files = get_files(target=DATA_DIR, start="test_", end=".xlsx") + get_files(target=DATA_DIR, start="test_",
-                                                                                   end=".xls")
-        yaml_files = get_files(target=DATA_DIR, start="test_", end=".yaml") + get_files(target=DATA_DIR, start="test_", end=".yml")
+                                                                                         end=".xls")
+        yaml_files = get_files(target=DATA_DIR, start="test_", end=".yaml") + get_files(target=DATA_DIR, start="test_",
+                                                                                        end=".yml")
     else:
         logger.error(f"{CASE_FILE_TYPE}不在CaseFileType内，不能自动生成用例！")
     # 自动生成测试用例
@@ -173,9 +176,28 @@ def gen_case_file(filename, case_template_path, case_common, case_data, target_c
         如果设置为 True，则不论目录是否已存在，os.makedirs 都不会报错；如果设置为 False（默认值），则在目录已存在时会引发 FileExistsError 异常。
         """
         os.makedirs(target_case_path, exist_ok=True)
-    # 定义生成的测试用例的模板
+    # 获取用例数据中的标记
+    case_markers = case_common.get("case_markers", [])
+    logger.debug(f"从用例中拿到的标记有：{case_markers}")
+    # 先读取用例模板中每一行的内容
     with open(file=case_template_path, mode="r", encoding="utf-8") as f:
-        case_template = f.read()
+        case_template = f.readlines()
+    current_case_template = []
+    for line_num, content in enumerate(case_template):
+        current_case_template.append(content)
+        # 这里是预计往 @pytest.mark.parametrize( 这一行的上面插入标记
+        if content.strip().startswith('@pytest.mark.parametrize('):
+            # 往测试用例模板中插入自定义标记
+            for case_marker in case_markers:
+                # 获取符合要求格式的自定义标记名称，并插入到测试模板中
+                marker = is_valid_marker(case_marker)
+                if marker and isinstance(marker, str):
+                    # ！！ 注意这里的4个空格，必须要有4个空格！！
+                    current_case_template.append(f"    @pytest.mark.{marker}\n")
+                if marker and isinstance(marker, dict):
+                    for k, v in marker.items():
+                        # ！！ 注意这里的4个空格，必须要有4个空格！！
+                        current_case_template.append(f"    @pytest.mark.{k}('{v}')\n")
     # 将用例数据的名称作为测试用例文件名称, 如test_login_demo
     func_name = filename
     # 方法名test_demo的类名是TestDemo
@@ -184,11 +206,13 @@ def gen_case_file(filename, case_template_path, case_common, case_data, target_c
     """
     string.Template是将一个string设置为模板，通过替换变量的方法，最终得到想要的string。
     """
-    my_case = Template(case_template).safe_substitute(
+    current_template = ''.join(current_case_template)
+    my_case = Template(current_template).safe_substitute(
         {
             "allure_epic": case_common["allure_epic"],
             "allure_feature": case_common["allure_feature"],
             "allure_story": case_common["allure_story"],
+            "case_markers": case_common["case_markers"],
             "case_data": case_data,
             "func_title": func_name,
             "class_title": class_name,
@@ -199,3 +223,38 @@ def gen_case_file(filename, case_template_path, case_common, case_data, target_c
     # 将测试用例方法写入py文件中
     with open(os.path.join(target_case_path, func_name + '.py'), "w", encoding="utf-8") as fp:
         fp.write(my_case)
+
+
+def is_valid_marker(markers):
+    """
+    检查标记名称是否合法：仅支持非数字/下划线开头，由数字，字母，下划线组成的标记名称
+    """
+    pattern = r'^[a-zA-Z_][a-zA-Z0-9_]*$'
+    if isinstance(markers, str):
+        if re.match(pattern, markers):
+            # 将自定义标记放到CUSTOM_MARKERS， 方便后续统一注册
+            if markers not in ("skip", "skipif", "parametrize", "usefixtures", "xfail", "filterwarings"):
+                CUSTOM_MARKERS.append(markers)
+            # 返回合法有效的标记名称，用于添加到测试方法中
+            return markers
+        else:
+            logger.error(f"{markers} 格式不合法， 建议仅输入数字，字母，下划线组合，且不能以数字，下划线开头")
+            return False
+    elif isinstance(markers, dict):
+        if len(markers) == 1:
+            marker_name = list(markers.keys())[0]
+            if re.match(pattern, marker_name):
+                # 将自定义标记放到CUSTOM_MARKERS， 方便后续统一注册
+                if marker_name not in ("skip", "skipif", "parametrize", "usefixtures", "xfail", "filterwarings"):
+                    CUSTOM_MARKERS.append(markers)
+                return markers
+            else:
+                logger.error(f"{markers} 格式不合法， 建议仅输入数字，字母，下划线组合，且不能以数字，下划线开头")
+                return None
+        else:
+            logger.error(f"{markers} 格式不合法， 只能存在一对键值对")
+            return None
+
+    else:
+        logger.error(f"{markers} 仅支持字符串或者字典格式")
+        return None

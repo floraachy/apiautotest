@@ -1,14 +1,17 @@
 # 公共参数
 case_common:
-  allure_epic: GitLink接口(自动生成用例)
+  allure_epic: GitLink接口（自动生成用例）
   allure_feature: 上传文件模块
   allure_story: 上传文件
+  case_markers:
+    - gitlink
+    - upload_file
 
 # 用例数据
 case_upload_demo_01:
   feature: 上传文件
   title: 测试单文件上传
-  run: True
+  run: False
   url: /api/attachments.json
   method: POST
   headers:

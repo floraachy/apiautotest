@@ -25,7 +25,7 @@ def case_skip(request):
         pytest.skip(reason)
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def login_init():
     """
     获取登录的cookie

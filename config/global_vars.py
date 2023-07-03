@@ -4,8 +4,12 @@
 # @File    : global_vars.py
 # @Software: PyCharm
 # @Desc:
+
 # 定义一个全局变量，用于存储运行过程中相关数据
 GLOBAL_VARS = {}
+
+# 定义一个变量。存储自定义的标记markers
+CUSTOM_MARKERS = []
 
 ENV_VARS = {
     "common": {

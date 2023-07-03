@@ -15,13 +15,14 @@ from loguru import logger
 from py._xmlgen import html  # 安装pytest-html，版本最好是2.1.1
 import pytest
 # 本地应用/模块导入
-from config.global_vars import ENV_VARS, GLOBAL_VARS
+from config.global_vars import ENV_VARS, GLOBAL_VARS, CUSTOM_MARKERS
 
 
 # ------------------------------------- START: pytest钩子函数处理---------------------------------------#
 def pytest_configure(config):
     """
-    # 在测试运行前，修改Environment部分信息，配置测试报告环境信息
+    1. 在测试运行前，修改Environment部分信息，配置测试报告环境信息
+    2. 注册自定义标记
     """
     # 给环境表 添加项目名称及开始时间
     config._metadata["项目名称"] = ENV_VARS["common"]["project_name"]
@@ -29,10 +30,17 @@ def pytest_configure(config):
     # 给环境表 移除packages 及plugins
     config._metadata.pop("Packages")
     config._metadata.pop("Plugins")
-    # 向pytest的配置中添加marker
-    # TODO 暂时还没给用例添加
-    config.addinivalue_line("markers", 'smoke')
-    config.addinivalue_line("markers", '回归测试')
+    # 注册自定义标记
+    print(f"需要注册的标记：{CUSTOM_MARKERS}")
+    markers = list(set(CUSTOM_MARKERS))
+    for custom_marker in markers:
+        if isinstance(custom_marker, str):
+            config.addinivalue_line('markers', f'{custom_marker}')
+            print(f"注册了自定义标记：{custom_marker}")
+        elif isinstance(custom_marker, dict):
+            for k, v in custom_marker.items():
+                config.addinivalue_line('markers', f'{k}:{v}')
+            print(f"注册了自定义标记：{custom_marker}")
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -83,7 +91,7 @@ def pytest_terminal_summary(terminalreporter, config):
                    "-------------测试结果--------------------\n"
                    f"用例总数: {_TOTAL}\n"
                    f"跳过用例数: {_SKIPPED}\n"
-                   f"实际执行用例总数: {_TOTAL - _SKIPPED}\n\n"
+                   f"实际执行用例总数: {_PASSED + _FAILED + _XPASSED + _XFAILED}\n\n"
                    f"异常用例数: {_ERROR}\n"
                    f"失败用例数: {_FAILED}\n"
                    f"重跑的用例数(--reruns的值): {_RERUN}({reruns_value})\n"

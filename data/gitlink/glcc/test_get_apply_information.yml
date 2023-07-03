@@ -1,7 +1,11 @@
 case_common:
-  allure_epic: GitLink接口(自动生成用例)
+  allure_epic: GitLink接口（自动生成用例）
   allure_feature: 开源夏令营模块
   allure_story: 获取项目列表接口
+  case_markers:
+    - glcc
+    - get_project
+    - skip: 跳过执行该用例
 
 case_glcc_demo_01:
   feature: GLCC

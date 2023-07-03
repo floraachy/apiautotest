@@ -184,8 +184,7 @@ case_common ：公共参数
   allure_epic：用作于@allure.epic()装饰器中的内容。
   allure_feature：用作于@allure.feature()装饰器中的内容。
   allure_story：用作于@allure.story()装饰器中的内容。
-  case_markers: 给测试方法添加标记，支持自定义标记，skip, usefixtures。 格式是列表嵌套字符串或者字典。例如：['glcc', {'skip': '跳过执行该用例'}]
-                  
+  case_markers: 给测试方法添加标记，支持自定义标记，skip, usefixtures。 格式是列表嵌套字符串或者字典。例如： # ['glcc', {'skip': '跳过执行该用例'}]
 case_001：用例ID
   feature：用例所属模块， 类似于@allure.feature()。
   title：用例标题

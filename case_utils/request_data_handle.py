@@ -33,6 +33,7 @@ class RequestPreDataHandle:
         logger.debug(f"\n======================================================\n" \
                      "-------------Start：处理用例数据前--------------------\n"
                      f"用例标题(title): {type(request_data.get('title', None))} || {request_data.get('title', None)}\n" \
+                     f"用例优先级(severity): {type(request_data.get('severity', None))} || {request_data.get('severity', None)}\n" \
                      f"请求路径(url): {type(request_data.get('url', None))} || {request_data.get('url', None)}\n" \
                      f"请求方式(method): {type(request_data.get('method', None))} || {request_data.get('method', None)}\n" \
                      f"请求头(headers):   {type(request_data.get('headers', None))} || {request_data.get('headers', None)}\n" \
@@ -61,6 +62,7 @@ class RequestPreDataHandle:
         logger.debug(f"\n======================================================\n" \
                      "-------------End：处理用例数据后--------------------\n"
                      f"用例标题(title):  {type(self.request_data.get('title', None))} || {self.request_data.get('title', None)}\n" \
+                     f"用例优先级(severity): {type(self.request_data.get('severity', None))} || {self.request_data.get('severity', None)}\n" \
                      f"请求路径(url): {type(self.request_data.get('url', None))} || {self.request_data.get('url', None)}\n" \
                      f"请求方式(method): {type(self.request_data.get('method', None))} || {self.request_data.get('method', None)}\n" \
                      f"请求头(headers):   {type(self.request_data.get('headers', None))} || {self.request_data.get('headers', None)}\n" \

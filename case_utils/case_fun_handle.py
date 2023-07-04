@@ -212,7 +212,7 @@ def gen_case_file(filename, case_template_path, case_common, case_data, target_c
             "allure_epic": case_common["allure_epic"],
             "allure_feature": case_common["allure_feature"],
             "allure_story": case_common["allure_story"],
-            "case_markers": case_common["case_markers"],
+            "case_markers": case_markers,
             "case_data": case_data,
             "func_title": func_name,
             "class_title": class_name,

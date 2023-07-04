@@ -12,6 +12,7 @@ case_common:
 case_new_project_demo_01:
   feature: 新建项目
   title: 正确输入各项必填参数，新建项目成功（不校验数据库, header里面传cookies）
+  severity: critical
   run: True
   url: /api/projects.json
   method: POST
@@ -38,7 +39,7 @@ case_new_project_demo_01:
 case_new_project_demo_02:
   feature: 新建项目
   title: 正确输入各项必填参数，新建项目成功（不校验数据库，单独传cookies）
-  run: False
+  run: True
   url: /api/projects.json
   method: POST
   headers:
@@ -63,6 +64,7 @@ case_new_project_demo_02:
 case_new_project_demo_03:
   feature: 新建项目
   title: 正确输入各项必填参数，新建项目成功（校验数据库）
+  severity: normal
   run: False
   url: /api/projects.json
   method: POST
@@ -92,6 +94,7 @@ case_new_project_demo_03:
 case_new_project_demo_04:
   feature: 新建项目
   title: 正确输入各项必填参数，新建项目成功（04）
+  severity: normal
   run: False
   url: /api/projects.json
   method: POST
@@ -117,6 +120,7 @@ case_new_project_demo_04:
 case_new_project_demo_05:
   feature: 新建项目
   title: 正确输入各项必填参数，新建项目成功（05）
+  severity: normal
   run: False
   url: /api/projects.json
   method: POST

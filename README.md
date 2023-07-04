@@ -29,6 +29,7 @@
 * 框架天然支持接口动态传参、关联灵活处理
 * 支持测试数据分析，测试数据不符合规范有预警机制
 * 支持通过用例数据动态配置pytest.mark， 包括自定义标记，pytest.mark.skip以及pytest,mark.usefixtues
+* 支持利用allure设置用例优先级，运行指定优先级的用例
 * 测试数据隔离, 实现数据驱动
 * 自动生成用例代码: 测试人员在yaml/excel文件中填写好测试用例, 程序可以直接生成用例代码，纯小白也能使用
 * 多种报告随心选择：框架支持pytest-html以及Allure测试报告，可以动态配置所需报告
@@ -271,6 +272,9 @@ excel表单2名称是：示例模块
 - [如何通过用例数据动态配置pytest.mark](https://www.gitlink.org.cn/zone/tester/newdetail/257)
 在测试过程中，我们经常需要对测试用例进行分类，运行时仅执行这一类用例。为了实现这一功能，我在测试用例中引入了添加pytest的自定义标记的功能，同时扩展支持了pytest.mark.skip以及pytest,mark.usefixtues。
 注意：目前这一功能，仅支持通过YAML格式编写用例。EXCEL用例暂时不支持。
+
+- [如何设置测试用例优先级](https://www.gitlink.org.cn/zone/tester/newdetail/260)
+测试用例会分优先级， 我们可以利用allure的特性设置用例优先级，以及运行指定优先级的用例。
 
 - [如何提取响应数据作为全局变量并使用？](https://www.gitlink.org.cn/zone/tester/newdetail/237)
 在测试过程中，通常下一个接口需要用到上一个接口的响应数据，这个时候就涉及到参数的提取。

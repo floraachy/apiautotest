@@ -6,11 +6,13 @@ case_common:
   case_markers:
     - gitlink
     - upload_file
+    - skip: 跳过该用例
 
 # 用例数据
 case_upload_demo_01:
   feature: 上传文件
   title: 测试单文件上传
+  severity:
   run: False
   url: /api/attachments.json
   method: POST
@@ -31,6 +33,7 @@ case_upload_demo_01:
 case_upload_demo_02:
   feature: 上传文件
   title: 测试多文件上传(该接口不支持多文件上传，这是一个示例)
+  severity: normal
   run: False
   url: /api/attachments.json
   method: POST

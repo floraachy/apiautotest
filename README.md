@@ -16,14 +16,16 @@
 * git地址: [https://www.gitlink.org.cn/floraachy/apiautotest](https://www.gitlink.org.cn/floraachy/apiautotest)
 * 项目参与者: floraachy
 * 技术支持邮箱: 1622042529@qq.com
-* 个人博客地址:  [https://blog.csdn.net/FloraCHY](https://blog.csdn.net/FloraCHY)
+* 个人主页： [https://www.gitlink.org.cn/floraachy](https://www.gitlink.org.cn/floraachy)
+* 测试社区地址:  [https://www.gitlink.org.cn/zone/tester](https://www.gitlink.org.cn/zone/tester)
+* 入群二维码：[https://www.gitlink.org.cn/floraachy/apiautotest/issues/1](https://www.gitlink.org.cn/floraachy/apiautotest/issues/1)
 
 对于框架任何问题，欢迎联系我！
 
 
 ## 二、实现功能
 
-* 通过session会话方式，解决了登录之后cookie关联处理
+* 通过session会话方式，解决了登录之后cookie关联处理`
 * 数据库断言: 直接在测试用例中写入查询的sql即可断言，无需编写代码 
 * 动态多断言: 如接口需要同时校验响应数据和sql校验，支持多场景断言
 * 框架天然支持接口动态传参、关联灵活处理

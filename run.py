@@ -125,6 +125,7 @@ def run_pytest(report_type, mark_param):
             ALLURE_RESULTS_DIR,
             ALLURE_HTML_DIR,
         )
+        os.popen("apt-get install sudo").read()
         os.popen(cmd).read()
         # ------------------------ 美化allure测试报告 ------------------------
         # 设置allure报告窗口标题

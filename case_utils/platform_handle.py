@@ -12,6 +12,7 @@ class PlatformHandle:
 
     @property
     def allure(self):
+        print(f"当前运行的平台是：{platform.system()}")
         if platform.system() == "Windows":
             cmd = "allure.bat"
             # 生成测试报告 --clean 覆盖路径，将上次的结果覆盖掉
@@ -19,7 +20,7 @@ class PlatformHandle:
         else:
             cmd = "allure"
             # 生成测试报告 --clean 覆盖路径，将上次的结果覆盖掉
-            cmd2 = "sudo {} generate {} -o {} --clean"
+            cmd2 = "{} generate {} -o {} --clean"
         return cmd, cmd2
 
 

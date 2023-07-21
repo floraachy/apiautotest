@@ -125,6 +125,7 @@ def run_pytest(report_type, mark_param):
             ALLURE_RESULTS_DIR,
             ALLURE_HTML_DIR,
         )
+        logger.debug(f"打印cmd命令：{cmd}")
         os.popen(cmd).read()
         # # ------------------------ 美化allure测试报告 ------------------------
         # # 设置allure报告窗口标题

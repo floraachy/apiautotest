@@ -84,14 +84,14 @@ def pytest_terminal_summary(terminalreporter, config):
     _SKIPPED = len([i for i in terminalreporter.stats.get('skipped', []) if i.when != 'teardown'])
     _XPASSED = len([i for i in terminalreporter.stats.get('xpassed', []) if i.when != 'teardown'])
     _XFAILED = len([i for i in terminalreporter.stats.get('xfailed', []) if i.when != 'teardown'])
-
     _TOTAL = terminalreporter._numcollected
     _TIMES = time.time() - terminalreporter._sessionstarttime
+    _ACTUAL_RUN = _PASSED + _FAILED + _XPASSED + _XFAILED
     logger.success(f"\n======================================================\n"
                    "-------------测试结果--------------------\n"
                    f"用例总数: {_TOTAL}\n"
                    f"跳过用例数: {_SKIPPED}\n"
-                   f"实际执行用例总数: {_PASSED + _FAILED + _XPASSED + _XFAILED}\n"
+                   f"实际执行用例总数: {_ACTUAL_RUN}\n"
                    f"通过用例数: {_PASSED}\n"
                    f"异常用例数: {_ERROR}\n"
                    f"失败用例数: {_FAILED}\n"
@@ -100,7 +100,7 @@ def pytest_terminal_summary(terminalreporter, config):
                    f"预期失败的用例数: {_XFAILED}\n\n"
                    "用例执行时长: %.2f" % _TIMES + " s\n")
     try:
-        _RATE = _PASSED / (_TOTAL - _SKIPPED) * 100
+        _RATE = _PASSED / _ACTUAL_RUN * 100
         logger.success(
             f"\n用例成功率: %.2f" % _RATE + " %\n"
                                        "=====================================================")

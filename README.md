@@ -5,13 +5,13 @@
   那么本自动化框架，将为你解决这些问题。
   - 框架主要使用 python 语言编写，结合 pytest 进行二次开发，用户仅需要在 yaml 或者 excel 文件中编写测试用例， 编写成功之后，会自动生成测试用例代码，零基础代码小白，也可以操作。 
   - 如果是具备代码基础的，也可以直接通过 py 文件编写测试用例。 
-  - 使用 pytest-html / Allure 生成报告，并针对测试报告样式进行了调整，使得报告更加美观； 
+  - 使用 Allure 生成报告，并针对测试报告样式进行了调整，使得报告更加美观； 
   - 测试完成后，支持发送 企业微信通知/ 钉钉通知/ 邮箱通知，灵活配置。
 
 
 ## 一、框架介绍
 
-本框架主要是基于 Python + pytest + pytest-html/Allure + loguru  + 邮件通知/企业微信通知/钉钉通知 实现的接口自动化框架。
+本框架主要是基于 Python + pytest + Allure + loguru  + 邮件通知/企业微信通知/钉钉通知 实现的接口自动化框架。
 
 * git地址: [https://www.gitlink.org.cn/floraachy/apiautotest](https://www.gitlink.org.cn/floraachy/apiautotest)
 * 项目参与者: floraachy
@@ -34,7 +34,7 @@
 * 支持利用allure设置用例优先级，运行指定优先级的用例
 * 测试数据隔离, 实现数据驱动
 * 自动生成用例代码: 测试人员在yaml/excel文件中填写好测试用例, 程序可以直接生成用例代码，纯小白也能使用
-* 多种报告随心选择：框架支持pytest-html以及Allure测试报告，可以动态配置所需报告
+* 使用Allure生成测试报告，并对测试报告进行了定制化修改，使得测试报告更加美观
 * 日志模块: 采用loguru管理日志，可以输出更为优雅，简洁的日志
 * 钉钉、企业微信通知: 支持多种通知场景，执行成功之后，可选择发送钉钉、或者企业微信、邮箱通知
 * 执行环境一键切换，解决多环境相互影响问题
@@ -52,14 +52,13 @@
 │    ├────case_fun_handle.py   根据配置文件，从指定类型文件中读取用例数据，并调用生成用例文件方法，生成用例文件
 │    ├────data_handle.py    数据处理
 │    ├────extract_data_handle.py    提取数据的一些方法
-│    ├────get_results_handle.py   从pytest-html/allure测试报告中获取测试结果
+│    ├────get_results_handle.py   从allure测试报告中获取测试结果
 │    ├────platform_handle.py  跨平台的支持allure，用于生成allure测试报告
 │    ├────request_data_handle.py   针对用例数据进行请求前后的处理
-│    └────send_result_handle.py   根据配置文件，从html测试报告中获取测试结果，发送指定类型的通知
+│    └────send_result_handle.py   根据配置文件，发送指定类型的测试结果
 ├────common_utils/  公共的工具类
 │    ├────__init__.py
 │    ├────base_request.py   封装的requests请求
-│    ├────bs4_handle.py  bs4（BeautifulSoup4）是Python中的第三方库。可以从HTML或XML文件中提取数据的Python库。
 │    ├────dingding_handle.py   封装的钉钉机器人
 │    ├────excel_handle.py  处理excel
 │    ├────files_handle.py   处理文件相关操作
@@ -77,8 +76,6 @@
 │    │    ├────http_server.exe    http服务，用来放置在allure压缩包中，方便在不安装allure环境下打开allure报告
 │    │    ├────logo.svg   保存用来替换allure报告的logo的，在代码中无用处
 │    │    ├────双击打开Allure报告.bat    .bat文件，用来放置在allure压缩包中，方便在不安装allure环境下打开allure报告
-│    ├────pytest_html_config/
-│    │    ├────pytest_html_report.css  改变pytest-html测试报告的样式文件
 │    ├────case_template.txt  自动生成的测试用例文件模板
 │    ├────global_vars.py    保存的一些全局变量
 │    ├────path_config.py    项目路径管理
@@ -113,7 +110,6 @@
 pymysql = "*"
 loguru = "*"
 requests-toolbelt = "*"
-beautifulsoup4 = "*"
 requests = "*"
 openpyxl = "*"
 sshtunnel = "*"
@@ -123,7 +119,6 @@ click = "*"
 faker = "*"
 jsonpath = "*"
 pytest = "==6.2.5"
-pytest-html = "==2.1.1"
 pytest-rerunfailures = "*"
 allure-pytest = "==2.9.45"
 pydantic = "*"
@@ -251,11 +246,8 @@ excel表单2名称是：示例模块
 - 如果pycharm.interpreter拥有了框架所需的所有依赖包，可以通过pycharm直接在`run.py`中右键运行
 
 ## 八、查看测试报告
-### pytest-html测试报告
-如果是pytest-html生成的测试报告，直接打开`outputs`目录下的`.html`报告即可。支持通过任意浏览器打开查看
-
 ### Allure测试报告
-1. 如果是Allure生成的测试报告，支持通过pycharm，点击`outputs/report/allure_html/index.html`打开查看测试报告
+1. Allure生成的测试报告，支持通过pycharm，点击`outputs/report/allure_html/index.html`打开查看测试报告
 2. 如果不通过pycharm打开，直接通过文件夹打开，windows系统环境下，可以点击`outputs/report/allure_html/双击打开Allure报告.bat`打开查看测试报告
 
 注意：

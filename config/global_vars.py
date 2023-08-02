@@ -13,10 +13,10 @@ CUSTOM_MARKERS = []
 
 ENV_VARS = {
     "common": {
-        "report_title": "自动化测试报告",
-        "project_name": "GitLink 确实开源",
-        "tester": "陈银花",
-        "department": "开源中心"
+        "报告标题": "自动化测试报告",
+        "项目名称": "GitLink 确实开源",
+        "测试人": "陈银花",
+        "所属部门": "开源中心"
     },
     "test": {
         # 示例测试环境及示例测试账号

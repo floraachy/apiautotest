@@ -9,15 +9,17 @@
 # 标准库导入
 import json
 import os
+import http.cookiejar
 # 第三方库导入
 from requests import Response
 from loguru import logger
+import allure
 # 本地应用/模块导入
 from common_utils.files_handle import get_file_field
 from common_utils.base_request import BaseRequest
 from case_utils.data_handle import eval_data_process, data_handle
 from case_utils.extract_data_handle import json_extractor, re_extract
-from case_utils.allure_handle import allure_step
+from case_utils.allure_handle import custom_allure_step
 from config.global_vars import GLOBAL_VARS
 from config.path_config import FILES_DIR
 
@@ -105,7 +107,7 @@ class RequestPreDataHandle:
             self.request_data["url"] = full_url
         except Exception as e:
             logger.error(f"处理url报错了：{e}")
-            print(f"处理url报错了：{e}")
+            raise TypeError(f"处理url报错了：{e}")
 
     def method_handle(self):
         # TODO 暂时不需要处理，后续有需要在处理
@@ -116,19 +118,24 @@ class RequestPreDataHandle:
         requests模块中，cookies参数要求是Dict or CookieJar object
         """
         cookies = self.request_data.get("cookies", None)
-        try:
-            # 从用例数据中获取cookies， 处理cookies
-            if cookies:
-                # 通过全局变量替换cookies，得到的是一个str类型
-                cookies = data_handle(obj=cookies, source=GLOBAL_VARS)
-                if isinstance(cookies, str):
-                    # 如果是字符串类型，就转成字典
-                    self.request_data["cookies"] = json.loads(cookies)
-                else:
-                    self.request_data["cookies"] = cookies
-        except Exception as e:
-            logger.error(f"处理{cookies}报错了：{e}")
-            print(f"处理{cookies}报错了：{e}")
+
+        # 从用例数据中获取cookies， 处理cookies
+        if cookies:
+            logger.debug(f"打印一下全局变量的值：{GLOBAL_VARS}")
+            print(f"打印一下全局变量的值：{GLOBAL_VARS}")
+            # 通过全局变量替换cookies，得到的是一个str类型
+            cookies = data_handle(obj=cookies, source=GLOBAL_VARS)
+            try:
+                cookies = json.loads(cookies)
+            except Exception as e:
+                cookies = cookies
+                logger.debug(f"处理{cookies}报错了：{e}")
+                print(f"处理{cookies}报错了：{e}")
+            if isinstance(cookies, dict) or isinstance(cookies, http.cookiejar.CookieJar):
+                self.request_data["cookies"] = cookies
+            else:
+                logger.error(f"cookies参数要求是Dict or CookieJar object， 目前cookies类型是：{type(cookies)}， cookies值是：{cookies}")
+                raise TypeError(f"cookies参数要求是Dict or CookieJar object， 目前cookies类型是：{type(cookies)}， cookies值是：{cookies}")
 
     def headers_handle(self):
         """
@@ -149,7 +156,7 @@ class RequestPreDataHandle:
                         self.request_data["headers"]["cookies"] = cookies
         except Exception as e:
             logger.error(f"处理{headers}报错了：{e}")
-            print(f"处理{headers}报错了：{e}")
+            raise TypeError(f"处理{headers}报错了：{e}")
 
     def payload_handle(self):
         # 处理请求参数payload
@@ -159,7 +166,7 @@ class RequestPreDataHandle:
                 self.request_data["payload"] = data_handle(obj=payload, source=GLOBAL_VARS)
         except Exception as e:
             logger.error(f"处理{payload}报错了：{e}")
-            print(f"处理{payload}报错了：{e}")
+            raise TypeError(f"处理{payload}报错了：{e}")
 
     def files_handle(self):
         """
@@ -192,7 +199,7 @@ class RequestPreDataHandle:
                 logger.debug(f"处理完成后的file:{self.request_data['files']}")
         except Exception as e:
             logger.error(f"处理{files}报错了：{e}")
-            print(f"处理{files}报错了：{e}")
+            raise TypeError(f"处理{files}报错了：{e}")
 
     def extract_handle(self):
         # 处理后置提取参数
@@ -203,7 +210,7 @@ class RequestPreDataHandle:
                 self.request_data["extract"] = eval_data_process(extract)
         except Exception as e:
             logger.error(f"处理{extract}报错了：{e}")
-            print(f"处理{extract}报错了：{e}")
+            raise TypeError(f"处理{extract}报错了：{e}")
 
     def assert_handle(self):
         # 处理响应断言参数
@@ -214,7 +221,7 @@ class RequestPreDataHandle:
             # 由于数据库断言里面的变量需要请求响应后进行提取，因此目前不进行处理
         except Exception as e:
             logger.error(f"处理{assert_response}报错了：{e}")
-            print(f"处理{assert_response}报错了：{e}")
+            raise TypeError(f"处理{assert_response}报错了：{e}")
 
 
 # ---------------------------------------- 进行请求，请求后的参数提取处理----------------------------------------#
@@ -226,6 +233,7 @@ class RequestHandle:
     def __init__(self, case_data):
         self.case_data = case_data
 
+    @allure.step("发送请求")
     def http_request(self):
         """
         发送请求并进行后置参数提取操作
@@ -243,11 +251,11 @@ class RequestHandle:
                     f"请求cookies: {type(self.case_data.get('cookies', None))} || {self.case_data.get('cookies', None)}\n"
                     f"请求类型(request_type): {type(self.case_data.get('request_type', None))} || {self.case_data.get('request_type', None)}\n"
                     f"请求参数(payload): {type(self.case_data.get('payload', None))} || {self.case_data.get('payload', None)}\n")
-        allure_step(step_title=f"请求地址(url):{self.case_data['url']}")
-        allure_step(step_title=f"请求方式(method)：{self.case_data['method']}")
-        allure_step(step_title="请求头(headers)", content=self.case_data['headers'])
-        allure_step(step_title="请求Cookies", content=str(self.case_data['cookies']))
-        allure_step(step_title="请求参数(payload)", content=self.case_data['payload'])
+        custom_allure_step(step_title=f"请求地址(url):{self.case_data['url']}")
+        custom_allure_step(step_title=f"请求方式(method)：{self.case_data['method']}")
+        custom_allure_step(step_title="请求头(headers)", content=self.case_data['headers'])
+        custom_allure_step(step_title="请求Cookies", content=str(self.case_data['cookies']))
+        custom_allure_step(step_title="请求参数(payload)", content=self.case_data['payload'])
         # 处理请求里面的files，使得日志以及allure中写入的是文件，而不是文件二进制内容
         if self.case_data.get('files', None):
             files = self.case_data["files"]
@@ -256,21 +264,25 @@ class RequestHandle:
                     _file = os.path.join(FILES_DIR, file[1][0])
                     logger.info(
                         f"\n请求文件(files): {type(_file)} || {_file}\n")
-                    allure_step(step_title="请求文件(files)", source=_file)
+                    custom_allure_step(step_title="请求文件(files)", source=_file)
             elif isinstance(files, dict):
                 dict_values = list(files.values())[0]
                 _file = os.path.join(FILES_DIR, dict_values[0])
                 logger.info(
                     f"\n请求文件(files): {type(_file)} || {_file}\n")
-                allure_step(step_title="请求文件(files)", source=_file)
+                custom_allure_step(step_title="请求文件(files)", source=_file)
         logger.info(
             f"\n请求响应数据(response): {response.text}\n"
             f"请求响应码(code): {response.status_code}\n"
             f"响应耗时: {round(response.elapsed.total_seconds(), 2)} s || {round(response.elapsed.total_seconds() * 1000, 2)} ms\n"
             "=====================================================")
-        allure_step(step_title="请求响应数据(response)", content=response.text)
-        allure_step(step_title=f"请求响应码(code):{response.status_code}")
-        allure_step(
+        try:
+            res = response.json()
+            custom_allure_step(step_title="请求响应数据(response)", content=res)
+        except:
+            custom_allure_step(step_title="请求响应数据(response)", content=response.text)
+        custom_allure_step(step_title=f"请求响应码(code):{response.status_code}")
+        custom_allure_step(
             step_title=f"响应耗时:{round(response.elapsed.total_seconds(), 2)} s || {round(response.elapsed.total_seconds() * 1000, 2)} ms")
         return response
 

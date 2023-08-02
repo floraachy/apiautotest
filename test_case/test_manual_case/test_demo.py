@@ -11,7 +11,7 @@ import pytest
 from loguru import logger
 from pytest_html import extras  # 往pytest-html报告中填写额外的内容
 import allure
-from case_utils.allure_handle import allure_title, allure_step
+from case_utils.allure_handle import allure_title, custom_allure_step
 
 # 读取用例数据
 cases = [{"title": "demo用例01", "severity": "blocker1", "user": "flora", "age": 17, "run": True},
@@ -29,6 +29,6 @@ def test_demo(case, extra):
     # 将用例数据显示在pytest-html报告中
     extra.append(extras.json(case, name="用例数据"))
     # 在allure报告中显示请求的用例数据
-    allure_step(step_title="用例数据", content=f"{case}")
+    custom_allure_step(step_title="用例数据", content=f"{case}")
     assert case["user"] == "flora"
     logger.info("\n-----------------------------END-用例执行结束-----------------------------\n")

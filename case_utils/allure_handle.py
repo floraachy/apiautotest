@@ -5,9 +5,12 @@
 # @Software: PyCharm
 # @Desc: 
 
+# 标准库导入
 import json
-import allure
 import os
+# 第三方库导入
+import allure
+# 本地应用/模块导入
 from config.models import AllureAttachmentType
 
 
@@ -17,7 +20,7 @@ def allure_title(title: str) -> None:
     allure.dynamic.title(title)
 
 
-def allure_step(step_title: str, content: str = None, source=None) -> None:
+def custom_allure_step(step_title: str, content: str = None, source=None) -> None:
     """
     allure.step()添加测试用例步骤
     :param step_title: 步骤及附件名称

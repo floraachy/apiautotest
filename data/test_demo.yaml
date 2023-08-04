@@ -1,0 +1,29 @@
+# 公共参数
+case_common:
+  allure_epic: 调试用例
+  allure_feature: Debug模块
+  allure_story: Debug接口
+  case_markers:
+    - debug
+
+# 用例数据
+case_demo_01:
+  feature: debug
+  title: 这是一条用于调试功能的用例
+  run: True
+  severity: normal
+  url: /api/accounts/${FakerData.generate_time('%Y-%m-%d')}/login.json
+  method: POST
+  headers: {"Content-Type": "application/json; charset=utf-8;"}
+  cookies:
+  request_type: json
+  payload:
+    startTime: ${FakerData.generate_time('%Y-%m-%d')}
+    common2: ${faker.name()}
+    url: /api/accounts/${FakerData.generate_time('%Y-%m-%d')}/login.json
+  files:
+  extract:
+  assert_response:
+     eq:
+         http_code: 200
+  assert_sql:

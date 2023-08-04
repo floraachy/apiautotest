@@ -177,7 +177,7 @@ def data_handle(obj, source):
                     # 调用FakerData类的方法获取数据
                     obj = obj.replace('${%s}' % func, str(getattr(FakerData(), func_name)()))
             # 处理其他Python表达式，例如：${1+1}
-            obj = obj.replace('${%s}' % func, func)
+            obj = obj.replace('${%s}' % func, eval_data_process(func))
             obj = eval_data_process(obj)
             return obj
         return eval_data_process(obj)

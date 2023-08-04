@@ -4,7 +4,6 @@ case_common:
   allure_feature: Debug模块
   allure_story: Debug接口
   case_markers:
-    - debug
 
 # 用例数据
 case_demo_01:
@@ -21,6 +20,10 @@ case_demo_01:
     startTime: ${FakerData.generate_time('%Y-%m-%d')}
     common2: ${faker.name()}
     url: /api/accounts/${FakerData.generate_time('%Y-%m-%d')}/login.json
+    tripFragments:
+        - startTime: ${FakerData.generate_time('%Y-%m-%d')}
+        - common2: ${faker.name()}
+        - url: /api/accounts/${FakerData.generate_time('%Y-%m-%d')}/login.json
   files:
   extract:
   assert_response:

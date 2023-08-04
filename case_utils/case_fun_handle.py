@@ -177,8 +177,8 @@ def gen_case_file(filename, case_template_path, case_common, case_data, target_c
         """
         os.makedirs(target_case_path, exist_ok=True)
     # 获取用例数据中的标记
-    case_markers = case_common.get("case_markers", [])
-    logger.debug(f"从用例中拿到的标记有：{case_markers}")
+    case_markers = case_common.get("case_markers", []) or []
+    logger.debug(f"从用例中拿到的标记有：{case_markers}， {type(case_markers)}")
     # 先读取用例模板中每一行的内容
     with open(file=case_template_path, mode="r", encoding="utf-8") as f:
         case_template = f.readlines()
@@ -188,6 +188,7 @@ def gen_case_file(filename, case_template_path, case_common, case_data, target_c
         # 这里是预计往 @pytest.mark.parametrize( 这一行的上面插入标记
         if content.strip().startswith('@pytest.mark.parametrize('):
             # 往测试用例模板中插入自定义标记
+            logger.debug(f"获取到的case_markers：{case_markers}， {type(case_markers)}")
             for case_marker in case_markers:
                 # 获取符合要求格式的自定义标记名称，并插入到测试模板中
                 marker = is_valid_marker(case_marker)

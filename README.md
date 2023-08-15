@@ -11,7 +11,7 @@
 
 ## 一、框架介绍
 
-本框架主要是基于 Python + pytest + Allure + loguru  + 邮件通知/企业微信通知/钉钉通知 实现的接口自动化框架。
+本框架主要是基于 Python + Pytest + Allure + Loguru  + 邮件通知/企业微信通知/钉钉通知 实现的接口自动化框架。
 
 * git地址: [https://www.gitlink.org.cn/floraachy/apiautotest](https://www.gitlink.org.cn/floraachy/apiautotest)
 * 项目参与者: floraachy
@@ -193,8 +193,9 @@ case_common ：公共参数
   allure_feature：用作于@allure.feature()装饰器中的内容。
   allure_story：用作于@allure.story()装饰器中的内容。
   case_markers: 给测试方法添加标记，支持自定义标记，skip, usefixtures。 格式是列表嵌套字符串或者字典。例如： # ['glcc', {'skip': '跳过执行该用例'}]
-case_001：用例ID
-  feature：用例所属模块， 类似于@allure.feature()。
+case_info: 具体的用例数据，是以列表的形式进行管理
+-
+  id：用例id
   title：用例标题
   run：是否执行用例，为空或者True都会执行，为False则不执行。
   url：请求路径（可填写全路径 或者 资源路径）。通常我们填写资源路径。在用例执行前，会针对路径进行处理。具体可见case_utils.request_data_handle.py.RequestPreDataHandle.url_handle。注：请求路径=基准路径（host/base_url）+资源路径(url)。

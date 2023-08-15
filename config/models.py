@@ -76,7 +76,7 @@ class TestCaseEnum(Enum):
     """
     测试用例中字段
     """
-    FEATURE = ("feature", False)
+    ID = ("id", True)
     TITLE = ("title", True)
     URL = ("url", True)
     SEVERITY = ("severity", False)
@@ -96,7 +96,7 @@ class TestCase(BaseModel):
     """
     测试用例各数据格式要求
     """
-    feature: Union[None, Text] = None
+    id: Union[None, Text]
     title: Text
     severity: Text
     url: Text

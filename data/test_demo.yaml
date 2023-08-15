@@ -6,8 +6,9 @@ case_common:
   case_markers:
 
 # 用例数据
-case_demo_01:
-  feature: debug
+case_info:
+-
+  id: case_demo_01
   title: 这是一条用于调试功能的用例
   run: True
   severity: normal

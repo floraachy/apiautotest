@@ -57,8 +57,7 @@ def handle_excel_data(file):
                     "allure_story": v["sheet_name"]
                 }
             # 处理excel用例数据
-            for case in v["data"]:
-                excel_case[case["id"]] = case
+            excel_case["case_info"] = v["data"]
             # 检查用例数据是否符合规范
             tested_case = CaseDataCheck().case_process(excel_case)
             # 生成测试方法

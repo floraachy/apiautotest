@@ -9,8 +9,9 @@ case_common:
     - usefixtures: login_init
 
 # 用例数据
-case_new_project_demo_01:
-  feature: 新建项目
+case_info:
+-
+  id: case_new_project_01
   title: 正确输入各项必填参数，新建项目成功（不校验数据库, header里面传cookies）
   severity: critical
   run: True
@@ -36,8 +37,8 @@ case_new_project_demo_01:
       $.login: ${login}
   assert_sql:
 
-case_new_project_demo_02:
-  feature: 新建项目
+-
+  id: case_new_project_02
   title: 正确输入各项必填参数，新建项目成功（不校验数据库，单独传cookies）
   run: True
   url: /api/projects.json
@@ -61,8 +62,8 @@ case_new_project_demo_02:
       $.login: ${login}
   assert_sql:
 
-case_new_project_demo_03:
-  feature: 新建项目
+-
+  id: case_new_project_03
   title: 正确输入各项必填参数，新建项目成功（校验数据库）
   severity: normal
   run: False
@@ -91,8 +92,8 @@ case_new_project_demo_03:
       $.name: ${project_name}
       $.identifier: ${project_identifier}
 
-case_new_project_demo_04:
-  feature: 新建项目
+-
+  id: case_new_project_04
   title: 正确输入各项必填参数，新建项目成功（04）
   severity: normal
   run: False
@@ -117,8 +118,8 @@ case_new_project_demo_04:
       $.login: ${login}
   assert_sql:
 
-case_new_project_demo_05:
-  feature: 新建项目
+-
+  id: case_new_project_05
   title: 正确输入各项必填参数，新建项目成功（05）
   severity: normal
   run: False

@@ -9,8 +9,9 @@ case_common:
    - skip: 跳过执行该用例
 
 # 用例数据
-case_login_demo_01:
-  feature: 登录
+case_info:
+-
+  id: case_login_01
   title: 用户名密码正确，登录成功(不校验数据库)
   run: True
   severity: normal
@@ -39,8 +40,8 @@ case_login_demo_01:
       $.user_id: 85390
   assert_sql:
 
-case_login_demo_02:
-  feature: 登录
+-
+  id: case_login_02
   title: 用户名密码正确，登录成功（校验数据库）
   run: False
   severity: minor
@@ -71,8 +72,9 @@ case_login_demo_02:
     eq:
       sql: select count(*) from tokens where user_id=${user_id};
       len: 1
-case_login_demo_03:
-  feature: 登录
+
+-
+  id: case_login_03
   title: 用户名正确，密码错误，登录失败
   severity: critical
   run: False

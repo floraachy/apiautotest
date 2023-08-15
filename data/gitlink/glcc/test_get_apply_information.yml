@@ -7,8 +7,9 @@ case_common:
     - get_project
     - skip: 跳过执行该用例
 
-case_glcc_demo_01:
-  feature: GLCC
+case_info:
+-
+  id: case_glcc_demo_01
   title: 获取已报名成功的项目数据
   severity: normal
   run: True
@@ -26,8 +27,8 @@ case_glcc_demo_01:
       $.message: success
   assert_sql:
 
-case_glcc_demo_02:
-  feature: GLCC
+-
+  id: case_glcc_demo_02
   title: 获取已报名成功的课题数据
   severity: normal
   run: True

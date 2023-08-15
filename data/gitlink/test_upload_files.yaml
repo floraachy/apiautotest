@@ -9,8 +9,9 @@ case_common:
     - skip: 跳过该用例
 
 # 用例数据
-case_upload_demo_01:
-  feature: 上传文件
+case_info:
+-
+  id: case_upload_file_01
   title: 测试单文件上传
   severity:
   run: False
@@ -30,8 +31,8 @@ case_upload_demo_01:
       http_code: 200
   assert_sql:
 
-case_upload_demo_02:
-  feature: 上传文件
+-
+  id: case_upload_file_02
   title: 测试多文件上传(该接口不支持多文件上传，这是一个示例)
   severity: normal
   run: False

@@ -24,10 +24,7 @@ from case_utils.allure_handle import allure_title
 # 读取用例数据
 yaml_data = YamlHandle(filename=os.path.join(DATA_DIR, "gitlink", "login_demo.yaml")).read_yaml
 case_common = yaml_data["case_common"]
-cases = []
-for k, v in yaml_data.items():
-    if k != "case_common":
-        cases.append(v)
+cases = yaml_data["case_info"]
 
 
 @allure.epic(case_common["allure_epic"])

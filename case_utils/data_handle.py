@@ -179,7 +179,6 @@ def data_handle(obj, source):
             # 处理其他Python表达式，例如：${1+1}
             obj = obj.replace('${%s}' % func, eval_data_process(func))
             obj = eval_data_process(obj)
-            return obj
         return eval_data_process(obj)
     elif isinstance(obj, list):
         for index, item in enumerate(obj):

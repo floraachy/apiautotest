@@ -17,7 +17,7 @@ import allure
 # 本地应用/模块导入
 from common_utils.files_handle import get_file_field
 from common_utils.base_request import BaseRequest
-from case_utils.data_handle import eval_data_process, data_handle
+from case_utils.data_handle import data_handle
 from case_utils.extract_data_handle import json_extractor, re_extract
 from case_utils.allure_handle import custom_allure_step
 from config.global_vars import GLOBAL_VARS
@@ -59,7 +59,6 @@ class RequestPreDataHandle:
         self.cookies_handle()
         self.payload_handle()
         self.files_handle()
-        self.extract_handle()
         self.assert_handle()
         logger.debug(f"\n======================================================\n" \
                      "-------------End：处理用例数据后--------------------\n"
@@ -200,17 +199,6 @@ class RequestPreDataHandle:
         except Exception as e:
             logger.error(f"处理{files}报错了：{e}")
             raise TypeError(f"处理{files}报错了：{e}")
-
-    def extract_handle(self):
-        # 处理后置提取参数
-        extract = self.request_data.get("extract", None)
-        try:
-            if extract:
-                # 仅提取参数中的python表达式，不需要进行数据替换
-                self.request_data["extract"] = eval_data_process(extract)
-        except Exception as e:
-            logger.error(f"处理{extract}报错了：{e}")
-            raise TypeError(f"处理{extract}报错了：{e}")
 
     def assert_handle(self):
         # 处理响应断言参数

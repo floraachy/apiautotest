@@ -170,7 +170,6 @@ class DataHandle:
         # 获取FakerData类所有自定义方法
         self.method_list = [method for method in dir(FakerData) if
                             callable(getattr(FakerData, method)) and not method.startswith("__")]
-        self.should_print = True
 
     # 将"[1,2,3]" 或者"{'k':'v'}" -> [1,2,3], {'k':'v'}
     def eval_data(self, data):
@@ -214,7 +213,7 @@ class DataHandle:
         func = {}
         keys = {}
         if not source or not isinstance(source, dict):
-            print("source为空或者source不是字典格式，都将认为是：{}")
+            # print("source为空或者source不是字典格式，都将认为是：{}")
             source = {}
         # 如果进来的是字符串，先将各种类型的表达式处理完
         if isinstance(obj, str):
@@ -281,6 +280,8 @@ class DataHandle:
                 pass
 
         return obj
+
+
 
 
 # 声明data_handle方法，这样外部就可以直接import data_handle来使用了

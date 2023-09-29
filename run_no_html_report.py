@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-# @Version: Python 3.9
-# @Time    : 2023/1/9 17:09
-# @Author  : chenyinhua
-# @File    : run.py
+# @Time    : 2023/9/29 9:04
+# @Author  : Flora.Chen
+# @File    : run_no_html_report.py
 # @Software: PyCharm
 # @Desc: 框架主入口
+
 """
 说明：
 1、用例创建原则，测试文件名必须以“test”开头，测试函数必须以“test”开头。
@@ -41,14 +41,9 @@ from loguru import logger
 import click
 # 本地应用/模块导入
 from case_utils.case_fun_handle import generate_cases
-from case_utils.platform_handle import PlatformHandle
-from case_utils.send_result_handle import send_result
-from case_utils.allure_handle import AllureReportBeautiful
-from config.path_config import REPORT_DIR, LOG_DIR, AUTO_CASE_DIR, CONF_DIR, ALLURE_RESULTS_DIR, \
-    ALLURE_HTML_DIR
+from config.path_config import LOG_DIR, AUTO_CASE_DIR, ALLURE_RESULTS_DIR
 from config.settings import LOG_LEVEL
 from config.global_vars import GLOBAL_VARS, ENV_VARS
-from common_utils.files_handle import zip_file, copy_file
 
 
 def capture_all_logs(level=LOG_LEVEL):
@@ -113,43 +108,6 @@ def run_pytest(mark_param):
     )
     pytest.main(args=arg_list)
 
-    # ------------------------ 使用allure生成测试报告 ------------------------
-    allure_cmd = PlatformHandle().allure
-    os.popen(allure_cmd).read()
-    # ------------------------ 美化allure测试报告 ------------------------
-    # 设置allure报告窗口标题
-    AllureReportBeautiful(allure_html_path=ALLURE_HTML_DIR).set_windows_title(
-        new_title=ENV_VARS["common"]["项目名称"]
-    )
-    # 设置allure报告名称
-    AllureReportBeautiful(allure_html_path=ALLURE_HTML_DIR).set_report_name(
-        new_name=ENV_VARS["common"]["报告标题"]
-    )
-    # 往allure测试报告中写入环境配置相关信息
-    env_info = ENV_VARS["common"]
-    env_info["运行环境"] = GLOBAL_VARS.get("host", "")
-    AllureReportBeautiful(allure_html_path=ALLURE_HTML_DIR).set_report_env_on_html(
-        env_info=env_info
-    )
-    # 复制http_server.exe以及双击查看报告.bat文件到allure-html根目录下，用于支撑电脑在未安装allure服务的情况下打开allure-html报告
-    # 注意：ZIP文件的名称包含某些特殊字符，会导致无法使用.bat文件打开allure-html报告， 例如空格，/ 等
-    allure_config_path = os.path.join(CONF_DIR, "allure_config")
-
-    copy_file(src_file_path=os.path.join(allure_config_path,
-                                         [i for i in os.listdir(allure_config_path) if i.endswith(".exe")][0]),
-              dest_dir_path=ALLURE_HTML_DIR)
-    copy_file(src_file_path=os.path.join(allure_config_path,
-                                         [i for i in os.listdir(allure_config_path) if i.endswith(".bat")][0]),
-              dest_dir_path=ALLURE_HTML_DIR)
-
-    # ------------------------ allure测试报告生成完毕，压缩allure测试报告为ZIP文件 ------------------------
-    # report_path以及attachment_path，后面发送测试结果需要用到
-    report_path = ALLURE_HTML_DIR
-    attachment_path = os.path.join(REPORT_DIR, f'autotest_{str(current_time)}.zip')
-    # 压缩allure-html报告为一个压缩文件zip
-    zip_file(in_path=report_path, out_path=attachment_path)
-    return report_path, attachment_path
-
 
 # 主函数
 @click.command()
@@ -170,11 +128,7 @@ def run(env, m):
         auto_generate_test_cases()
 
         # ------------------------ pytest执行测试用例 ------------------------
-        report_path, attachment_path = run_pytest(mark_param=m)
-
-        # ------------------------ 发送测试结果 ------------------------
-        # 发送通知
-        send_result(report_path, attachment_path=attachment_path)
+        run_pytest(mark_param=m)
 
     except Exception as e:
         raise e
